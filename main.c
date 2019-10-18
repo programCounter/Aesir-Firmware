@@ -92,6 +92,7 @@
 #include "BLE_CUS.h"
 #include "bsi_config.h"
 #include "bsi_qspi.h"
+//#include "ble_cus.h"
 
 //#define QSPI_STD_CMD_WRSR   0x01
 //#define QSPI_STD_CMD_RSTEN  0x66
@@ -390,7 +391,6 @@ static void services_init(void)
     //Sets the read and write permisions for the custom service.
     //BLE_GAP_CONN_SEC_MODE_SET_OPEN(&cus_init.custom_value_char_attr_md.read_perm);
     //BLE_GAP_CONN_SEC_MODE_SET_OPEN(&cus_init.custom_value_char_attr_md.write_perm);
-
 }
 
 
@@ -558,13 +558,26 @@ static void on_adv_evt(ble_adv_evt_t ble_adv_evt)
  */
 static void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context)
 {
+
+    ble_cus_t * p_cus = (ble_cus_t *) p_context;
+
     ret_code_t err_code = NRF_SUCCESS;
 
     switch (p_ble_evt->header.evt_id)
     {
+        case BLE_GATTS_EVT_WRITE: //from BLE_CUS.c
+            if (p_cus == NULL || p_ble_evt == NULL)
+            {
+                return;
+            }
+           on_write(p_cus, p_ble_evt);
+           break;
+
         case BLE_GAP_EVT_DISCONNECTED:
             NRF_LOG_INFO("Disconnected.");
             // LED indication will be changed when advertising starts.
+
+            on_disconnect(p_cus, p_ble_evt); //from BLE_CUS.c
             break;
 
         case BLE_GAP_EVT_CONNECTED:
@@ -574,6 +587,9 @@ static void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context)
             m_conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
             err_code = nrf_ble_qwr_conn_handle_assign(&m_qwr, m_conn_handle);
             APP_ERROR_CHECK(err_code);
+
+
+            on_connect(p_cus, p_ble_evt);//from BLE_CUS.c
             break;
 
         case BLE_GAP_EVT_PHY_UPDATE_REQUEST:
@@ -611,6 +627,35 @@ static void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context)
 }
 
 
+//void ble_cus_on_ble_evt( ble_evt_t const * p_ble_evt, void * p_context)
+//{
+//    ble_cus_t * p_cus = (ble_cus_t *) p_context;
+
+//    if (p_cus == NULL || p_ble_evt == NULL)
+//    {
+//        return;
+//    }
+    
+//    switch (p_ble_evt->header.evt_id)
+//    {
+//       case BLE_GAP_EVT_CONNECTED:
+//            on_connect(p_cus, p_ble_evt);
+//            break;
+
+//       case BLE_GAP_EVT_DISCONNECTED:
+//            on_disconnect(p_cus, p_ble_evt);
+//            break;
+       
+//       case BLE_GATTS_EVT_WRITE:
+//           on_write(p_cus, p_ble_evt);
+//           break;
+//
+//       default:
+//            // No implementation needed.
+//            break;
+//    }
+//}
+
 /**@brief Function for initializing the BLE stack.
  *
  * @details Initializes the SoftDevice and the BLE event interrupt.
@@ -633,7 +678,10 @@ static void ble_stack_init(void)
     APP_ERROR_CHECK(err_code);
 
     // Register a handler for BLE events.
-    NRF_SDH_BLE_OBSERVER(m_ble_observer, APP_BLE_OBSERVER_PRIO, ble_evt_handler, NULL);
+    NRF_SDH_BLE_OBSERVER(m_ble_observer, APP_BLE_OBSERVER_PRIO, ble_evt_handler, &m_ble_observer);
+    //NRF_SDH_BLE_OBSERVER(_name ## _obs,                                                                 \
+//                     BLE_HRS_BLE_OBSERVER_PRIO,                                                     \
+//                     ble_cus_on_ble_evt, &_name)
 }
 
 

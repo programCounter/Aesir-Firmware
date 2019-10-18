@@ -1,5 +1,5 @@
 Output/ble_app_template_pca10056_s140\ Debug/Obj/security_manager.o: \
- C:\Users\demeg\online.camosun.ca\Project\ Term\ 2019F\ -\ Documents\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\components\ble\peer_manager\security_manager.c \
+ C:\dev\nRF5_SDK_15.3.0\components\ble\peer_manager\security_manager.c \
  ../../../../../../components/libraries/util/sdk_common.h \
  C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.18/include/stdint.h \
  C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.18/include/stdbool.h \
@@ -29,7 +29,7 @@ Output/ble_app_template_pca10056_s140\ Debug/Obj/security_manager.o: \
  ../../../../../../components/softdevice/s140/headers/nrf_svc.h \
  ../../../../../../components/libraries/util/sdk_macros.h \
  ../../../../../../components/libraries/util/nrf_assert.h \
- C:\Users\demeg\online.camosun.ca\Project\ Term\ 2019F\ -\ Documents\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\components\ble\peer_manager\security_manager.h \
+ C:\dev\nRF5_SDK_15.3.0\components\ble\peer_manager\security_manager.h \
  ../../../../../../components/libraries/util/sdk_errors.h \
  ../../../../../../components/softdevice/s140/headers/ble.h \
  ../../../../../../components/softdevice/s140/headers/nrf_svc.h \
@@ -44,7 +44,7 @@ Output/ble_app_template_pca10056_s140\ Debug/Obj/security_manager.o: \
  ../../../../../../components/softdevice/s140/headers/ble_gattc.h \
  ../../../../../../components/softdevice/s140/headers/ble_gatts.h \
  ../../../../../../components/softdevice/s140/headers/ble_gap.h \
- C:\Users\demeg\online.camosun.ca\Project\ Term\ 2019F\ -\ Documents\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\components\ble\peer_manager\peer_manager_types.h \
+ C:\dev\nRF5_SDK_15.3.0\components\ble\peer_manager\peer_manager_types.h \
  ../../../../../../components/softdevice/s140/headers/ble_hci.h \
  ../../../../../../components/ble/common/ble_gatt_db.h \
  ../../../../../../components/softdevice/s140/headers/ble_gattc.h \
@@ -56,13 +56,13 @@ Output/ble_app_template_pca10056_s140\ Debug/Obj/security_manager.o: \
  ../../../../../../components/libraries/util/app_error.h \
  C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.18/include/stdio.h \
  ../../../../../../components/libraries/util/app_error_weak.h \
- C:\Users\demeg\online.camosun.ca\Project\ Term\ 2019F\ -\ Documents\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\components\ble\peer_manager\security_dispatcher.h \
+ C:\dev\nRF5_SDK_15.3.0\components\ble\peer_manager\security_dispatcher.h \
  ../../../../../../components/softdevice/s140/headers/ble_err.h \
- C:\Users\demeg\online.camosun.ca\Project\ Term\ 2019F\ -\ Documents\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\components\ble\peer_manager\peer_database.h \
- C:\Users\demeg\online.camosun.ca\Project\ Term\ 2019F\ -\ Documents\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\components\ble\peer_manager\peer_manager_internal.h \
+ C:\dev\nRF5_SDK_15.3.0\components\ble\peer_manager\peer_database.h \
+ C:\dev\nRF5_SDK_15.3.0\components\ble\peer_manager\peer_manager_internal.h \
  ../../../../../../components/ble/common/ble_conn_state.h \
  ../../../../../../components/libraries/atomic/nrf_atomic.h \
- C:\Users\demeg\online.camosun.ca\Project\ Term\ 2019F\ -\ Documents\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\components\ble\peer_manager\id_manager.h \
+ C:\dev\nRF5_SDK_15.3.0\components\ble\peer_manager\id_manager.h \
  ../../../../../../components/libraries/log/nrf_log.h \
  ../../../../../../components/libraries/experimental_section_vars/nrf_section.h \
  ../../../../../../components/libraries/util/nordic_common.h \

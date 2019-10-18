@@ -1,5 +1,5 @@
 Output/ble_app_template_pca10056_s140\ Debug/Obj/nrf_atflags.o: \
- C:\Users\demeg\online.camosun.ca\Project\ Term\ 2019F\ -\ Documents\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\components\libraries\atomic_flags\nrf_atflags.c \
+ C:\dev\nRF5_SDK_15.3.0\components\libraries\atomic_flags\nrf_atflags.c \
  ../../../../../../modules/nrfx/mdk/nrf.h \
  ../../../../../../modules/nrfx/mdk/nrf52840.h \
  ../../../../../../components/toolchain/cmsis/include/core_cm4.h \
@@ -30,4 +30,4 @@ Output/ble_app_template_pca10056_s140\ Debug/Obj/nrf_atflags.o: \
  ../../../../../../components/softdevice/s140/headers/nrf_svc.h \
  ../../../../../../components/libraries/util/sdk_macros.h \
  ../../../../../../components/libraries/util/nrf_assert.h \
- C:\Users\demeg\online.camosun.ca\Project\ Term\ 2019F\ -\ Documents\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\components\libraries\atomic_flags\nrf_atflags.h
+ C:\dev\nRF5_SDK_15.3.0\components\libraries\atomic_flags\nrf_atflags.h

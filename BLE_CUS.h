@@ -28,10 +28,10 @@ This code is based on the following nordic tutorial
  */
 #define BLE_CUS_DEF(_name)                                                                          \
 static ble_cus_t _name;                                                                             \
-NRF_SDH_BLE_OBSERVER(_name ## _obs,                                                                 \
-                     BLE_HRS_BLE_OBSERVER_PRIO,                                                     \
-                     ble_cus_on_ble_evt, &_name)                  
-
+//NRF_SDH_BLE_OBSERVER(_name ## _obs,                                                                 \
+//                     BLE_HRS_BLE_OBSERVER_PRIO,                                                     \
+//                     ble_cus_on_ble_evt, &_name)                  
+    
 
 /**@brief Custom Service init structure. This contains all options and data needed for
  *        initialization of the service.*/
@@ -76,8 +76,8 @@ void ble_cus_on_ble_evt( ble_evt_t const * p_ble_evt, void * p_context);
 
 uint32_t ble_cus_init(ble_cus_t * p_cus, const ble_cus_init_t * p_cus_init);
 
-static void on_write(ble_cus_t * p_cus, ble_evt_t const * p_ble_evt);
+void on_write(ble_cus_t * p_cus, ble_evt_t const * p_ble_evt);
 
-static void on_disconnect(ble_cus_t * p_cus, ble_evt_t const * p_ble_evt);
+void on_disconnect(ble_cus_t * p_cus, ble_evt_t const * p_ble_evt);
 
-static void on_connect(ble_cus_t * p_cus, ble_evt_t const * p_ble_evt);
+void on_connect(ble_cus_t * p_cus, ble_evt_t const * p_ble_evt);

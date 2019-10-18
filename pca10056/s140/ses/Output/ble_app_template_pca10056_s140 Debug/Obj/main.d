@@ -1,5 +1,5 @@
 Output/ble_app_template_pca10056_s140\ Debug/Obj/main.o: \
- C:\Users\demeg\online.camosun.ca\Project\ Term\ 2019F\ -\ Documents\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\examples\ble_peripheral\BSI_10056\main.c \
+ C:\dev\nRF5_SDK_15.3.0\examples\ble_peripheral\BSI_10056\main.c \
  C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.18/include/stdbool.h \
  C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.18/include/stdint.h \
  C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.18/include/string.h \
@@ -122,6 +122,6 @@ Output/ble_app_template_pca10056_s140\ Debug/Obj/main.o: \
  ../../../../../../modules/nrfx/drivers/include/nrfx_qspi.h \
  ../../../../../../modules/nrfx/hal/nrf_qspi.h \
  ../../../../../../components/libraries/delay/nrf_delay.h \
- C:\Users\demeg\online.camosun.ca\Project\ Term\ 2019F\ -\ Documents\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\examples\ble_peripheral\BSI_10056\BLE_CUS.h \
- C:\Users\demeg\online.camosun.ca\Project\ Term\ 2019F\ -\ Documents\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\examples\ble_peripheral\BSI_10056\bsi_config.h \
- C:\Users\demeg\online.camosun.ca\Project\ Term\ 2019F\ -\ Documents\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\examples\ble_peripheral\BSI_10056\bsi_qspi.h
+ C:\dev\nRF5_SDK_15.3.0\examples\ble_peripheral\BSI_10056\BLE_CUS.h \
+ C:\dev\nRF5_SDK_15.3.0\examples\ble_peripheral\BSI_10056\bsi_config.h \
+ C:\dev\nRF5_SDK_15.3.0\examples\ble_peripheral\BSI_10056\bsi_qspi.h

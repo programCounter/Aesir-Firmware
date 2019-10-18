@@ -1,5 +1,5 @@
 Output/ble_app_template_pca10056_s140\ Debug/Obj/fds.o: \
- C:\Users\demeg\online.camosun.ca\Project\ Term\ 2019F\ -\ Documents\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\components\libraries\fds\fds.c \
+ C:\dev\nRF5_SDK_15.3.0\components\libraries\fds\fds.c \
  ../../../../../../components/libraries/util/sdk_common.h \
  C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.18/include/stdint.h \
  C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.18/include/stdbool.h \
@@ -29,7 +29,7 @@ Output/ble_app_template_pca10056_s140\ Debug/Obj/fds.o: \
  ../../../../../../components/softdevice/s140/headers/nrf_svc.h \
  ../../../../../../components/libraries/util/sdk_macros.h \
  ../../../../../../components/libraries/util/nrf_assert.h \
- C:\Users\demeg\online.camosun.ca\Project\ Term\ 2019F\ -\ Documents\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\components\libraries\fds\fds.h \
+ C:\dev\nRF5_SDK_15.3.0\components\libraries\fds\fds.h \
  ../../../../../../components/libraries/util/sdk_errors.h \
  ../../../../../../components/libraries/util/app_util_platform.h \
  ../../../../../../components/softdevice/s140/headers/nrf_soc.h \
@@ -40,7 +40,7 @@ Output/ble_app_template_pca10056_s140\ Debug/Obj/fds.o: \
  ../../../../../../components/libraries/util/app_error.h \
  C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.18/include/stdio.h \
  ../../../../../../components/libraries/util/app_error_weak.h \
- C:\Users\demeg\online.camosun.ca\Project\ Term\ 2019F\ -\ Documents\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\components\libraries\fds\fds_internal_defs.h \
+ C:\dev\nRF5_SDK_15.3.0\components\libraries\fds\fds_internal_defs.h \
  ../../../../../../components/libraries/atomic/nrf_atomic.h \
  ../../../../../../components/libraries/atomic_fifo/nrf_atfifo.h \
  ../../../../../../components/libraries/util/nordic_common.h \

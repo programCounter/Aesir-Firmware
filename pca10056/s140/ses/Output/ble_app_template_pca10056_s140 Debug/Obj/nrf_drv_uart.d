@@ -1,6 +1,6 @@
 Output/ble_app_template_pca10056_s140\ Debug/Obj/nrf_drv_uart.o: \
- C:\Users\demeg\online.camosun.ca\Project\ Term\ 2019F\ -\ Documents\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\integration\nrfx\legacy\nrf_drv_uart.c \
- C:\Users\demeg\online.camosun.ca\Project\ Term\ 2019F\ -\ Documents\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\integration\nrfx\legacy\nrf_drv_uart.h \
+ C:\dev\nRF5_SDK_15.3.0\integration\nrfx\legacy\nrf_drv_uart.c \
+ C:\dev\nRF5_SDK_15.3.0\integration\nrfx\legacy\nrf_drv_uart.h \
  ../../../../../../modules/nrfx/nrfx.h \
  ../../../../../../integration/nrfx/nrfx_config.h ../config/sdk_config.h \
  ../../../../../../modules/nrfx/drivers/nrfx_common.h \

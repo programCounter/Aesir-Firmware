@@ -1,17 +1,17 @@
 Output/ble_app_template_pca10056_s140\ Debug/Obj/app_error_handler_gcc.o: \
- C:\Users\demeg\online.camosun.ca\Project\ Term\ 2019F\ -\ Documents\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\components\libraries\util\app_error_handler_gcc.c \
- C:\Users\demeg\online.camosun.ca\Project\ Term\ 2019F\ -\ Documents\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\components\libraries\util\sdk_common.h \
+ C:\dev\nRF5_SDK_15.3.0\components\libraries\util\app_error_handler_gcc.c \
+ C:\dev\nRF5_SDK_15.3.0\components\libraries\util\sdk_common.h \
  C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.18/include/stdint.h \
  C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.18/include/stdbool.h \
  C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.18/include/string.h \
  C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.18/include/__crossworks.h \
  ../config/sdk_config.h \
- C:\Users\demeg\online.camosun.ca\Project\ Term\ 2019F\ -\ Documents\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\components\libraries\util\nordic_common.h \
+ C:\dev\nRF5_SDK_15.3.0\components\libraries\util\nordic_common.h \
  ../../../../../../modules/nrfx/mdk/compiler_abstraction.h \
- C:\Users\demeg\online.camosun.ca\Project\ Term\ 2019F\ -\ Documents\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\components\libraries\util\sdk_os.h \
- C:\Users\demeg\online.camosun.ca\Project\ Term\ 2019F\ -\ Documents\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\components\libraries\util\sdk_errors.h \
+ C:\dev\nRF5_SDK_15.3.0\components\libraries\util\sdk_os.h \
+ C:\dev\nRF5_SDK_15.3.0\components\libraries\util\sdk_errors.h \
  ../../../../../../components/softdevice/s140/headers/nrf_error.h \
- C:\Users\demeg\online.camosun.ca\Project\ Term\ 2019F\ -\ Documents\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\components\libraries\util\app_util.h \
+ C:\dev\nRF5_SDK_15.3.0\components\libraries\util\app_util.h \
  C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.18/include/stddef.h \
  ../../../../../../modules/nrfx/mdk/nrf.h \
  ../../../../../../modules/nrfx/mdk/nrf52840.h \
@@ -27,8 +27,8 @@ Output/ble_app_template_pca10056_s140\ Debug/Obj/app_error_handler_gcc.o: \
  ../../../../../../modules/nrfx/mdk/compiler_abstraction.h \
  ../../../../../../components/softdevice/s140/headers/nrf52/nrf_mbr.h \
  ../../../../../../components/softdevice/s140/headers/nrf_svc.h \
- C:\Users\demeg\online.camosun.ca\Project\ Term\ 2019F\ -\ Documents\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\components\libraries\util\sdk_macros.h \
- C:\Users\demeg\online.camosun.ca\Project\ Term\ 2019F\ -\ Documents\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\components\libraries\util\nrf_assert.h \
- C:\Users\demeg\online.camosun.ca\Project\ Term\ 2019F\ -\ Documents\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\components\libraries\util\app_error.h \
+ C:\dev\nRF5_SDK_15.3.0\components\libraries\util\sdk_macros.h \
+ C:\dev\nRF5_SDK_15.3.0\components\libraries\util\nrf_assert.h \
+ C:\dev\nRF5_SDK_15.3.0\components\libraries\util\app_error.h \
  C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.18/include/stdio.h \
- C:\Users\demeg\online.camosun.ca\Project\ Term\ 2019F\ -\ Documents\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\components\libraries\util\app_error_weak.h
+ C:\dev\nRF5_SDK_15.3.0\components\libraries\util\app_error_weak.h

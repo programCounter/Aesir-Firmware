@@ -1,5 +1,5 @@
 Output/ble_app_template_pca10056_s140\ Debug/Obj/bsi_qspi.o: \
- C:\Users\demeg\online.camosun.ca\Project\ Term\ 2019F\ -\ Documents\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\examples\ble_peripheral\BSI_10056\bsi_qspi.c \
+ C:\dev\nRF5_SDK_15.3.0\examples\ble_peripheral\BSI_10056\bsi_qspi.c \
  ../../../../../../integration/nrfx/legacy/nrf_drv_qspi.h \
  ../../../../../../modules/nrfx/drivers/include/nrfx_qspi.h \
  ../../../../../../modules/nrfx/nrfx.h \
@@ -53,7 +53,7 @@ Output/ble_app_template_pca10056_s140\ Debug/Obj/bsi_qspi.o: \
  ../../../../../../components/softdevice/s140/headers/nrf_sd_def.h \
  ../../../../../../modules/nrfx/drivers/nrfx_errors.h \
  ../../../../../../modules/nrfx/hal/nrf_qspi.h \
- C:\Users\demeg\online.camosun.ca\Project\ Term\ 2019F\ -\ Documents\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\examples\ble_peripheral\BSI_10056\bsi_qspi.h \
+ C:\dev\nRF5_SDK_15.3.0\examples\ble_peripheral\BSI_10056\bsi_qspi.h \
  ../../../../../../components/libraries/bsp/bsp_btn_ble.h \
  ../../../../../../components/softdevice/s140/headers/ble.h \
  ../../../../../../components/softdevice/s140/headers/ble_err.h \

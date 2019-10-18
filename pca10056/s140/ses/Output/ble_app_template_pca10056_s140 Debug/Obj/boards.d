@@ -1,6 +1,6 @@
 Output/ble_app_template_pca10056_s140\ Debug/Obj/boards.o: \
- C:\Users\demeg\online.camosun.ca\Project\ Term\ 2019F\ -\ Documents\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\components\boards\boards.c \
- C:\Users\demeg\online.camosun.ca\Project\ Term\ 2019F\ -\ Documents\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\components\boards\boards.h \
+ C:\dev\nRF5_SDK_15.3.0\components\boards\boards.c \
+ C:\dev\nRF5_SDK_15.3.0\components\boards\boards.h \
  ../../../../../../modules/nrfx/hal/nrf_gpio.h \
  ../../../../../../modules/nrfx/nrfx.h \
  ../../../../../../integration/nrfx/nrfx_config.h ../config/sdk_config.h \
@@ -52,4 +52,4 @@ Output/ble_app_template_pca10056_s140\ Debug/Obj/boards.o: \
  ../../../../../../components/libraries/util/sdk_resources.h \
  ../../../../../../components/softdevice/s140/headers/nrf_sd_def.h \
  ../../../../../../modules/nrfx/drivers/nrfx_errors.h \
- C:\Users\demeg\online.camosun.ca\Project\ Term\ 2019F\ -\ Documents\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\components\boards\pca10056.h
+ C:\dev\nRF5_SDK_15.3.0\components\boards\pca10056.h

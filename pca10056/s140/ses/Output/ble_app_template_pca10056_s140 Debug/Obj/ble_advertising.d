@@ -1,5 +1,5 @@
 Output/ble_app_template_pca10056_s140\ Debug/Obj/ble_advertising.o: \
- C:\Users\demeg\online.camosun.ca\Project\ Term\ 2019F\ -\ Documents\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\components\ble\ble_advertising\ble_advertising.c \
+ C:\dev\nRF5_SDK_15.3.0\components\ble\ble_advertising\ble_advertising.c \
  ../../../../../../components/libraries/util/sdk_common.h \
  C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.18/include/stdint.h \
  C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.18/include/stdbool.h \
@@ -42,7 +42,7 @@ Output/ble_app_template_pca10056_s140\ Debug/Obj/ble_advertising.o: \
  ../../../../../../components/softdevice/s140/headers/ble_gatt.h \
  ../../../../../../components/softdevice/s140/headers/ble_gattc.h \
  ../../../../../../components/softdevice/s140/headers/ble_gatts.h \
- C:\Users\demeg\online.camosun.ca\Project\ Term\ 2019F\ -\ Documents\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\components\ble\ble_advertising\ble_advertising.h \
+ C:\dev\nRF5_SDK_15.3.0\components\ble\ble_advertising\ble_advertising.h \
  ../../../../../../components/softdevice/s140/headers/ble_gap.h \
  ../../../../../../components/softdevice/s140/headers/ble_gattc.h \
  ../../../../../../components/softdevice/s140/headers/nrf_soc.h \

@@ -1,6 +1,6 @@
 Output/ble_app_template_pca10056_s140\ Debug/Obj/ble_srv_common.o: \
- C:\Users\demeg\online.camosun.ca\Project\ Term\ 2019F\ -\ Documents\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\components\ble\common\ble_srv_common.c \
- C:\Users\demeg\online.camosun.ca\Project\ Term\ 2019F\ -\ Documents\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\components\ble\common\ble_srv_common.h \
+ C:\dev\nRF5_SDK_15.3.0\components\ble\common\ble_srv_common.c \
+ C:\dev\nRF5_SDK_15.3.0\components\ble\common\ble_srv_common.h \
  C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.18/include/stdint.h \
  C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.18/include/stdbool.h \
  ../../../../../../components/softdevice/s140/headers/ble_types.h \

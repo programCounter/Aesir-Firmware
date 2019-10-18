@@ -1,5 +1,5 @@
 Output/ble_app_template_pca10056_s140\ Debug/Obj/nrf_fprintf.o: \
- C:\Users\demeg\online.camosun.ca\Project\ Term\ 2019F\ -\ Documents\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\external\fprintf\nrf_fprintf.c \
+ C:\dev\nRF5_SDK_15.3.0\external\fprintf\nrf_fprintf.c \
  ../../../../../../components/libraries/util/sdk_common.h \
  C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.18/include/stdint.h \
  C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.18/include/stdbool.h \
@@ -31,5 +31,5 @@ Output/ble_app_template_pca10056_s140\ Debug/Obj/nrf_fprintf.o: \
  ../../../../../../components/libraries/util/nrf_assert.h \
  C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.18/include/stdarg.h \
  ../../../../../../components/libraries/util/nrf_assert.h \
- C:\Users\demeg\online.camosun.ca\Project\ Term\ 2019F\ -\ Documents\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\external\fprintf\nrf_fprintf_format.h \
- C:\Users\demeg\online.camosun.ca\Project\ Term\ 2019F\ -\ Documents\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\external\fprintf\nrf_fprintf.h
+ C:\dev\nRF5_SDK_15.3.0\external\fprintf\nrf_fprintf_format.h \
+ C:\dev\nRF5_SDK_15.3.0\external\fprintf\nrf_fprintf.h

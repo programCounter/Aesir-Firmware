@@ -1,7 +1,7 @@
 Output/ble_app_template_pca10056_s140\ Debug/Obj/nrf_drv_clock.o: \
- C:\Users\demeg\online.camosun.ca\Project\ Term\ 2019F\ -\ Documents\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\integration\nrfx\legacy\nrf_drv_clock.c \
+ C:\dev\nRF5_SDK_15.3.0\integration\nrfx\legacy\nrf_drv_clock.c \
  ../../../../../../components/libraries/util/nordic_common.h \
- C:\Users\demeg\online.camosun.ca\Project\ Term\ 2019F\ -\ Documents\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\integration\nrfx\legacy\nrf_drv_clock.h \
+ C:\dev\nRF5_SDK_15.3.0\integration\nrfx\legacy\nrf_drv_clock.h \
  ../../../../../../modules/nrfx/drivers/include/nrfx_clock.h \
  ../../../../../../modules/nrfx/nrfx.h \
  ../../../../../../integration/nrfx/nrfx_config.h ../config/sdk_config.h \

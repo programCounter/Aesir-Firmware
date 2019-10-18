@@ -1,5 +1,5 @@
 Output/ble_app_template_pca10056_s140\ Debug/Obj/BLE_CUS.o: \
- C:\Users\demeg\online.camosun.ca\Project\ Term\ 2019F\ -\ Documents\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\examples\ble_peripheral\BSI_10056\BLE_CUS.c \
+ C:\dev\nRF5_SDK_15.3.0\examples\ble_peripheral\BSI_10056\BLE_CUS.c \
  ../../../../../../components/libraries/util/sdk_common.h \
  C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.18/include/stdint.h \
  C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.18/include/stdbool.h \
@@ -46,7 +46,7 @@ Output/ble_app_template_pca10056_s140\ Debug/Obj/BLE_CUS.o: \
  ../../../../../../components/softdevice/s140/headers/ble_gatts.h \
  ../../../../../../components/softdevice/s140/headers/ble_gap.h \
  ../../../../../../components/softdevice/s140/headers/ble_gatt.h \
- C:\Users\demeg\online.camosun.ca\Project\ Term\ 2019F\ -\ Documents\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\examples\ble_peripheral\BSI_10056\ble_cus.h \
+ C:\dev\nRF5_SDK_15.3.0\examples\ble_peripheral\BSI_10056\ble_cus.h \
  ../../../../../../modules/nrfx/hal/nrf_gpio.h \
  ../../../../../../modules/nrfx/nrfx.h \
  ../../../../../../integration/nrfx/nrfx_config.h \

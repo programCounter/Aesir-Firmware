@@ -146,6 +146,7 @@ ret_code_t init_fds()
     }
     return retCode;
 }
+
 static bool volatile fds_record_deleted;
 ret_code_t delete_config_fds(void)
 {
@@ -185,6 +186,6 @@ void fds_evt_handler(fds_evt_t const * p_evt)
         break;
 
         default:
-            break;
+        break;
     }
 }

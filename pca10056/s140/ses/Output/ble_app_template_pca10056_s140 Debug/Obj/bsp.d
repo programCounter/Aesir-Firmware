@@ -1,6 +1,6 @@
 Output/ble_app_template_pca10056_s140\ Debug/Obj/bsp.o: \
- C:\Users\demeg\online.camosun.ca\Project\ Term\ 2019F\ -\ Documents\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\components\libraries\bsp\bsp.c \
- C:\Users\demeg\online.camosun.ca\Project\ Term\ 2019F\ -\ Documents\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\components\libraries\bsp\bsp.h \
+ C:\dev\nRF5_SDK_15.3.0\components\libraries\bsp\bsp.c \
+ C:\dev\nRF5_SDK_15.3.0\components\libraries\bsp\bsp.h \
  C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.18/include/stdint.h \
  C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.18/include/stdbool.h \
  ../../../../../../components/boards/boards.h \
@@ -56,5 +56,5 @@ Output/ble_app_template_pca10056_s140\ Debug/Obj/bsp.o: \
  ../../../../../../components/boards/pca10056.h \
  ../../../../../../components/libraries/button/app_button.h \
  ../../../../../../components/libraries/util/app_error.h \
- C:\Users\demeg\online.camosun.ca\Project\ Term\ 2019F\ -\ Documents\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\components\libraries\bsp\bsp_config.h \
+ C:\dev\nRF5_SDK_15.3.0\components\libraries\bsp\bsp_config.h \
  ../../../../../../components/libraries/timer/app_timer.h

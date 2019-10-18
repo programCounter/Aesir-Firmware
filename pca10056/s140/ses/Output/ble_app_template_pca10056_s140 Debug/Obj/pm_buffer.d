@@ -1,5 +1,5 @@
 Output/ble_app_template_pca10056_s140\ Debug/Obj/pm_buffer.o: \
- C:\Users\demeg\online.camosun.ca\Project\ Term\ 2019F\ -\ Documents\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\components\ble\peer_manager\pm_buffer.c \
+ C:\dev\nRF5_SDK_15.3.0\components\ble\peer_manager\pm_buffer.c \
  ../../../../../../components/libraries/util/sdk_common.h \
  C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.18/include/stdint.h \
  C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.18/include/stdbool.h \
@@ -29,6 +29,6 @@ Output/ble_app_template_pca10056_s140\ Debug/Obj/pm_buffer.o: \
  ../../../../../../components/softdevice/s140/headers/nrf_svc.h \
  ../../../../../../components/libraries/util/sdk_macros.h \
  ../../../../../../components/libraries/util/nrf_assert.h \
- C:\Users\demeg\online.camosun.ca\Project\ Term\ 2019F\ -\ Documents\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\components\ble\peer_manager\pm_buffer.h \
+ C:\dev\nRF5_SDK_15.3.0\components\ble\peer_manager\pm_buffer.h \
  ../../../../../../components/libraries/util/sdk_errors.h \
  ../../../../../../components/libraries/atomic_flags/nrf_atflags.h

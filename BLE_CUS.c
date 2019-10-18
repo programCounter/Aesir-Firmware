@@ -134,7 +134,7 @@ static uint32_t custom_value_char_add(ble_cus_t * p_cus, const ble_cus_init_t * 
  * @param[in]   p_cus       Custom Service structure.
  * @param[in]   p_ble_evt   Event received from the BLE stack.
  */
-static void on_connect(ble_cus_t * p_cus, ble_evt_t const * p_ble_evt)
+void on_connect(ble_cus_t * p_cus, ble_evt_t const * p_ble_evt)
 {
     p_cus->conn_handle = p_ble_evt->evt.gap_evt.conn_handle; //Tells the service the device is now valid.
 }
@@ -144,13 +144,13 @@ static void on_connect(ble_cus_t * p_cus, ble_evt_t const * p_ble_evt)
  * @param[in]   p_cus       Custom Service structure.
  * @param[in]   p_ble_evt   Event received from the BLE stack.
  */
-static void on_disconnect(ble_cus_t * p_cus, ble_evt_t const * p_ble_evt)
+void on_disconnect(ble_cus_t * p_cus, ble_evt_t const * p_ble_evt)
 {
     UNUSED_PARAMETER(p_ble_evt);
     p_cus->conn_handle = BLE_CONN_HANDLE_INVALID; //Tells the service the connection is no longer valid.
 }
 
-static void on_write(ble_cus_t * p_cus, ble_evt_t const * p_ble_evt)
+void on_write(ble_cus_t * p_cus, ble_evt_t const * p_ble_evt)
 {
     ble_gatts_evt_write_t * p_evt_write = &p_ble_evt->evt.gatts_evt.params.write;
     
@@ -161,32 +161,32 @@ static void on_write(ble_cus_t * p_cus, ble_evt_t const * p_ble_evt)
     }
 }
 
-//BLE Event handler
-void ble_cus_on_ble_evt( ble_evt_t const * p_ble_evt, void * p_context)
-{
-    ble_cus_t * p_cus = (ble_cus_t *) p_context;
-
-    if (p_cus == NULL || p_ble_evt == NULL)
-    {
-        return;
-    }
-    
-    switch (p_ble_evt->header.evt_id)
-    {
-       case BLE_GAP_EVT_CONNECTED:
-            on_connect(p_cus, p_ble_evt);
-            break;
-
-       case BLE_GAP_EVT_DISCONNECTED:
-            on_disconnect(p_cus, p_ble_evt);
-            break;
-       
-       case BLE_GATTS_EVT_WRITE:
-           on_write(p_cus, p_ble_evt);
-           break;
-
-       default:
-            // No implementation needed.
-            break;
-    }
-}
+//BLE Event handler -- Moved to main.c there is already an event handler for connect
+//void ble_cus_on_ble_evt( ble_evt_t const * p_ble_evt, void * p_context)
+//{
+//    ble_cus_t * p_cus = (ble_cus_t *) p_context;
+//
+//    if (p_cus == NULL || p_ble_evt == NULL)
+//    {
+//        return;
+//    }
+//    
+//    switch (p_ble_evt->header.evt_id)
+//    {
+//       case BLE_GAP_EVT_CONNECTED:
+//            on_connect(p_cus, p_ble_evt);
+//            break;
+//
+//       case BLE_GAP_EVT_DISCONNECTED:
+//            on_disconnect(p_cus, p_ble_evt);
+//            break;
+//       
+//       case BLE_GATTS_EVT_WRITE:
+//           on_write(p_cus, p_ble_evt);
+//           break;
+//
+//       default:
+//            // No implementation needed.
+//            break;
+//    }
+//}

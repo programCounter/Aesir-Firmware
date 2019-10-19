@@ -16,18 +16,20 @@
 #define fds_Sensor3_Key (0x0003)
 
 typedef struct {
-  
   bool configChanged;
   bool sensorEnabled;
   uint16_t sensorAddress;
   uint8_t measInterval;
   uint16_t deltaTimeAlarm;
   uint16_t deltaMeasAlarm;
-
 }BSI_Sensor_Config; 
 
-ret_code_t write_fds(uint16_t sensorFile, uint16_t sensorKey, fds_record_t fdsRec);
+ret_code_t write_fds(uint16_t sensorFile, uint16_t sensorKey, fds_record_t fdsRec); //Handles write and update
 
 ret_code_t init_fds(void);
 
 void fds_evt_handler(fds_evt_t const * p_evt);
+
+ret_code_t delete_config_fds(void);
+
+//ret_code_t read_fds()

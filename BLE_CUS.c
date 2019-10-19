@@ -152,7 +152,31 @@ void on_disconnect(ble_cus_t * p_cus, ble_evt_t const * p_ble_evt)
 
 void on_write(ble_cus_t * p_cus, ble_evt_t const * p_ble_evt)
 {
+//    #define CONFIG_SERVICE_UUID               0x1400
+//    #define CUSTOM_CHAR_UUID_MEAS_INTV        0x1401 // The time in minutes between each measurment, for each Analog sensor, 2 uint 8. 
+//    #define CUSTOM_CHAR_UUID_DT_ALRM          0x1402 // The Delta T for pulses that sets an alarm state. IF time between pulses is below x time, set alarm.
+//    #define CUSTOM_CHAR_UUID_DM_ALRM          0x1403 // The Delta for measurements that sets an alarm state. IF measurments increase by x since last measure, set alarm.
+//    #define CUSTOM_CHAR_UUID_UPLD_SZE         0x1404 // The size what size of data are we going to upload. in kb, 5 = 5kbyte
+//    #define CUSTOM_CHAR_UUID_SENS_CNFG        0x1405 // The sensors attached to the device. PULSE,ANLG,ANLG. 1 = connected, 0 = disconnected. ie 110.
+//    #define CUSTOM_CHAR_UUID_SENS_ADDRS       0x1406 // The Addresses of the attached sensors (uint-16, uint-16, uint-16). 
     ble_gatts_evt_write_t * p_evt_write = &p_ble_evt->evt.gatts_evt.params.write;
+    switch(p_evt_write->uuid.uuid)
+     {
+     case CUSTOM_CHAR_UUID_MEAS_INTV
+     break;
+     case CUSTOM_CHAR_UUID_DT_ALRM
+     break;
+     case CUSTOM_CHAR_UUID_DM_ALRM
+     break;
+     case CUSTOM_CHAR_UUID_UPLD_SZE
+     break;
+     case CUSTOM_CHAR_UUID_SENS_CNFG
+     break;
+     case CUSTOM_CHAR_UUID_SENS_ADDRS
+     break;
+     }
+    //We are going to want to switch on the uuid of the written event
+    //then update the FDS with the new values from the LoLi.
     
     // Check if the handle passed with the event matches the Custom Value Characteristic handle.
     if (p_evt_write->handle == p_cus->custom_value_handles.value_handle)

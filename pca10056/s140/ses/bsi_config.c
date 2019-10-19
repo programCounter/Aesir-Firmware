@@ -98,6 +98,16 @@ static fds_record_t const FDS_sensor3_record =
     .data.length_words = (sizeof(sensor3_config) + 3) / sizeof(uint32_t),
 };
 
+ret_code_t read_fds()
+{
+  rc = fds_record_find(CONFIG_FILE, CONFIG_REC_KEY, &desc, &tok);
+
+  /* Open the record and read its contents. */
+  rc = fds_record_open(&desc, &config);
+  APP_ERROR_CHECK(rc);
+
+  memcpy(&m_dummy_cfg, config.p_data, sizeof(configuration_t));
+}
 
 ret_code_t write_fds(uint16_t sensorFile, uint16_t sensorKey, fds_record_t fdsRec)
 {

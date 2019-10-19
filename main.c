@@ -558,9 +558,7 @@ static void on_adv_evt(ble_adv_evt_t ble_adv_evt)
  */
 static void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context)
 {
-
     ble_cus_t * p_cus = (ble_cus_t *) p_context;
-
     ret_code_t err_code = NRF_SUCCESS;
 
     switch (p_ble_evt->header.evt_id)
@@ -568,7 +566,7 @@ static void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context)
         case BLE_GATTS_EVT_WRITE: //from BLE_CUS.c
             if (p_cus == NULL || p_ble_evt == NULL)
             {
-                return;
+                return; //Returns if the evet has no evt or context. Null
             }
            on_write(p_cus, p_ble_evt);
            break;

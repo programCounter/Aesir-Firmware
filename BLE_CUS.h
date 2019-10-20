@@ -21,6 +21,7 @@ This code is based on the following nordic tutorial
 #define CUSTOM_CHAR_UUID_UPLD_SZE         0x1404 // The size what size of data are we going to upload. in kb, 5 = 5kbyte
 #define CUSTOM_CHAR_UUID_SENS_CNFG        0x1405 // The sensors attached to the device. PULSE,ANLG,ANLG. 1 = connected, 0 = disconnected. ie 110.
 #define CUSTOM_CHAR_UUID_SENS_ADDRS       0x1406 // The Addresses of the attached sensors (uint-16, uint-16, uint-16). 
+#define CUSTOM_CHAR_UUID_UPLD_INTV        0x1407 // The interval that the BSI uploads the data. 
 /**@brief   Macro for defining a ble_cus instance.
  *
  * @param   _name   Name of the instance.

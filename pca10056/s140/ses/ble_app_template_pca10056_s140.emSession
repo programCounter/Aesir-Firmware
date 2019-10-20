@@ -67,11 +67,11 @@
  <Files>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="891" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../main.c" selected="0" top="913" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="16" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../BLE_CUS.h" selected="0" top="9" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="17" y="178" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../BLE_CUS.c" selected="0" top="132" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="2" y="34" useTextEdit="1" useBinaryEdit="0" left="0" path="bsi_config.h" selected="0" top="6" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="2" y="108" useTextEdit="1" useBinaryEdit="0" left="0" path="bsi_config.c" selected="1" top="79" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="178" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../BLE_CUS.c" selected="0" top="132" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="34" useTextEdit="1" useBinaryEdit="0" left="0" path="bsi_config.h" selected="0" top="6" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="108" useTextEdit="1" useBinaryEdit="0" left="0" path="bsi_config.c" selected="1" top="79" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="71" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../bsi_qspi.c" selected="0" top="48" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="2" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../bsi_qspi.h" selected="0" top="0" codecName="Default"/>
  </Files>
- <ARMCrossStudioWindow activeProject="ble_app_template_pca10056_s140" fileDialogDefaultFilter="*.asm;*.s;*.inc" autoConnectTarget="J-Link" buildConfiguration="Debug" sessionSettings="" debugSearchFileMap="" fileDialogInitialDirectory="E:/onedrive/OneDrive - online.camosun.ca/nRF5_SDK_153/nRF5_SDK_15.3.0_59ac345/examples/ble_peripheral/BSI_10056" debugSearchPath="" autoConnectCapabilities="3711"/>
+ <ARMCrossStudioWindow activeProject="ble_app_template_pca10056_s140" fileDialogDefaultFilter="*.asm;*.s;*.inc" autoConnectTarget="J-Link" buildConfiguration="Debug" sessionSettings="" debugSearchFileMap="" fileDialogInitialDirectory="E:/onedrive/OneDrive - online.camosun.ca/nRF5_SDK_153/nRF5_SDK_15.3.0_59ac345/examples/ble_peripheral/BSI_10056" debugSearchPath="" autoConnectCapabilities="3199"/>
 </session>

@@ -32,4 +32,4 @@ void fds_evt_handler(fds_evt_t const * p_evt);
 
 ret_code_t delete_config_fds(void);
 
-//ret_code_t read_fds()
+ret_code_t read_fds(uint16_t sensorFile, uint16_t sensorKey, fds_record_t fdsRec,BSI_Sensor_Config * sens_config );

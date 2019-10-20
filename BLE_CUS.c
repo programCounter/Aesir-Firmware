@@ -164,25 +164,25 @@ void on_write(ble_cus_t * p_cus, ble_evt_t const * p_ble_evt)
     ble_gatts_evt_write_t * p_evt_write = &p_ble_evt->evt.gatts_evt.params.write;
     switch(p_evt_write->uuid.uuid)
      {
-     case CUSTOM_CHAR_UUID_MEAS_INTV
+     case CUSTOM_CHAR_UUID_MEAS_INTV:
      // The time in minutes between each measurment, for each Analog sensor, 2 uint 8. 
      break;
-     case CUSTOM_CHAR_UUID_DT_ALRM
+     case CUSTOM_CHAR_UUID_DT_ALRM:
      // The Delta T for pulses that sets an alarm state. IF time between pulses is below x time, set alarm.
      break;
-     case CUSTOM_CHAR_UUID_DM_ALRM
+     case CUSTOM_CHAR_UUID_DM_ALRM:
      // The Delta for measurements that sets an alarm state. IF measurments increase by x since last measure, set alarm.
      break;
-     case CUSTOM_CHAR_UUID_UPLD_SZE
+     case CUSTOM_CHAR_UUID_UPLD_SZE:
      // What size of data are we going to upload. in kb, 5 = 5kbyte
      break;
-     case CUSTOM_CHAR_UUID_SENS_CNFG
+     case CUSTOM_CHAR_UUID_SENS_CNFG:
      // The sensors attached to the device. PULSE,ANLG,ANLG. 1 = connected, 0 = disconnected. ie 110.
      break;
-     case CUSTOM_CHAR_UUID_SENS_ADDRS
+     case CUSTOM_CHAR_UUID_SENS_ADDRS:
      // The Addresses of the attached sensors (uint-16, uint-16, uint-16). 
      break;
-     case CUSTOM_CHAR_UUID_UPLD_INTV
+     case CUSTOM_CHAR_UUID_UPLD_INTV:
      // The interval that the BSI uploads the data.
      break;
      }

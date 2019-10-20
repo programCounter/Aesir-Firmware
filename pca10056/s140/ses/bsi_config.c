@@ -98,15 +98,19 @@ static fds_record_t const FDS_sensor3_record =
     .data.length_words = (sizeof(sensor3_config) + 3) / sizeof(uint32_t),
 };
 
-ret_code_t read_fds()
+ret_code_t read_fds(uint16_t sensorFile, uint16_t sensorKey, fds_record_t fdsRec,BSI_Sensor_Config * sens_config )
 {
-  rc = fds_record_find(CONFIG_FILE, CONFIG_REC_KEY, &desc, &tok);
+  ret_code_t retCode;
+  fds_record_desc_t descript    = {0};
+  fds_find_token_t  token       = {0};
+  fds_flash_record_t flash_rec  = {0};
+  retCode = fds_record_find(sensorFile, sensorKey, &descript, &token);
 
   /* Open the record and read its contents. */
-  rc = fds_record_open(&desc, &config);
-  APP_ERROR_CHECK(rc);
+  retCode = fds_record_open(&descript, &sens_config);
+  APP_ERROR_CHECK(retCode);
 
-  memcpy(&m_dummy_cfg, config.p_data, sizeof(configuration_t));
+  memcpy(&sens_config, flash_rec.p_data, sizeof(BSI_Sensor_Config));
 }
 
 ret_code_t write_fds(uint16_t sensorFile, uint16_t sensorKey, fds_record_t fdsRec)

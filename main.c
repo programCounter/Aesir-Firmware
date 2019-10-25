@@ -173,9 +173,8 @@ static uint32_t NumFlashAddrs = 16777215; // the device is configured in 24bit a
 #define SENSOR_MEASURE_TICK APP_TIMER_TICKS(3600000) //1 hour. default measurement time for analog sensors
 
 APP_TIMER_DEF(m_minute_timer_id);                                  
-APP_TIMER_DEF(m_measure_timer_id);  
-
-
+APP_TIMER_DEF(m_measure_timer1_id);  
+APP_TIMER_DEF(m_measure_timer2_id);  
 
 static void advertising_start(bool erase_bonds); 
 
@@ -218,26 +217,7 @@ static void pm_evt_handler(pm_evt_t const * p_evt)
 }
 
 
-/**@brief Function for the Timer initialization.
- *
- * @details Initializes the timer module. This creates and starts application timers.
- */
-static void timers_init(void)
-{
-    // Initialize timer module.
-    ret_code_t err_code = app_timer_init();
-    APP_ERROR_CHECK(err_code);
 
-    // Create timers.
-
-    /* YOUR_JOB: Create any timers to be used by the application.
-                 Below is an example of how to create a timer.
-                 For every new timer needed, increase the value of the macro APP_TIMER_MAX_TIMERS by
-                 one.
-       ret_code_t err_code;
-       err_code = app_timer_create(&m_app_timer_id, APP_TIMER_MODE_REPEATED, timer_timeout_handler);
-       APP_ERROR_CHECK(err_code); */
-}
 
 
 /**@brief Function for the GAP initialization.
@@ -473,6 +453,62 @@ static void meas_timeout_handler(void * p_context)
   //Turn off sensor 2 power
 }
 
+/**@brief Function for the Timer initialization.
+ *
+ * @details Initializes the timer module. This creates and starts application timers.
+ */
+static void timers_init(void)
+{
+    // Initialize timer module.
+    ret_code_t err_code = app_timer_init();
+    APP_ERROR_CHECK(err_code);
+
+    /* YOUR_JOB: Create any timers to be used by the application.
+                 Below is an example of how to create a timer.
+                 For every new timer needed, increase the value of the macro APP_TIMER_MAX_TIMERS by
+                 one.
+       ret_code_t err_code;
+       err_code = app_timer_create(&m_app_timer_id, APP_TIMER_MODE_REPEATED, timer_timeout_handler);
+       APP_ERROR_CHECK(err_code); */
+
+    // Create timers.
+    err_code = app_timer_create(&m_minute_timer_id,
+                                APP_TIMER_MODE_REPEATED,
+                                minute_timer_timeout_handler);
+    APP_ERROR_CHECK(err_code);
+
+    err_code = app_timer_create(&m_measure_timer1_id,
+                                APP_TIMER_MODE_REPEATED,
+                                meas_timeout_handler);
+    APP_ERROR_CHECK(err_code);
+
+    err_code = app_timer_create(&m_measure_timer2_id,
+                                APP_TIMER_MODE_REPEATED,
+                                meas_timeout_handler);
+    APP_ERROR_CHECK(err_code);
+}
+
+static void reset_timer(uint16_t timer1, uint16_t timer2)
+{
+  //Stops both timers and re-starts them with the given values.
+  uint32_t err_code;
+  //stop timer 1
+  err_code = app_timer_stop(m_measure_timer1_id);
+  APP_ERROR_CHECK(err_code);
+
+  //Reset the timer 1 with the new value
+  err_code = app_timer_start(m_measure_timer1_id,timer1, NULL);
+  APP_ERROR_CHECK(err_code);
+
+  //stop timer 2
+  err_code = app_timer_stop(m_measure_timer2_id);
+  APP_ERROR_CHECK(err_code);
+
+  //Reset the timer 2 with the new value
+  err_code = app_timer_start(m_measure_timer2_id,timer2, NULL);
+  APP_ERROR_CHECK(err_code);
+
+}
 
 /**@brief Function for starting timers.
  */
@@ -483,22 +519,27 @@ static void application_timers_start(void)
        err_code = app_timer_start(m_app_timer_id, TIMER_INTERVAL, NULL);
        APP_ERROR_CHECK(err_code); */
 
-    ret_code_t err_code;
-
-    // Initialize timer module.
-    err_code = app_timer_init();
-    APP_ERROR_CHECK(err_code);
-
-    // Create timers.
-    err_code = app_timer_create(&m_minute_timer_id,
-                                APP_TIMER_MODE_REPEATED,
-                                minute_timer_timeout_handler);
-    APP_ERROR_CHECK(err_code);
-
-    err_code = app_timer_create(&m_measure_timer_id,
-                                APP_TIMER_MODE_REPEATED,
-                                meas_timeout_handler);
-    APP_ERROR_CHECK(err_code);
+//    ret_code_t err_code;
+//
+//    // Initialize timer module.
+//    err_code = app_timer_init();
+//    APP_ERROR_CHECK(err_code);
+//
+//    // Create timers.
+//    err_code = app_timer_create(&m_minute_timer_id,
+//                                APP_TIMER_MODE_REPEATED,
+//                                minute_timer_timeout_handler);
+//    APP_ERROR_CHECK(err_code);
+//
+//    err_code = app_timer_create(&m_measure_timer1_id,
+//                                APP_TIMER_MODE_REPEATED,
+//                                meas_timeout_handler);
+//    APP_ERROR_CHECK(err_code);
+//
+//    err_code = app_timer_create(&m_measure_timer2_id,
+//                                APP_TIMER_MODE_REPEATED,
+//                                meas_timeout_handler);
+//    APP_ERROR_CHECK(err_code);
 }
 
 

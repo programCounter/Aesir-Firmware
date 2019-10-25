@@ -20,8 +20,10 @@ typedef struct {
   bool sensorEnabled;
   uint16_t sensorAddress;
   uint16_t measInterval;
-  uint16_t deltaTimeAlarm;
-  uint16_t deltaMeasAlarm;
+  uint16_t deltaTimeAlarmOn;
+  uint16_t deltaTimeAlarmOff;
+  uint16_t deltaMeasAlarmOn;
+  uint16_t deltaMeasAlarmOff;
 }BSI_Sensor_Config; 
 
 ret_code_t write_fds(uint16_t sensorFile, uint16_t sensorKey, fds_record_t fdsRec); //Handles write and update

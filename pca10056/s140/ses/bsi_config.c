@@ -40,34 +40,40 @@ static char const * fds_evt_str[] =
 //Init the struct for sensor 1
 BSI_Sensor_Config sensor1_config =
 {
-  .configChanged  = false,
-  .sensorEnabled  = false,
-  .sensorAddress  = 0,
-  .measInterval   = 0,
-  .deltaTimeAlarm = 0,
-  .deltaMeasAlarm = 0,
+  .configChanged      = false,
+  .sensorEnabled      = false,
+  .sensorAddress      = 0,
+  .measInterval       = 0,
+  .deltaTimeAlarmOn   = 0,
+  .deltaTimeAlarmOff  = 0,
+  .deltaMeasAlarmOn   = 0,
+  .deltaMeasAlarmOff  = 0,
 };
 
 //Init the struct for sensor 2
 BSI_Sensor_Config sensor2_config =
 {
-  .configChanged  = false,
-  .sensorEnabled  = false,
-  .sensorAddress  = 0,
-  .measInterval   = 0,
-  .deltaTimeAlarm = 0,
-  .deltaMeasAlarm = 0,
+  .configChanged      = false,
+  .sensorEnabled      = false,
+  .sensorAddress      = 0,
+  .measInterval       = 0,
+  .deltaTimeAlarmOn   = 0,
+  .deltaTimeAlarmOff  = 0,
+  .deltaMeasAlarmOn   = 0,
+  .deltaMeasAlarmOff  = 0,
 };
 
 //Init the struct for sensor 3
 BSI_Sensor_Config sensor3_config =
 {
-  .configChanged  = false,
-  .sensorEnabled  = false,
-  .sensorAddress  = 0,
-  .measInterval   = 0,
-  .deltaTimeAlarm = 0,
-  .deltaMeasAlarm = 0,
+  .configChanged      = false,
+  .sensorEnabled      = false,
+  .sensorAddress      = 0,
+  .measInterval       = 0,
+  .deltaTimeAlarmOn   = 0,
+  .deltaTimeAlarmOff  = 0,
+  .deltaMeasAlarmOn   = 0,
+  .deltaMeasAlarmOff  = 0,
 };
 
 //Create FDS record for Sensor1

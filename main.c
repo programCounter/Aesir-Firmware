@@ -89,10 +89,10 @@
 #include "sdk_config.h"
 #include "nrf_delay.h"
 #include "app_util_platform.h"
+
 #include "BLE_CUS.h"
 #include "bsi_config.h"
 #include "bsi_qspi.h"
-//#include "ble_cus.h"
 
 //#define QSPI_STD_CMD_WRSR   0x01
 //#define QSPI_STD_CMD_RSTEN  0x66
@@ -488,7 +488,7 @@ static void timers_init(void)
     APP_ERROR_CHECK(err_code);
 }
 
-static void reset_timer(uint16_t timer1, uint16_t timer2)
+static void reset_timer(uint16_t timerS1, uint16_t timerS2)
 {
   //Stops both timers and re-starts them with the given values.
   uint32_t err_code;
@@ -497,7 +497,7 @@ static void reset_timer(uint16_t timer1, uint16_t timer2)
   APP_ERROR_CHECK(err_code);
 
   //Reset the timer 1 with the new value
-  err_code = app_timer_start(m_measure_timer1_id,timer1, NULL);
+  err_code = app_timer_start(m_measure_timer1_id,timerS1, NULL);
   APP_ERROR_CHECK(err_code);
 
   //stop timer 2
@@ -505,7 +505,7 @@ static void reset_timer(uint16_t timer1, uint16_t timer2)
   APP_ERROR_CHECK(err_code);
 
   //Reset the timer 2 with the new value
-  err_code = app_timer_start(m_measure_timer2_id,timer2, NULL);
+  err_code = app_timer_start(m_measure_timer2_id,timerS2, NULL);
   APP_ERROR_CHECK(err_code);
 
 }
@@ -519,27 +519,10 @@ static void application_timers_start(void)
        err_code = app_timer_start(m_app_timer_id, TIMER_INTERVAL, NULL);
        APP_ERROR_CHECK(err_code); */
 
-//    ret_code_t err_code;
-//
-//    // Initialize timer module.
-//    err_code = app_timer_init();
-//    APP_ERROR_CHECK(err_code);
-//
-//    // Create timers.
-//    err_code = app_timer_create(&m_minute_timer_id,
-//                                APP_TIMER_MODE_REPEATED,
-//                                minute_timer_timeout_handler);
-//    APP_ERROR_CHECK(err_code);
-//
-//    err_code = app_timer_create(&m_measure_timer1_id,
-//                                APP_TIMER_MODE_REPEATED,
-//                                meas_timeout_handler);
-//    APP_ERROR_CHECK(err_code);
-//
-//    err_code = app_timer_create(&m_measure_timer2_id,
-//                                APP_TIMER_MODE_REPEATED,
-//                                meas_timeout_handler);
-//    APP_ERROR_CHECK(err_code);
+    ret_code_t err_code;//Start the 1 minute timer, this is the timer used to trigger the updload
+    err_code = app_timer_start(m_minute_timer_id, MINUTE_TIMER_TICK, NULL);
+    APP_ERROR_CHECK(err_code);
+
 }
 
 
@@ -665,35 +648,6 @@ static void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context)
     }
 }
 
-
-//void ble_cus_on_ble_evt( ble_evt_t const * p_ble_evt, void * p_context)
-//{
-//    ble_cus_t * p_cus = (ble_cus_t *) p_context;
-
-//    if (p_cus == NULL || p_ble_evt == NULL)
-//    {
-//        return;
-//    }
-    
-//    switch (p_ble_evt->header.evt_id)
-//    {
-//       case BLE_GAP_EVT_CONNECTED:
-//            on_connect(p_cus, p_ble_evt);
-//            break;
-
-//       case BLE_GAP_EVT_DISCONNECTED:
-//            on_disconnect(p_cus, p_ble_evt);
-//            break;
-       
-//       case BLE_GATTS_EVT_WRITE:
-//           on_write(p_cus, p_ble_evt);
-//           break;
-//
-//       default:
-//            // No implementation needed.
-//            break;
-//    }
-//}
 
 /**@brief Function for initializing the BLE stack.
  *
@@ -932,7 +886,8 @@ static void advertising_start(bool erase_bonds)
 int main(void)
 {
     bool erase_bonds;
-    
+    nrf_drv_qspi_config_t config = NRF_DRV_QSPI_DEFAULT_CONFIG;
+
     // Initialize.
     log_init();
     timers_init();
@@ -948,25 +903,32 @@ int main(void)
     conn_params_init();
     peer_manager_init();
 
-    nrf_drv_qspi_config_t config = NRF_DRV_QSPI_DEFAULT_CONFIG;
+
     nrf_drv_qspi_init(&config, qspi_handler, NULL);
 
     configure_memory();
     m_finished = false;
 
-    nrf_drv_qspi_erase(NRF_QSPI_ERASE_LEN_64KB, 0);
-    WAIT_FOR_PERIPH();
+//    nrf_drv_qspi_erase(NRF_QSPI_ERASE_LEN_64KB, 0);
+//    WAIT_FOR_PERIPH();
+    
+    init_fds();
 
     // Start execution.
     NRF_LOG_INFO("Template example started.");
     application_timers_start();
 
     advertising_start(erase_bonds);
-
+    
+    //somejunkvar = true;
     //ble_bas_battery_level_update(&m_bas, 5, BLE_CONN_HANDLE_ALL);
     // Enter main loop.
     for (;;)
     {
+        
+        if(sensor1_config.configChanged = false)
+        {
+        }
         if(lwrite_qspi == true)
         {
           write_qspi();

@@ -99,10 +99,10 @@
       <file file_name="../config/sdk_config.h" />
       <file file_name="../../../BLE_CUS.c" />
       <file file_name="../../../BLE_CUS.h" />
-      <file file_name="bsi_config.h" />
-      <file file_name="bsi_config.c" />
       <file file_name="../../../bsi_qspi.c" />
       <file file_name="../../../bsi_qspi.h" />
+      <file file_name="../../../bsi_config.c" />
+      <file file_name="../../../bsi_config.h" />
     </folder>
     <folder Name="nRF_Segger_RTT">
       <file file_name="../../../../../../external/segger_rtt/SEGGER_RTT.c" />

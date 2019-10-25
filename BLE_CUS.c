@@ -53,7 +53,8 @@ uint32_t ble_cus_init(ble_cus_t * p_cus, const ble_cus_init_t * p_cus_init)
     }
 
     // Add Custom Value characteristic 
-    custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_MEAS_INTV,"Measurement Interval");
+    custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_S2_MEAS_INTV,"Analog 1 Measurement Interval");
+    custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_S3_MEAS_INTV,"Analog 2 Measurement Interval");
     custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_DT_ALRM,"Delta Time Alarm");
     custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_DM_ALRM,"Delta Measurment Alarm");
     custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_UPLD_SZE,"Upload Size");
@@ -154,18 +155,22 @@ void on_disconnect(ble_cus_t * p_cus, ble_evt_t const * p_ble_evt)
 void on_write(ble_cus_t * p_cus, ble_evt_t const * p_ble_evt)
 {
 //    #define CONFIG_SERVICE_UUID               0x1400
-//    #define CUSTOM_CHAR_UUID_MEAS_INTV        0x1401 // The time in minutes between each measurment, for each Analog sensor, 2 uint 8. 
-//    #define CUSTOM_CHAR_UUID_DT_ALRM          0x1402 // The Delta T for pulses that sets an alarm state. IF time between pulses is below x time, set alarm.
-//    #define CUSTOM_CHAR_UUID_DM_ALRM          0x1403 // The Delta for measurements that sets an alarm state. IF measurments increase by x since last measure, set alarm.
-//    #define CUSTOM_CHAR_UUID_UPLD_SZE         0x1404 // The size what size of data are we going to upload. in kb, 5 = 5kbyte
-//    #define CUSTOM_CHAR_UUID_SENS_CNFG        0x1405 // The sensors attached to the device. PULSE,ANLG,ANLG. 1 = connected, 0 = disconnected. ie 110.
-//    #define CUSTOM_CHAR_UUID_SENS_ADDRS       0x1406 // The Addresses of the attached sensors (uint-16, uint-16, uint-16). 
-//    #define CUSTOM_CHAR_UUID_UPLD_INTV        0x1407 // The interval that the BSI uploads the data. 
+//    #define CUSTOM_CHAR_UUID_S2_MEAS_INTV     0x1401 // The time in minutes between each measurment, 1440 mins in a day
+//    #define CUSTOM_CHAR_UUID_S3_MEAS_INTV     0x1402 // The time in minutes between each measurment, 1440 mins in a day
+//    #define CUSTOM_CHAR_UUID_DT_ALRM          0x1403 // The Delta T for pulses that sets an alarm state. IF time between pulses is below x time, set alarm.
+//    #define CUSTOM_CHAR_UUID_DM_ALRM          0x1404 // The Delta for measurements that sets an alarm state. IF measurments increase by x since last measure, set alarm.
+//    #define CUSTOM_CHAR_UUID_UPLD_SZE         0x1405 // The size what size of data are we going to upload. in kb, 5 = 5kbyte
+//    #define CUSTOM_CHAR_UUID_SENS_CNFG        0x1406 // The sensors attached to the device. PULSE,ANLG,ANLG. 1 = connected, 0 = disconnected. ie 110.
+//    #define CUSTOM_CHAR_UUID_SENS_ADDRS       0x1407 // The Addresses of the attached sensors (uint-16, uint-16, uint-16). 
+//    #define CUSTOM_CHAR_UUID_UPLD_INTV        0x1408 // The interval that the BSI uploads the data. 
     ble_gatts_evt_write_t * p_evt_write = &p_ble_evt->evt.gatts_evt.params.write;
     switch(p_evt_write->uuid.uuid)
      {
-     case CUSTOM_CHAR_UUID_MEAS_INTV:
-     // The time in minutes between each measurment, for each Analog sensor, 2 uint 8. 
+     case CUSTOM_CHAR_UUID_S2_MEAS_INTV:
+     // The time in minutes between each measurment.
+     break;
+     case CUSTOM_CHAR_UUID_S3_MEAS_INTV:
+     // The time in minutes between each measurment.
      break;
      case CUSTOM_CHAR_UUID_DT_ALRM:
      // The Delta T for pulses that sets an alarm state. IF time between pulses is below x time, set alarm.

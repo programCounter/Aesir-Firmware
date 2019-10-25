@@ -19,7 +19,7 @@ typedef struct {
   bool configChanged;
   bool sensorEnabled;
   uint16_t sensorAddress;
-  uint8_t measInterval;
+  uint16_t measInterval;
   uint16_t deltaTimeAlarm;
   uint16_t deltaMeasAlarm;
 }BSI_Sensor_Config; 

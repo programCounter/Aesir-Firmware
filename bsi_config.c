@@ -250,7 +250,7 @@ void fds_evt_handler(fds_evt_t const * p_evt)
 
         case FDS_EVT_DEL_RECORD:
         {
-          fds_record_deleted = true; //Set the flag so that the program knows the delet operation finished
+          fds_record_deleted = true; //Set the flag so that the program knows the delete operation finished
         } 
         break;
 
@@ -261,7 +261,21 @@ void fds_evt_handler(fds_evt_t const * p_evt)
 
 ret_code_t init_sensors(uint16_t sensorMap)
 {
-    uint8_t sensors = Uint8(sensorMap & 0xff);
+    //Intending to just use a binary value to indicate which sensors are off or on. We need to unpack the the byte
+     
+    uint8_t sensors = Uint8(sensorMap & 0xff); // recieveing a uint16, we only care about the lower byte.
 
-
+    if((sensors&0001)==1) // bitwise and to see if sensor 3 is enabled or not. Analog
+    {
+      bsi_config.sensor3_config.sensorEnabled = true;
+    }
+    if(((sensors>>1)&0001)==1) //shift by 1 and bitwise AND to see if the sensor2 is: 1 on, or 0 off. Analog
+    {
+      bsi_config.sensor2_config.sensorEnabled = true;
+    }
+    if(((sensors>>2)&0001)==1) //shift by 2 and bitwise AND to see if the sensor1 is: 1 on, or 0 off. Pulse
+    {
+      bsi_config.sensor1_config.sensorEnabled = true;
+    }
+    
 }

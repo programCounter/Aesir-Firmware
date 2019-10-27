@@ -233,7 +233,7 @@ void on_write(ble_cus_t * p_cus, ble_evt_t const * p_ble_evt)
        break;
      case CUSTOM_CHAR_UUID_SENS_CNFG:
        // The sensors attached to the device. PULSE,ANLG,ANLG. 1 = connected, 0 = disconnected. ie 110.
-       bsi_config.
+       init_sensors((int)p_evt_write->data);
        break;
 //     case CUSTOM_CHAR_UUID_SENS_ADDRS:
 //       // The Addresses of the attached sensors (uint-16, uint-16, uint-16). 

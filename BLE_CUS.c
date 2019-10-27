@@ -12,6 +12,7 @@ This code is based on the following nordic tutorial
 #include "nrf_gpio.h"
 #include "boards.h"
 #include "nrf_log.h"
+#include "bsi_config.h"
 
 /**@brief Function for initializing the Custom Service.
  *
@@ -60,7 +61,7 @@ uint32_t ble_cus_init(ble_cus_t * p_cus, const ble_cus_init_t * p_cus_init)
     //#define CUSTOM_CHAR_UUID_DM_ALRM_S2_OFF   0x1406 // The Delta for measurements that sets an alarm state. 
     //#define CUSTOM_CHAR_UUID_DM_ALRM_S3_ON    0x1407 // The Delta for measurements that sets an alarm state. 
     //#define CUSTOM_CHAR_UUID_DM_ALRM_S3_OFF   0x1408 // The Delta for measurements that sets an alarm state. 
-    //#define CUSTOM_CHAR_UUID_UPLD_SZE         0x1409 // The size what size of data are we going to upload. in kb, 5 = 5kbyte
+    //#define CUSTOM_CHAR_UUID_UPLD_SZE         0x1409 // The size of data we are going to upload. in kb, 5 = 5kbyte
     //#define CUSTOM_CHAR_UUID_SENS_CNFG        0x1410 // The sensors attached to the device. PULSE,ANLG,ANLG. 1 = connected, 0 = disconnected. ie 110.
     //#define CUSTOM_CHAR_UUID_SENS_ADDRS       0x1411 // The Addresses of the attached sensors (uint-16, uint-16, uint-16). 
     //#define CUSTOM_CHAR_UUID_UPLD_INTV        0x1412 // The interval that the BSI uploads the data. 
@@ -76,7 +77,7 @@ uint32_t ble_cus_init(ble_cus_t * p_cus, const ble_cus_init_t * p_cus_init)
     custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_DM_ALRM_S3_OFF,"Delta Measurment S3 Alarm Off");
     custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_UPLD_SZE,"Upload Size");
     custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_SENS_CNFG,"Sensor Configuration");
-    custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_SENS_ADDRS,"Sensor Addresses");
+    //custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_SENS_ADDRS,"Sensor Addresses");
     custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_UPLD_INTV,"Upload Interval");
     return 0;
 }
@@ -127,7 +128,7 @@ static uint32_t custom_value_char_add(ble_cus_t * p_cus, const ble_cus_init_t * 
 
     ble_uuid.type = p_cus->uuid_type;
     //ble_uuid.uuid = CUSTOM_CHAR_UUID_MEAS_INTV;//Specified in the BLE_CUS.h file.
-    ble_uuid.uuid = p_cus_uuid;
+    ble_uuid.uuid = (int)p_cus_uuid;
     memset(&attr_char_value, 0, sizeof(attr_char_value));
 
     attr_char_value.p_uuid    = &ble_uuid;
@@ -179,50 +180,69 @@ void on_write(ble_cus_t * p_cus, ble_evt_t const * p_ble_evt)
 //    #define CUSTOM_CHAR_UUID_DM_ALRM_S2_OFF   0x1406 // The Delta for measurements that sets an alarm state. 
 //    #define CUSTOM_CHAR_UUID_DM_ALRM_S3_ON    0x1407 // The Delta for measurements that sets an alarm state. 
 //    #define CUSTOM_CHAR_UUID_DM_ALRM_S3_OFF   0x1408 // The Delta for measurements that sets an alarm state. 
-//    #define CUSTOM_CHAR_UUID_UPLD_SZE         0x1409 // The size what size of data are we going to upload. in kb, 5 = 5kbyte
+//    #define CUSTOM_CHAR_UUID_UPLD_SZE         0x1409 // The size of data we are going to upload. in kb, 5 = 5kbyte
 //    #define CUSTOM_CHAR_UUID_SENS_CNFG        0x1410 // The sensors attached to the device. PULSE,ANLG,ANLG. 1 = connected, 0 = disconnected. ie 110.
 //    #define CUSTOM_CHAR_UUID_SENS_ADDRS       0x1411 // The Addresses of the attached sensors (uint-16, uint-16, uint-16). 
 //    #define CUSTOM_CHAR_UUID_UPLD_INTV        0x1412 // The interval that the BSI uploads the data.  
     ble_gatts_evt_write_t * p_evt_write = &p_ble_evt->evt.gatts_evt.params.write;
     switch(p_evt_write->uuid.uuid)
      {
-     case CUSTOM_CHAR_UUID_S2_MEAS_INTV:
-     // The time in minutes between each measurment.
-     break;
+     case CUSTOM_CHAR_UUID_S2_MEAS_INTV:     
+       // The time in minutes between each measurment.
+       //sensor2_config.configChanged     = true;
+       bsi_config.sensor2_config.measInterval      = (int)p_evt_write->data;
+       break;
      case CUSTOM_CHAR_UUID_S3_MEAS_INTV:
-     // The time in minutes between each measurment.
-     break;
+       // The time in minutes between each measurment.
+       //sensor3_config.configChanged     = true;
+       bsi_config.sensor3_config.measInterval      = (int)p_evt_write->data;
+       break;
      case CUSTOM_CHAR_UUID_DT_ALRM_ON:
-     // The Delta T for pulses that sets an alarm state. IF time between pulses is below x time, set alarm.
-     break;
+       // The Delta T for pulses that sets an alarm state. IF time between pulses is below x time, set alarm.
+       //sensor1_config.configChanged     = true;
+       bsi_config.sensor1_config.deltaTimeAlarmOn  = (int)p_evt_write->data;
+       break;
      case CUSTOM_CHAR_UUID_DT_ALRM_OFF:
-     // The Delta for measurements that sets an alarm state. 
-     break;
+       // The Delta for measurements that sets an alarm state. 
+       //sensor1_config.configChanged     = true;
+       bsi_config.sensor1_config.deltaTimeAlarmOff = (int)p_evt_write->data;
+       break;
      case CUSTOM_CHAR_UUID_DM_ALRM_S2_ON:
-     // The Delta for measurements that sets an alarm state for S2. 
-     break;
+       // The Delta for measurements that sets an alarm state for S2. 
+       //sensor2_config.configChanged     = true;
+       bsi_config.sensor2_config.deltaMeasAlarmOn  = (int)p_evt_write->data;
+       break;
      case CUSTOM_CHAR_UUID_DM_ALRM_S2_OFF:
-     // The Delta for measurements that sets an alarm state for S2. 
-     break;
+       // The Delta for measurements that sets an alarm state for S2. 
+       //sensor2_config.configChanged     = true;
+       bsi_config.sensor2_config.deltaMeasAlarmOff = (int)p_evt_write->data;
+       break;
      case CUSTOM_CHAR_UUID_DM_ALRM_S3_ON:
-     // The Delta for measurements that sets an alarm state for S3. 
-     break;
+       // The Delta for measurements that sets an alarm state for S3. 
+       //sensor3_config.configChanged     = true;
+       bsi_config.sensor3_config.deltaMeasAlarmOn  = (int)p_evt_write->data;
+       break;
      case CUSTOM_CHAR_UUID_DM_ALRM_S3_OFF:
-     // The Delta for measurements that sets an alarm state for S3. 
-     break;
+       // The Delta for measurements that sets an alarm state for S3.
+       //sensor3_config.configChanged     = true;
+       bsi_config.sensor3_config.deltaMeasAlarmOff = (int)p_evt_write->data;
+       break;
      case CUSTOM_CHAR_UUID_UPLD_SZE:
-     // What size of data are we going to upload. in kb, 5 = 5kbyte
-     break;
+       // What size of data are we going to upload. in kb, 5 = 5kbyte
+       bsi_config.uploadSize = (int)p_evt_write->data;
+       break;
      case CUSTOM_CHAR_UUID_SENS_CNFG:
-     // The sensors attached to the device. PULSE,ANLG,ANLG. 1 = connected, 0 = disconnected. ie 110.
-     break;
-     case CUSTOM_CHAR_UUID_SENS_ADDRS:
-     // The Addresses of the attached sensors (uint-16, uint-16, uint-16). 
-     break;
+       // The sensors attached to the device. PULSE,ANLG,ANLG. 1 = connected, 0 = disconnected. ie 110.
+       bsi_config.
+       break;
+//     case CUSTOM_CHAR_UUID_SENS_ADDRS:
+//       // The Addresses of the attached sensors (uint-16, uint-16, uint-16). 
+//       break;
      case CUSTOM_CHAR_UUID_UPLD_INTV:
-     // The interval that the BSI uploads the data.
-     break;
-     }
+       // The interval that the BSI uploads the data.
+       bsi_config.uploadSize = (int)p_evt_write->data;
+       break;
+    }
     //We are going to want to switch on the uuid of the written event
     //then update the FDS with the new values from the LoLi.
     

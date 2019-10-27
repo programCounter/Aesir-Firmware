@@ -90,10 +90,10 @@
 #include "nrf_delay.h"
 #include "app_util_platform.h"
 
-#include "BLE_CUS.h"
+
 #include "bsi_config.h"
 #include "bsi_qspi.h"
-
+#include "BLE_CUS.h"
 //#define QSPI_STD_CMD_WRSR   0x01
 //#define QSPI_STD_CMD_RSTEN  0x66
 //#define QSPI_STD_CMD_RST    0x99
@@ -926,9 +926,6 @@ int main(void)
     for (;;)
     {
         
-        if(sensor1_config.configChanged = false)
-        {
-        }
         if(lwrite_qspi == true)
         {
           write_qspi();

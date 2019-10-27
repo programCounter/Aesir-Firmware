@@ -1,5 +1,5 @@
-#include "fds.h"
 #include "bsi_config.h"
+
 //Flash data storage. FDS
 
 /* Array to map FDS return values to strings. */
@@ -36,72 +36,91 @@ static char const * fds_evt_str[] =
     "FDS_EVT_DEL_FILE",
     "FDS_EVT_GC",
 };
-bool somejunkvar = false;
+
 //Init the struct for sensor 1
-BSI_Sensor_Config sensor1_config = 
-{
-  .configChanged      = false,
-  .sensorEnabled      = false,
-  .sensorAddress      = 0,
-  .measInterval       = 0,
-  .deltaTimeAlarmOn   = 0,
-  .deltaTimeAlarmOff  = 0,
-  .deltaMeasAlarmOn   = 0,
-  .deltaMeasAlarmOff  = 0,
-};
+//BSI_Sensor_Config s1_config = 
+//{
+//  .configChanged      = false,
+//  .sensorEnabled      = false,
+//  .sensorAddress      = 0,
+//  .measInterval       = 0,
+//  .deltaTimeAlarmOn   = 0,
+//  .deltaTimeAlarmOff  = 0,
+//  .deltaMeasAlarmOn   = 0,
+//  .deltaMeasAlarmOff  = 0,
+//};
 
 //Init the struct for sensor 2
-BSI_Sensor_Config sensor2_config =
-{
-  .configChanged      = false,
-  .sensorEnabled      = false,
-  .sensorAddress      = 0,
-  .measInterval       = 0,
-  .deltaTimeAlarmOn   = 0,
-  .deltaTimeAlarmOff  = 0,
-  .deltaMeasAlarmOn   = 0,
-  .deltaMeasAlarmOff  = 0,
-};
+//BSI_Sensor_Config s2_config =
+//{
+//  .configChanged      = false,
+//  .sensorEnabled      = false,
+//  .sensorAddress      = 0,
+//  .measInterval       = 0,
+//  .deltaTimeAlarmOn   = 0,
+//  .deltaTimeAlarmOff  = 0,
+//  .deltaMeasAlarmOn   = 0,
+//  .deltaMeasAlarmOff  = 0,
+//};
 
 //Init the struct for sensor 3
-BSI_Sensor_Config sensor3_config =
-{
-  .configChanged      = false,
-  .sensorEnabled      = false,
-  .sensorAddress      = 0,
-  .measInterval       = 0,
-  .deltaTimeAlarmOn   = 0,
-  .deltaTimeAlarmOff  = 0,
-  .deltaMeasAlarmOn   = 0,
-  .deltaMeasAlarmOff  = 0,
+//BSI_Sensor_Config s3_config =
+//{
+//  .configChanged      = false,
+//  .sensorEnabled      = false,
+//  .sensorAddress      = 0,
+//  .measInterval       = 0,
+//  .deltaTimeAlarmOn   = 0,
+//  .deltaTimeAlarmOff  = 0,
+//  .deltaMeasAlarmOn   = 0,
+//  .deltaMeasAlarmOff  = 0,
+//};
+
+BSI_Config bsi_config = {
+  .configChanged  = false,
+//  .sensor1_config = s1_config,
+//  .sensor2_config = s2_config,
+//  .sensor3_config = s3_config,
+  .uploadSize     = 9,
+  .uploadInterval = 0,
 };
 
 //Create FDS record for Sensor1
-static fds_record_t const FDS_sensor1_record =
-{
-    .file_id           = fds_Sensor1_File,
-    .key               = fds_Sensor1_Key,
-    .data.p_data       = &sensor1_config,
-    /* The length of a record is always expressed in 4-byte units (words). */
-    .data.length_words = (sizeof(sensor1_config) + 3) / sizeof(uint32_t),
-};
+//static fds_record_t const FDS_sensor1_record =
+//{
+//    .file_id           = fds_Sensor1_File,
+//    .key               = fds_Sensor1_Key,
+//    .data.p_data       = &bsi_config.sensor1_config,
+//    /* The length of a record is always expressed in 4-byte units (words). */
+//    .data.length_words = (sizeof(bsi_config.sensor1_config) + 3) / sizeof(uint32_t),
+//};
 //Create FDS record for Sensor2
-static fds_record_t const FDS_sensor2_record =
-{
-    .file_id           = fds_Sensor2_File,
-    .key               = fds_Sensor2_Key,
-    .data.p_data       = &sensor2_config,
-    /* The length of a record is always expressed in 4-byte units (words). */
-    .data.length_words = (sizeof(sensor2_config) + 3) / sizeof(uint32_t),
-};
+//static fds_record_t const FDS_sensor2_record =
+//{
+//    .file_id           = fds_Sensor2_File,
+//    .key               = fds_Sensor2_Key,
+//    .data.p_data       = &bsi_config.sensor2_config,
+//    /* The length of a record is always expressed in 4-byte units (words). */
+//    .data.length_words = (sizeof(bsi_config.sensor2_config) + 3) / sizeof(uint32_t),
+//};
 //Create FDS record for Sensor3
-static fds_record_t const FDS_sensor3_record =
+//static fds_record_t const FDS_sensor3_record =
+//{
+//    .file_id           = fds_Sensor3_File,
+//    .key               = fds_Sensor3_Key,
+//    .data.p_data       = &bsi_config.sensor3_config,
+//    /* The length of a record is always expressed in 4-byte units (words). */
+//    .data.length_words = (sizeof(bsi_config.sensor3_config) + 3) / sizeof(uint32_t),
+//};
+
+//Create FDS record for Sensor3
+static fds_record_t const FDS_BSI_record =
 {
-    .file_id           = fds_Sensor3_File,
-    .key               = fds_Sensor3_Key,
-    .data.p_data       = &sensor3_config,
+    .file_id           = fds_BSI_File,
+    .key               = fds_BSI_Key,
+    .data.p_data       = &bsi_config,
     /* The length of a record is always expressed in 4-byte units (words). */
-    .data.length_words = (sizeof(sensor3_config) + 3) / sizeof(uint32_t),
+    .data.length_words = (sizeof(bsi_config) + 3) / sizeof(uint32_t),
 };
 
 ret_code_t read_fds(uint16_t sensorFile, uint16_t sensorKey, fds_record_t fdsRec,BSI_Sensor_Config * sens_config )
@@ -191,24 +210,28 @@ bool update_BSI_Config(void)
 {
     // Updates the FDS with the new config after it's been updated through the characteristic
     bool retVal = true;
-    if(sensor1_config.configChanged == false || sensor1_config.configChanged == false || sensor1_config.configChanged == false)
+    if(bsi_config.configChanged == false )
     {
       retVal = false; // No configs have changed, time to leave
     }
     else 
     {
-      if(sensor1_config.configChanged == true)
+      if(bsi_config.configChanged == true)
       {
-        write_fds(fds_Sensor1_File,fds_Sensor1_Key,FDS_sensor1_record);
+        write_fds(fds_BSI_File,fds_BSI_Key,FDS_BSI_record);
       }
-      if(sensor2_config.configChanged == true)
-      {
-        write_fds(fds_Sensor2_File,fds_Sensor2_Key,FDS_sensor2_record);
-      }
-      if(sensor3_config.configChanged == true)
-      {
-        write_fds(fds_Sensor3_File,fds_Sensor3_Key,FDS_sensor3_record);
-      }
+//      if(bsi_config.sensor1_config.configChanged == true)
+//      {
+//        write_fds(fds_Sensor1_File,fds_Sensor1_Key,FDS_sensor1_record);
+//      }
+//      if(bsi_config.sensor2_config.configChanged == true)
+//      {
+//        write_fds(fds_Sensor2_File,fds_Sensor2_Key,FDS_sensor2_record);
+//      }
+//      if(bsi_config.sensor3_config.configChanged == true)
+//      {
+//        write_fds(fds_Sensor3_File,fds_Sensor3_Key,FDS_sensor3_record);
+//      }
     }
 
     return retVal; //did we update the config?
@@ -234,4 +257,11 @@ void fds_evt_handler(fds_evt_t const * p_evt)
         default:
         break;
     }
+}
+
+ret_code_t init_sensors(uint16_t sensorMap)
+{
+    uint8_t sensors = Uint8(sensorMap & 0xff);
+
+
 }

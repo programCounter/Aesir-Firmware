@@ -122,6 +122,6 @@ Output/ble_app_template_pca10056_s140\ Debug/Obj/main.o: \
  ../../../../../../modules/nrfx/drivers/include/nrfx_qspi.h \
  ../../../../../../modules/nrfx/hal/nrf_qspi.h \
  ../../../../../../components/libraries/delay/nrf_delay.h \
- E:\dev\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\examples\ble_peripheral\Aesir-Firmware\BLE_CUS.h \
  E:\dev\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\examples\ble_peripheral\Aesir-Firmware\bsi_config.h \
- E:\dev\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\examples\ble_peripheral\Aesir-Firmware\bsi_qspi.h
+ E:\dev\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\examples\ble_peripheral\Aesir-Firmware\bsi_qspi.h \
+ E:\dev\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\examples\ble_peripheral\Aesir-Firmware\BLE_CUS.h

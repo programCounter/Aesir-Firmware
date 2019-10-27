@@ -80,4 +80,6 @@ Output/ble_app_template_pca10056_s140\ Debug/Obj/BLE_CUS.o: \
  ../../../../../../components/libraries/log/src/nrf_log_internal.h \
  ../../../../../../components/libraries/log/nrf_log_instance.h \
  ../../../../../../components/libraries/log/nrf_log_types.h \
- ../../../../../../components/libraries/log/nrf_log_types.h
+ ../../../../../../components/libraries/log/nrf_log_types.h \
+ E:\dev\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\examples\ble_peripheral\Aesir-Firmware\bsi_config.h \
+ ../../../../../../components/libraries/fds/fds.h

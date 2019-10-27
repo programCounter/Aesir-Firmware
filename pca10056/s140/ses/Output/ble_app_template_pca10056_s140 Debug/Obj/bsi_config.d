@@ -1,5 +1,6 @@
 Output/ble_app_template_pca10056_s140\ Debug/Obj/bsi_config.o: \
  E:\dev\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\examples\ble_peripheral\Aesir-Firmware\bsi_config.c \
+ E:\dev\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\examples\ble_peripheral\Aesir-Firmware\bsi_config.h \
  ../../../../../../components/libraries/fds/fds.h \
  E:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.22/include/stdint.h \
  E:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.22/include/stdbool.h \
@@ -30,5 +31,4 @@ Output/ble_app_template_pca10056_s140\ Debug/Obj/bsi_config.o: \
  E:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.22/include/__crossworks.h \
  ../../../../../../components/libraries/util/sdk_errors.h \
  ../../../../../../components/libraries/util/nordic_common.h \
- ../../../../../../components/libraries/util/app_error_weak.h \
- E:\dev\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\examples\ble_peripheral\Aesir-Firmware\bsi_config.h
+ ../../../../../../components/libraries/util/app_error_weak.h

@@ -136,8 +136,8 @@ static uint32_t custom_value_char_add(ble_cus_t * p_cus, const ble_cus_init_t * 
     attr_char_value.init_len  = sizeof(uint16_t);
     attr_char_value.init_offs = 0;
     attr_char_value.max_len   = sizeof(uint16_t);
-    attr_char_value.p_value   = 12;
-
+    attr_char_value.p_value   = 0;
+    
     err_code = sd_ble_gatts_characteristic_add(p_cus->service_handle, &char_md,
                                                &attr_char_value,
                                                &p_cus->custom_value_handles);
@@ -185,6 +185,9 @@ void on_write(ble_cus_t * p_cus, ble_evt_t const * p_ble_evt)
 //    #define CUSTOM_CHAR_UUID_SENS_ADDRS       0x1411 // The Addresses of the attached sensors (uint-16, uint-16, uint-16). 
 //    #define CUSTOM_CHAR_UUID_UPLD_INTV        0x1412 // The interval that the BSI uploads the data.  
     ble_gatts_evt_write_t * p_evt_write = &p_ble_evt->evt.gatts_evt.params.write;
+    
+    bsi_config.configChanged = true;
+    
     switch(p_evt_write->uuid.uuid)
      {
      case CUSTOM_CHAR_UUID_S2_MEAS_INTV:     
@@ -233,7 +236,7 @@ void on_write(ble_cus_t * p_cus, ble_evt_t const * p_ble_evt)
        break;
      case CUSTOM_CHAR_UUID_SENS_CNFG:
        // The sensors attached to the device. PULSE,ANLG,ANLG. 1 = connected, 0 = disconnected. ie 110.
-       init_sensors((int)p_evt_write->data);
+       init_sensors(p_evt_write->data[0]);
        break;
 //     case CUSTOM_CHAR_UUID_SENS_ADDRS:
 //       // The Addresses of the attached sensors (uint-16, uint-16, uint-16). 

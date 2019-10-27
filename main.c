@@ -903,7 +903,6 @@ int main(void)
     conn_params_init();
     peer_manager_init();
 
-
     nrf_drv_qspi_init(&config, qspi_handler, NULL);
 
     configure_memory();
@@ -913,7 +912,7 @@ int main(void)
 //    WAIT_FOR_PERIPH();
     
     init_fds();
-
+    read_fds(fds_BSI_File,fds_BSI_Key, &bsi_config);
     // Start execution.
     NRF_LOG_INFO("Template example started.");
     application_timers_start();
@@ -925,7 +924,11 @@ int main(void)
     // Enter main loop.
     for (;;)
     {
-        
+        if(bsi_config.configChanged == true)
+        {
+          write_fds(fds_BSI_File,fds_BSI_Key);
+          bsi_config.configChanged = false; // Written the conig, set this back to false...
+        }
         if(lwrite_qspi == true)
         {
           write_qspi();

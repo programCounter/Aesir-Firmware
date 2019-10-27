@@ -9,6 +9,7 @@ This code is based on the following nordic tutorial
 #include <stdbool.h>
 #include "ble.h"
 #include "ble_srv_common.h"
+//#include "bsi_config.h"
 
 //0e28c719-6801-4160-a7d6-a3b252dc43a1 - needs to be stored as small endian...so turn it backwards.
 #define CUSTOM_SERVICE_UUID_BASE         {0xA1, 0x43, 0xDC, 0x52, 0xB2, 0xA3, 0xD6, 0xA7, \

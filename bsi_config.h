@@ -40,7 +40,8 @@ extern BSI_Config bsi_config;
 //#define fds_Sensor3_Key (0x0003)
 
 
-ret_code_t write_fds(uint16_t sensorFile, uint16_t sensorKey, fds_record_t fdsRec); //Handles write and update
+//ret_code_t write_fds(uint16_t sensorFile, uint16_t sensorKey, fds_record_t fdsRec); //Handles write and update
+ret_code_t write_fds(uint16_t sensorFile, uint16_t sensorKey); //Handles write and update
 
 ret_code_t init_fds(void);
 
@@ -48,6 +49,7 @@ void fds_evt_handler(fds_evt_t const * p_evt);
 
 ret_code_t delete_config_fds(void); //Deletes all the config files from the FDS
 
-ret_code_t read_fds(uint16_t sensorFile, uint16_t sensorKey, fds_record_t fdsRec,BSI_Sensor_Config * sens_config ); //Reads a file from the FDS
+//ret_code_t read_fds(uint16_t sensorFile, uint16_t sensorKey, fds_record_t fdsRec,BSI_Sensor_Config * sens_config )
+ret_code_t read_fds(uint16_t sensorFile, uint16_t sensorKey,BSI_Sensor_Config * sens_config ); //Reads a file from the FDS
 
 ret_code_t init_sensors(uint16_t sensorMap);

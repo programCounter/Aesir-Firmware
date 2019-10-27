@@ -113,38 +113,55 @@ BSI_Config bsi_config = {
 //    .data.length_words = (sizeof(bsi_config.sensor3_config) + 3) / sizeof(uint32_t),
 //};
 
-//Create FDS record for Sensor3
-static fds_record_t const FDS_BSI_record =
-{
-    .file_id           = fds_BSI_File,
-    .key               = fds_BSI_Key,
-    .data.p_data       = &bsi_config,
-    /* The length of a record is always expressed in 4-byte units (words). */
-    .data.length_words = (sizeof(bsi_config) + 3) / sizeof(uint32_t),
-};
+//Create FDS record for BSI //think this needs to go in write_fds so it's created before written.
+//static fds_record_t const FDS_BSI_record =
+//{
+//    .file_id           = fds_BSI_File,
+//    .key               = fds_BSI_Key,
+//    .data.p_data       = &bsi_config,
+//    /* The length of a record is always expressed in 4-byte units (words). */
+//    .data.length_words = (sizeof(bsi_config) + 3) / sizeof(uint32_t),
+//};
 
-ret_code_t read_fds(uint16_t sensorFile, uint16_t sensorKey, fds_record_t fdsRec,BSI_Sensor_Config * sens_config )
+//ret_code_t read_fds(uint16_t sensorFile, uint16_t sensorKey, fds_record_t fdsRec,BSI_Sensor_Config * sens_config )
+ret_code_t read_fds(uint16_t sensorFile, uint16_t sensorKey,BSI_Sensor_Config * sens_config )
 {
   ret_code_t retCode;
   fds_record_desc_t descript    = {0};
   fds_find_token_t  token       = {0};
   fds_flash_record_t flash_rec  = {0};
-  retCode = fds_record_find(sensorFile, sensorKey, &descript, &token);
+  retCode = fds_record_find(sensorFile, sensorKey, &descript, &token); // does our record actually exist in the flash?
 
-  /* Open the record and read its contents. */
-  retCode = fds_record_open(&descript, &sens_config);
-  APP_ERROR_CHECK(retCode);
+  if(retCode == FDS_SUCCESS)
+  {
+    /* Open the record and read its contents. */
+    //retCode = fds_record_open(&descript, &sens_config);
+    retCode = fds_record_open(&descript, &flash_rec);//uses the dsecriptor returned from fds_record_find to retrieve the record which contains our data.
+    APP_ERROR_CHECK(retCode);
 
-  memcpy(&sens_config, flash_rec.p_data, sizeof(BSI_Sensor_Config));
+    memcpy(&sens_config, flash_rec.p_data, sizeof(BSI_Sensor_Config));//copy the data in the flash over our current bsi_config.
+    fds_record_close(&descript);//Have to close it when were done to that garbage collection can happen
+  }
+  return retCode;
 }
 
-ret_code_t write_fds(uint16_t sensorFile, uint16_t sensorKey, fds_record_t fdsRec)
+//ret_code_t write_fds(uint16_t sensorFile, uint16_t sensorKey, fds_record_t fdsRec)
+ret_code_t write_fds(uint16_t sensorFile, uint16_t sensorKey)
 {
   //This checks if the passed file exists. IF the file exists, it updates it. Otherwise, it creates the file
   ret_code_t retCode;
   fds_record_desc_t descript  = {0};
   fds_find_token_t  token     = {0};
   
+  static fds_record_t const FDS_BSI_record =
+  {
+      .file_id           = fds_BSI_File,
+      .key               = fds_BSI_Key,
+      .data.p_data       = &bsi_config,
+      /* The length of a record is always expressed in 4-byte units (words). */
+      .data.length_words = (sizeof(bsi_config) + 3) / sizeof(uint32_t),
+  };
+
   //Check if the file exists in the flash
   retCode = fds_record_find(sensorFile, sensorKey, &descript, &token);
   
@@ -153,12 +170,12 @@ ret_code_t write_fds(uint16_t sensorFile, uint16_t sensorKey, fds_record_t fdsRe
   {
     case FDS_SUCCESS:
       //The file exists, we can update it.
-      retCode = fds_record_update(&descript, &fdsRec);
+      retCode = fds_record_update(&descript, &FDS_BSI_record);
       break;
 
     case FDS_ERR_NOT_FOUND:
       //The file DOES NOT exists, we can need to make it.
-      retCode = fds_record_write(&descript, &fdsRec);
+      retCode = fds_record_write(&descript, &FDS_BSI_record);
       break;
   }
   return retCode;
@@ -218,7 +235,8 @@ bool update_BSI_Config(void)
     {
       if(bsi_config.configChanged == true)
       {
-        write_fds(fds_BSI_File,fds_BSI_Key,FDS_BSI_record);
+//        write_fds(fds_BSI_File,fds_BSI_Key,FDS_BSI_record);
+        write_fds(fds_BSI_File,fds_BSI_Key);
       }
 //      if(bsi_config.sensor1_config.configChanged == true)
 //      {
@@ -262,8 +280,14 @@ void fds_evt_handler(fds_evt_t const * p_evt)
 ret_code_t init_sensors(uint16_t sensorMap)
 {
     //Intending to just use a binary value to indicate which sensors are off or on. We need to unpack the the byte
-     
-    uint8_t sensors = Uint8(sensorMap & 0xff); // recieveing a uint16, we only care about the lower byte.
+    if(sensorMap > 7)// if a value > 7 was sent, this is not a vlaid config
+    {
+      return 0;
+    }
+    uint8_t sensors = sensorMap & 0x0f; // recieveing a uint16, we only care about the lower byte.
+    bsi_config.sensor1_config.sensorEnabled = false;
+    bsi_config.sensor2_config.sensorEnabled = false;
+    bsi_config.sensor3_config.sensorEnabled = false;
 
     if((sensors&0001)==1) // bitwise and to see if sensor 3 is enabled or not. Analog
     {

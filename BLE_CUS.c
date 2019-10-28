@@ -232,7 +232,7 @@ void on_write(ble_cus_t * p_cus, ble_evt_t const * p_ble_evt)
        break;
      case CUSTOM_CHAR_UUID_UPLD_SZE:
        // What size of data are we going to upload. in kb, 5 = 5kbyte
-       bsi_config.uploadSize = (int)p_evt_write->data;
+       bsi_config.uploadSize = p_evt_write->data[0];
        break;
      case CUSTOM_CHAR_UUID_SENS_CNFG:
        // The sensors attached to the device. PULSE,ANLG,ANLG. 1 = connected, 0 = disconnected. ie 110.
@@ -243,7 +243,7 @@ void on_write(ble_cus_t * p_cus, ble_evt_t const * p_ble_evt)
 //       break;
      case CUSTOM_CHAR_UUID_UPLD_INTV:
        // The interval that the BSI uploads the data.
-       bsi_config.uploadSize = (int)p_evt_write->data;
+       bsi_config.uploadSize = p_evt_write->data[0];
        break;
     }
     //We are going to want to switch on the uuid of the written event

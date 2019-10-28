@@ -130,6 +130,9 @@ ret_code_t read_fds(uint16_t sensorFile, uint16_t sensorKey,BSI_Sensor_Config * 
   fds_record_desc_t descript    = {0};
   fds_find_token_t  token       = {0};
   fds_flash_record_t flash_rec  = {0};
+  
+  BSI_Config *data;
+
   retCode = fds_record_find(sensorFile, sensorKey, &descript, &token); // does our record actually exist in the flash?
 
   if(retCode == FDS_SUCCESS)
@@ -137,13 +140,16 @@ ret_code_t read_fds(uint16_t sensorFile, uint16_t sensorKey,BSI_Sensor_Config * 
     /* Open the record and read its contents. */
     //retCode = fds_record_open(&descript, &sens_config);
     retCode = fds_record_open(&descript, &flash_rec);//uses the dsecriptor returned from fds_record_find to retrieve the record which contains our data.
-    APP_ERROR_CHECK(retCode);
-
-    memcpy(&sens_config, flash_rec.p_data, sizeof(BSI_Sensor_Config));//copy the data in the flash over our current bsi_config.
+    //APP_ERROR_CHECK(retCode);
+    data = (BSI_Config *) flash_rec.p_data;
+    //memcpy(&sens_config, flash_rec.p_data, sizeof(BSI_Config));//copy the data in the flash over our current bsi_config.
+    memcpy(sens_config, data, sizeof(BSI_Config));//copy the data in the flash over our current bsi_config.
+    //sens_config = data;
     fds_record_close(&descript);//Have to close it when were done to that garbage collection can happen
   }
   return retCode;
 }
+
 
 //ret_code_t write_fds(uint16_t sensorFile, uint16_t sensorKey, fds_record_t fdsRec)
 ret_code_t write_fds(uint16_t sensorFile, uint16_t sensorKey)

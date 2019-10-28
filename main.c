@@ -885,6 +885,7 @@ static void advertising_start(bool erase_bonds)
 /**@brief Function for application main entry.*/
 int main(void)
 {
+    ret_code_t retCode;
     bool erase_bonds;
     nrf_drv_qspi_config_t config = NRF_DRV_QSPI_DEFAULT_CONFIG;
 
@@ -911,8 +912,10 @@ int main(void)
 //    nrf_drv_qspi_erase(NRF_QSPI_ERASE_LEN_64KB, 0);
 //    WAIT_FOR_PERIPH();
     
-    init_fds();
-    read_fds(fds_BSI_File,fds_BSI_Key, &bsi_config);
+    retCode = init_fds();
+    APP_ERROR_CHECK(retCode);
+    retCode = read_fds(fds_BSI_File,fds_BSI_Key, &bsi_config);
+    //APP_ERROR_CHECK(retCode);
     // Start execution.
     NRF_LOG_INFO("Template example started.");
     application_timers_start();
@@ -926,7 +929,8 @@ int main(void)
     {
         if(bsi_config.configChanged == true)
         {
-          write_fds(fds_BSI_File,fds_BSI_Key);
+          retCode = write_fds(fds_BSI_File,fds_BSI_Key);
+          APP_ERROR_CHECK(retCode);
           bsi_config.configChanged = false; // Written the conig, set this back to false...
         }
         if(lwrite_qspi == true)

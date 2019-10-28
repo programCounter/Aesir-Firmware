@@ -29,7 +29,7 @@ typedef struct BSIConfig {
 
 extern BSI_Config bsi_config;
 
-#define fds_BSI_File (0xF001)
+#define fds_BSI_File (0xA001)
 //#define fds_Sensor1_File (0xF001)
 //#define fds_Sensor2_File (0xF002)
 //#define fds_Sensor3_File (0xF003)

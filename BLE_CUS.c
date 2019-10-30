@@ -193,42 +193,42 @@ void on_write(ble_cus_t * p_cus, ble_evt_t const * p_ble_evt)
      case CUSTOM_CHAR_UUID_S2_MEAS_INTV:     
        // The time in minutes between each measurment.
        //sensor2_config.configChanged     = true;
-       bsi_config.sensor2_config.measInterval      = (int)p_evt_write->data;
+       bsi_config.sensor2_config.measInterval      = p_evt_write->data[0];
        break;
      case CUSTOM_CHAR_UUID_S3_MEAS_INTV:
        // The time in minutes between each measurment.
        //sensor3_config.configChanged     = true;
-       bsi_config.sensor3_config.measInterval      = (int)p_evt_write->data;
+       bsi_config.sensor3_config.measInterval      = p_evt_write->data[0];
        break;
      case CUSTOM_CHAR_UUID_DT_ALRM_ON:
        // The Delta T for pulses that sets an alarm state. IF time between pulses is below x time, set alarm.
        //sensor1_config.configChanged     = true;
-       bsi_config.sensor1_config.deltaTimeAlarmOn  = (int)p_evt_write->data;
+       bsi_config.sensor1_config.deltaTimeAlarmOn  = p_evt_write->data[0];
        break;
      case CUSTOM_CHAR_UUID_DT_ALRM_OFF:
        // The Delta for measurements that sets an alarm state. 
        //sensor1_config.configChanged     = true;
-       bsi_config.sensor1_config.deltaTimeAlarmOff = (int)p_evt_write->data;
+       bsi_config.sensor1_config.deltaTimeAlarmOff = p_evt_write->data[0];
        break;
      case CUSTOM_CHAR_UUID_DM_ALRM_S2_ON:
        // The Delta for measurements that sets an alarm state for S2. 
        //sensor2_config.configChanged     = true;
-       bsi_config.sensor2_config.deltaMeasAlarmOn  = (int)p_evt_write->data;
+       bsi_config.sensor2_config.deltaMeasAlarmOn  = p_evt_write->data[0];
        break;
      case CUSTOM_CHAR_UUID_DM_ALRM_S2_OFF:
        // The Delta for measurements that sets an alarm state for S2. 
        //sensor2_config.configChanged     = true;
-       bsi_config.sensor2_config.deltaMeasAlarmOff = (int)p_evt_write->data;
+       bsi_config.sensor2_config.deltaMeasAlarmOff = p_evt_write->data[0];
        break;
      case CUSTOM_CHAR_UUID_DM_ALRM_S3_ON:
        // The Delta for measurements that sets an alarm state for S3. 
        //sensor3_config.configChanged     = true;
-       bsi_config.sensor3_config.deltaMeasAlarmOn  = (int)p_evt_write->data;
+       bsi_config.sensor3_config.deltaMeasAlarmOn  = p_evt_write->data[0];
        break;
      case CUSTOM_CHAR_UUID_DM_ALRM_S3_OFF:
        // The Delta for measurements that sets an alarm state for S3.
        //sensor3_config.configChanged     = true;
-       bsi_config.sensor3_config.deltaMeasAlarmOff = (int)p_evt_write->data;
+       bsi_config.sensor3_config.deltaMeasAlarmOff = p_evt_write->data[0];
        break;
      case CUSTOM_CHAR_UUID_UPLD_SZE:
        // What size of data are we going to upload. in kb, 5 = 5kbyte

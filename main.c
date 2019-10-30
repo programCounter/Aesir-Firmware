@@ -488,7 +488,7 @@ static void timers_init(void)
     APP_ERROR_CHECK(err_code);
 }
 
-static void reset_timer(uint16_t timerS1, uint16_t timerS2)
+void reset_timer(uint16_t timerS1, uint16_t timerS2)
 {
   //Stops both timers and re-starts them with the given values.
   uint32_t err_code;
@@ -931,6 +931,26 @@ int main(void)
         {
           retCode = write_fds(fds_BSI_File,fds_BSI_Key);
           APP_ERROR_CHECK(retCode);
+          //Need to update timers to match the new config.
+          uint16_t S2 = bsi_config.sensor2_config.measInterval;
+          uint16_t S3 = bsi_config.sensor3_config.measInterval;
+          //reset_timer(S2,S3);
+          
+          retCode = app_timer_stop(m_measure_timer1_id);
+          APP_ERROR_CHECK(retCode);
+
+          //Reset the timer 1 with the new value
+          retCode = app_timer_start(m_measure_timer1_id,S2, NULL);
+          APP_ERROR_CHECK(retCode);
+//
+//          //stop timer 2
+//          retCode = app_timer_stop(m_measure_timer2_id);
+//          APP_ERROR_CHECK(retCode);
+//
+//          //Reset the timer 2 with the new value
+//          retCode = app_timer_start(m_measure_timer2_id,S3, NULL);
+//          APP_ERROR_CHECK(retCode);
+
           bsi_config.configChanged = false; // Written the conig, set this back to false...
         }
         if(lwrite_qspi == true)

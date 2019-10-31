@@ -1,7 +1,7 @@
 Output/ble_app_template_pca10056_s140\ Debug/Obj/app_util_platform.o: \
- C:\dev\nRF5_SDK_15.3.0\components\libraries\util\app_util_platform.c \
- C:\dev\nRF5_SDK_15.3.0\components\libraries\util\app_util_platform.h \
- C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.18/include/stdint.h \
+ E:\dev\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\components\libraries\util\app_util_platform.c \
+ E:\dev\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\components\libraries\util\app_util_platform.h \
+ E:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.22/include/stdint.h \
  ../../../../../../modules/nrfx/mdk/compiler_abstraction.h \
  ../../../../../../modules/nrfx/mdk/nrf.h \
  ../../../../../../modules/nrfx/mdk/nrf52840.h \
@@ -20,12 +20,12 @@ Output/ble_app_template_pca10056_s140\ Debug/Obj/app_util_platform.o: \
  ../../../../../../components/softdevice/s140/headers/nrf_error.h \
  ../../../../../../components/softdevice/s140/headers/nrf_error_soc.h \
  ../../../../../../components/softdevice/s140/headers/nrf_nvic.h \
- C:\dev\nRF5_SDK_15.3.0\components\libraries\util\nrf_assert.h \
- C:\dev\nRF5_SDK_15.3.0\components\libraries\util\app_error.h \
- C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.18/include/stdio.h \
- C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.18/include/__crossworks.h \
- C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.18/include/stdbool.h \
- C:\dev\nRF5_SDK_15.3.0\components\libraries\util\sdk_errors.h \
+ E:\dev\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\components\libraries\util\nrf_assert.h \
+ E:\dev\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\components\libraries\util\app_error.h \
+ E:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.22/include/stdio.h \
+ E:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.22/include/__crossworks.h \
+ E:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.22/include/stdbool.h \
+ E:\dev\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\components\libraries\util\sdk_errors.h \
  ../../../../../../components/softdevice/s140/headers/nrf_error.h \
- C:\dev\nRF5_SDK_15.3.0\components\libraries\util\nordic_common.h \
- C:\dev\nRF5_SDK_15.3.0\components\libraries\util\app_error_weak.h
+ E:\dev\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\components\libraries\util\nordic_common.h \
+ E:\dev\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\components\libraries\util\app_error_weak.h

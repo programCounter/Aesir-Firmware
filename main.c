@@ -143,7 +143,10 @@ BLE_ADVERTISING_DEF(m_advertising);                                             
 
 static uint16_t m_conn_handle = BLE_CONN_HANDLE_INVALID;                        /**< Handle of the current connection. */
 
-
+static uint32_t ticksS2;
+static uint32_t ticksS3;
+static bool S2MeasureNow;
+static bool S3MeasureNow;
 
 /* YOUR_JOB: Declare all services structure your application is using
  *  BLE_XYZ_DEF(m_xyz);
@@ -170,11 +173,11 @@ static uint32_t NumFlashAddrs = 16777215; // the device is configured in 24bit a
 
 
 #define MINUTE_TIMER_TICK APP_TIMER_TICKS(60000) //1 min, lowest resolution of time we will think about.
-#define SENSOR_MEASURE_TICK APP_TIMER_TICKS(3600000) //1 hour. default measurement time for analog sensors
+//#define SENSOR_MEASURE_TICK APP_TIMER_TICKS(3600000) //1 hour. default measurement time for analog sensors
 
 APP_TIMER_DEF(m_minute_timer_id);                                  
-APP_TIMER_DEF(m_measure_timer1_id);  
-APP_TIMER_DEF(m_measure_timer2_id);  
+//APP_TIMER_DEF(m_measure_timer1_id);  
+//APP_TIMER_DEF(m_measure_timer2_id);  
 
 static void advertising_start(bool erase_bonds); 
 
@@ -434,24 +437,23 @@ static void minute_timer_timeout_handler(void * p_context)
   //Wake up and increment the time variable
   //If the variable 
   UNUSED_PARAMETER(p_context);
+
+  ticksS2++;
+  ticksS3++;
+  if(ticksS2 > bsi_config.sensor2_config.measInterval)
+  {
+    S2MeasureNow = true;
+    ticksS2 = 0;
+  }
+  if(ticksS3 > bsi_config.sensor3_config.measInterval)
+  {
+    S3MeasureNow = true;
+    ticksS3 = 0;
+  }
+
 }
 
-static void meas_timeout_handler(void * p_context)
-{
-  //What happens when the measurement interval elapses?
-  UNUSED_PARAMETER(p_context);
-  //Turn on sensor 1 power
-  //Wait for ADC ready
-  //Get sensor 1 value from ADC
-  //Store value to QSPI
-  //Turn off sensor 1 power
 
-  //Turn on sensor 2 power
-  //Wait for ADC ready
-  //Get sensor 2 value from ADC
-  //Store value to QSPI
-  //Turn off sensor 2 power
-}
 
 /**@brief Function for the Timer initialization.
  *
@@ -477,38 +479,9 @@ static void timers_init(void)
                                 minute_timer_timeout_handler);
     APP_ERROR_CHECK(err_code);
 
-    err_code = app_timer_create(&m_measure_timer1_id,
-                                APP_TIMER_MODE_REPEATED,
-                                meas_timeout_handler);
-    APP_ERROR_CHECK(err_code);
-
-    err_code = app_timer_create(&m_measure_timer2_id,
-                                APP_TIMER_MODE_REPEATED,
-                                meas_timeout_handler);
-    APP_ERROR_CHECK(err_code);
 }
 
-void reset_timer(uint16_t timerS1, uint16_t timerS2)
-{
-  //Stops both timers and re-starts them with the given values.
-  uint32_t err_code;
-  //stop timer 1
-  err_code = app_timer_stop(m_measure_timer1_id);
-  APP_ERROR_CHECK(err_code);
 
-  //Reset the timer 1 with the new value
-  err_code = app_timer_start(m_measure_timer1_id,timerS1, NULL);
-  APP_ERROR_CHECK(err_code);
-
-  //stop timer 2
-  err_code = app_timer_stop(m_measure_timer2_id);
-  APP_ERROR_CHECK(err_code);
-
-  //Reset the timer 2 with the new value
-  err_code = app_timer_start(m_measure_timer2_id,timerS2, NULL);
-  APP_ERROR_CHECK(err_code);
-
-}
 
 /**@brief Function for starting timers.
  */
@@ -931,27 +904,18 @@ int main(void)
         {
           retCode = write_fds(fds_BSI_File,fds_BSI_Key);
           APP_ERROR_CHECK(retCode);
-          //Need to update timers to match the new config.
-          uint16_t S2 = bsi_config.sensor2_config.measInterval;
-          uint16_t S3 = bsi_config.sensor3_config.measInterval;
-          //reset_timer(S2,S3);
-          
-          retCode = app_timer_stop(m_measure_timer1_id);
-          APP_ERROR_CHECK(retCode);
-
-          //Reset the timer 1 with the new value
-          retCode = app_timer_start(m_measure_timer1_id,S2, NULL);
-          APP_ERROR_CHECK(retCode);
-//
-//          //stop timer 2
-//          retCode = app_timer_stop(m_measure_timer2_id);
-//          APP_ERROR_CHECK(retCode);
-//
-//          //Reset the timer 2 with the new value
-//          retCode = app_timer_start(m_measure_timer2_id,S3, NULL);
-//          APP_ERROR_CHECK(retCode);
 
           bsi_config.configChanged = false; // Written the conig, set this back to false...
+        }
+        if(S2MeasureNow == true)
+        {
+          //Time to take a measurement on Analog S2
+          S2MeasureNow = false;
+        }
+        if(S3MeasureNow == true)
+        {
+          //Time to take a measurement on Analog S3
+          S3MeasureNow = false;
         }
         if(lwrite_qspi == true)
         {

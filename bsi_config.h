@@ -25,6 +25,7 @@ typedef struct BSIConfig {
     BSI_Sensor_Config sensor3_config;
     uint16_t uploadSize; //in KB
     uint32_t uploadInterval; //Duration in minutes between broadcasting data. Probably wont use it since the limiting factor is the advertising size.
+    uint32_t LastKnownAddress;
 }BSI_Config;
 
 extern BSI_Config bsi_config;

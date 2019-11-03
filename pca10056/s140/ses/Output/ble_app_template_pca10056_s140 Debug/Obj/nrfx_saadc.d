@@ -1,8 +1,5 @@
-Output/ble_app_template_pca10056_s140\ Debug/Obj/nrf_drv_clock.o: \
- E:\dev\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\integration\nrfx\legacy\nrf_drv_clock.c \
- ../../../../../../components/libraries/util/nordic_common.h \
- E:\dev\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\integration\nrfx\legacy\nrf_drv_clock.h \
- ../../../../../../modules/nrfx/drivers/include/nrfx_clock.h \
+Output/ble_app_template_pca10056_s140\ Debug/Obj/nrfx_saadc.o: \
+ E:\dev\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\modules\nrfx\drivers\src\nrfx_saadc.c \
  ../../../../../../modules/nrfx/nrfx.h \
  ../../../../../../integration/nrfx/nrfx_config.h ../config/sdk_config.h \
  ../../../../../../modules/nrfx/drivers/nrfx_common.h \
@@ -34,6 +31,7 @@ Output/ble_app_template_pca10056_s140\ Debug/Obj/nrf_drv_clock.o: \
  ../../../../../../components/libraries/util/nordic_common.h \
  ../../../../../../components/softdevice/s140/headers/nrf52/nrf_mbr.h \
  ../../../../../../components/softdevice/s140/headers/nrf_svc.h \
+ ../../../../../../components/libraries/util/nordic_common.h \
  ../../../../../../components/libraries/util/app_util_platform.h \
  ../../../../../../components/softdevice/s140/headers/nrf_soc.h \
  ../../../../../../components/softdevice/s140/headers/nrf_svc.h \
@@ -52,18 +50,15 @@ Output/ble_app_template_pca10056_s140\ Debug/Obj/nrf_drv_clock.o: \
  ../../../../../../components/libraries/util/sdk_resources.h \
  ../../../../../../components/softdevice/s140/headers/nrf_sd_def.h \
  ../../../../../../modules/nrfx/drivers/nrfx_errors.h \
- ../../../../../../modules/nrfx/hal/nrf_clock.h \
- ../../../../../../modules/nrfx/drivers/include/nrfx_power_clock.h \
- ../../../../../../components/softdevice/common/nrf_sdh.h \
- ../../../../../../components/libraries/experimental_section_vars/nrf_section_iter.h \
- ../../../../../../components/libraries/experimental_section_vars/nrf_section.h \
- ../../../../../../components/softdevice/common/nrf_sdh_soc.h \
+ ../../../../../../modules/nrfx/drivers/include/nrfx_saadc.h \
+ ../../../../../../modules/nrfx/hal/nrf_saadc.h \
+ ../../../../../../integration/nrfx/nrfx_log.h \
+ ../../../../../../components/libraries/log/nrf_log.h \
  ../../../../../../components/libraries/util/sdk_common.h \
  E:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.22/include/string.h \
  ../../../../../../components/libraries/util/sdk_os.h \
  ../../../../../../components/libraries/util/app_util.h \
  ../../../../../../components/libraries/util/sdk_macros.h \
- ../../../../../../components/libraries/log/nrf_log.h \
  ../../../../../../components/libraries/experimental_section_vars/nrf_section.h \
  ../../../../../../components/libraries/strerror/nrf_strerror.h \
  ../../../../../../components/libraries/log/src/nrf_log_internal.h \

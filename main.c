@@ -56,6 +56,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+
 #include "nordic_common.h"
 #include "nrf.h"
 #include "app_error.h"
@@ -94,6 +95,8 @@
 #include "bsi_config.h"
 #include "bsi_qspi.h"
 #include "BLE_CUS.h"
+//#include "nrfx_saadc.h"
+#include "bsi_measure.h"
 //#define QSPI_STD_CMD_WRSR   0x01
 //#define QSPI_STD_CMD_RSTEN  0x66
 //#define QSPI_STD_CMD_RST    0x99
@@ -438,19 +441,25 @@ static void minute_timer_timeout_handler(void * p_context)
   //If the variable 
   UNUSED_PARAMETER(p_context);
 
-  ticksS2++;
-  ticksS3++;
-  if(ticksS2 > bsi_config.sensor2_config.measInterval)
+  if(bsi_config.sensor2_config.sensorEnabled == true) // IF the sensors not enabled dont even increment the count
   {
-    S2MeasureNow = true;
-    ticksS2 = 0;
-  }
-  if(ticksS3 > bsi_config.sensor3_config.measInterval)
-  {
-    S3MeasureNow = true;
-    ticksS3 = 0;
+    ticksS2++;
+    if(ticksS2 > bsi_config.sensor2_config.measInterval)
+    {
+      S2MeasureNow = true;
+      ticksS2 = 0;
+    }
   }
 
+  if(bsi_config.sensor3_config.sensorEnabled == true) // IF the sensors not enabled dont even increment the count
+  {
+    ticksS3++;
+    if(ticksS3 > bsi_config.sensor3_config.measInterval)
+    {
+      S3MeasureNow = true;
+      ticksS3 = 0;
+    }
+  }
 }
 
 
@@ -882,6 +891,8 @@ int main(void)
 
     configure_memory();
     m_finished = false;
+    
+    saadc_init();
 
 //    nrf_drv_qspi_erase(NRF_QSPI_ERASE_LEN_64KB, 0);
 //    WAIT_FOR_PERIPH();
@@ -890,8 +901,9 @@ int main(void)
     APP_ERROR_CHECK(retCode);
     retCode = read_fds(fds_BSI_File,fds_BSI_Key, &bsi_config);
     //APP_ERROR_CHECK(retCode);
+
     // Start execution.
-    NRF_LOG_INFO("Template example started.");
+    //NRF_LOG_INFO("Template example started.");
     application_timers_start();
 
     advertising_start(erase_bonds);

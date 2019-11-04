@@ -95,7 +95,6 @@
 #include "bsi_config.h"
 #include "bsi_qspi.h"
 #include "BLE_CUS.h"
-//#include "nrfx_saadc.h"
 #include "bsi_measure.h"
 //#define QSPI_STD_CMD_WRSR   0x01
 //#define QSPI_STD_CMD_RSTEN  0x66
@@ -893,7 +892,7 @@ int main(void)
     m_finished = false;
     
     saadc_init();
-
+    gpio_init();
 //    nrf_drv_qspi_erase(NRF_QSPI_ERASE_LEN_64KB, 0);
 //    WAIT_FOR_PERIPH();
     

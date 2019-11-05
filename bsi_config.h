@@ -19,6 +19,7 @@ typedef struct BSISensorConfig {
 //extern BSI_Sensor_Config sensor3_config;
 
 typedef struct BSIConfig {
+    char BSI_Name[16];
     bool configChanged;
     BSI_Sensor_Config sensor1_config;
     BSI_Sensor_Config sensor2_config;

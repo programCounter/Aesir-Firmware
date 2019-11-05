@@ -11,7 +11,7 @@
         m_finished = false;    \
     } while (0)
 
-uint16_t pressCount = 0;
+uint16_t pressCount = 65535;
 bool lwrite_qspi = false;
 bool lread_qspi = false;
 bool m_finished = false; // used in the QSPI event
@@ -58,38 +58,40 @@ void configure_memory()
 void write_qspi()
 {
     ret_code_t err_code;
-    volatile uint8_t nCount = pressCount;
-    volatile uint8_t c = 0;
+    volatile uint16_t nCount = pressCount;
+    volatile uint16_t c = 0;
     // counter for binary array 
 
     bsp_board_leds_off();
     bsp_board_led_on(0);
-    m_buffer_tx[0]=0;
-    m_buffer_tx[1]=0;
-    m_buffer_tx[2]=0;
-    m_buffer_tx[3]=0;
-
-    //memset(&m_buffer_tx, 0, sizeof(m_buffer_tx)); //try this to nuke the array.
+    //m_buffer_tx[0]=0;
+    //m_buffer_tx[1]=0;
+    //m_buffer_tx[2]=0;
+    //m_buffer_tx[3]=0;
+    memset(&m_buffer_tx, 0, sizeof(m_buffer_tx)); //try this to nuke the array.
     
     while (nCount > 0) { 
-        // storing remainder in binary array 
-        //m_buffer_tx[c] = nCount % 2; 
+        // storing remainder in binary array  
         m_buffer_tx[c] = nCount & 00000001; 
-        //nCount = nCount / 2; 
         nCount = nCount>>1;
         c++; 
      }
 
-     err_code = nrf_drv_qspi_erase(NRF_QSPI_ERASE_LEN_64KB, 0);
-     APP_ERROR_CHECK(err_code);
+     //err_code = nrf_drv_qspi_erase(NRF_QSPI_ERASE_LEN_64KB, 0);
+     //APP_ERROR_CHECK(err_code);
      //nrf_drv_qspi_chip_erase();
-     WAIT_FOR_PERIPH();
+     //WAIT_FOR_PERIPH();
 
      err_code = nrf_drv_qspi_write(m_buffer_tx, sizeof(m_buffer_tx), LastKnownAddr);
      APP_ERROR_CHECK(err_code);
      WAIT_FOR_PERIPH();
+
+    if(err_code == NRF_SUCCESS) { //If write was success, then increment address (+1 so we start at a new place, no overlap)
+      LastKnownAddr += (sizeof(m_buffer_tx));
+    }
  
      //bsp_board_leds_on();
+     pressCount = 0;
      lwrite_qspi = false;
 }
 
@@ -99,9 +101,9 @@ void read_qspi()
       ret_code_t err_code;
       volatile uint8_t c = 0;
       volatile uint8_t digit_2read = 0;
+      memset(&m_buffer_rx, 0, sizeof(m_buffer_rx)); //try this to nuke the array.
 
-      digit_2read = 0;
-      err_code = nrf_drv_qspi_read(m_buffer_rx, sizeof(m_buffer_tx), LastKnownAddr);
+      err_code = nrf_drv_qspi_read(m_buffer_rx, sizeof(m_buffer_tx), (LastKnownAddr-sizeof(m_buffer_tx)));
       APP_ERROR_CHECK(err_code);
       WAIT_FOR_PERIPH();
 

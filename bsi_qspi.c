@@ -122,7 +122,7 @@ void read_qspi(uint32_t Address)
       ret_code_t err_code;
       //volatile uint8_t c = 0;
       //volatile uint8_t digit_2read = 0;
-      //memset(&m_buffer_rx, 0, sizeof(m_buffer_rx)); //try this to nuke the array.
+      memset(&ReadHeader, 0, sizeof(ReadHeader)); //try this to nuke the array.
 
       err_code = nrf_drv_qspi_read(&ReadHeader, sizeof(ReadHeader), Address);
       APP_ERROR_CHECK(err_code);

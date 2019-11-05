@@ -149,7 +149,8 @@ static uint32_t ticksS2;
 static uint32_t ticksS3;
 static bool S2MeasureNow;
 static bool S3MeasureNow;
-//uint32_t qspiAddress = 0;
+
+uint32_t qspiAddress = 0; //ONLY FOR DEBUG
 
 /* YOUR_JOB: Declare all services structure your application is using
  *  BLE_XYZ_DEF(m_xyz);
@@ -721,6 +722,10 @@ static void bsp_event_handler(bsp_event_t event)
     m_finished = false;
     switch (event)
     {
+        case BSP_EVENT_KEY_0:
+            nrf_drv_qspi_erase(NRF_QSPI_ERASE_LEN_4KB, 0); //Erase 4kB from &0
+            break;
+
         case BSP_EVENT_KEY_1:
             //Increment the button counter, only 4 LEDs so rolls over after 15.
             pressCount ++;
@@ -932,11 +937,11 @@ int main(void)
         }
         if(lwrite_qspi == true)
         {
-          //write_qspi(qspiAddress);
+          write_qspi(qspiAddress);
         }
         if(lread_qspi == true)
         {
-          //read_qspi(qspiAddress);
+          read_qspi(qspiAddress);
         }
         idle_state_handle();
     }

@@ -8,7 +8,7 @@ static volatile uint32_t LastKnownAddr = 0; // Attempt to track the most recent 
 
 typedef struct BSI_Header {
       char BSI_Name[16];
-      uint8_t StartTime[7]; //7 bytes (5+ 2byte year) YYYY/MM/DD/HH/MM/SS
+      uint8_t StartTime[8]; //7 bytes (5+ 2byte year) YYYY/MM/DD/HH/MM/SS
 }BSI_Header;
 
 typedef struct QSPI_Page {

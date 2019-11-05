@@ -11,7 +11,7 @@
         m_finished = false;    \
     } while (0)
 
-uint16_t pressCount = 65535;
+uint16_t pressCount = 0;
 bool lwrite_qspi = false;
 bool lread_qspi = false;
 bool m_finished = false; // used in the QSPI event

@@ -149,6 +149,7 @@ static uint32_t ticksS2;
 static uint32_t ticksS3;
 static bool S2MeasureNow;
 static bool S3MeasureNow;
+//uint32_t qspiAddress = 0;
 
 /* YOUR_JOB: Declare all services structure your application is using
  *  BLE_XYZ_DEF(m_xyz);
@@ -891,8 +892,8 @@ int main(void)
     configure_memory();
     m_finished = false;
     
-    saadc_init();
-    gpio_init();
+//    saadc_init();
+//    gpio_init();
 //    nrf_drv_qspi_erase(NRF_QSPI_ERASE_LEN_64KB, 0);
 //    WAIT_FOR_PERIPH();
     
@@ -917,7 +918,7 @@ int main(void)
           retCode = write_fds(fds_BSI_File,fds_BSI_Key);
           APP_ERROR_CHECK(retCode);
 
-          bsi_config.configChanged = false; // Written the conig, set this back to false...
+          bsi_config.configChanged = false; // Written the config, set this back to false...
         }
         if(S2MeasureNow == true)
         {
@@ -931,11 +932,11 @@ int main(void)
         }
         if(lwrite_qspi == true)
         {
-          write_qspi();
+          //write_qspi(qspiAddress);
         }
         if(lread_qspi == true)
         {
-          read_qspi();
+          //read_qspi(qspiAddress);
         }
         idle_state_handle();
     }

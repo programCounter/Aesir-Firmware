@@ -1,6 +1,7 @@
 #include "nrf_drv_qspi.h"
 #include "bsi_qspi.h"
 #include "bsp_btn_ble.h"
+#include "bsi_config.h"
 
 #define QSPI_STD_CMD_WRSR   0x01
 #define QSPI_STD_CMD_RSTEN  0x66
@@ -109,6 +110,9 @@ void write_qspi(uint32_t Address)
 
     if(err_code == NRF_SUCCESS) { //If write was success, then increment address (+1 so we start at a new place, no overlap)
       LastKnownAddr += (sizeof(TestHeader));
+      //Added code to write the last known address to the config so it survives power cycles.
+      bsi_config.lastKnownAddr = LastKnownAddr;
+      bsi_config.configChanged = true;
     }
  
      //bsp_board_leds_on();

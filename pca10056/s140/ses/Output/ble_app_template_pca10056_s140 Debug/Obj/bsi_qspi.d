@@ -70,4 +70,6 @@ Output/ble_app_template_pca10056_s140\ Debug/Obj/bsi_qspi.o: \
  ../../../../../../modules/nrfx/hal/nrf_gpio.h \
  ../../../../../../components/boards/pca10056.h \
  ../../../../../../components/libraries/button/app_button.h \
- ../../../../../../components/libraries/util/app_error.h
+ ../../../../../../components/libraries/util/app_error.h \
+ E:\dev\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\examples\ble_peripheral\Aesir-Firmware\bsi_config.h \
+ ../../../../../../components/libraries/fds/fds.h

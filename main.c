@@ -869,6 +869,30 @@ static void advertising_start(bool erase_bonds)
     }
 }
 
+/**@brief Struct that contains pointers to the encoded advertising data. */
+static ble_gap_adv_data_t m_adv_data =
+{
+    .adv_data =
+    {
+        .p_data = m_enc_advdata,
+        .len    = BLE_GAP_ADV_SET_DATA_SIZE_MAX
+    },
+    .scan_rsp_data =
+    {
+        .p_data = NULL,
+        .len    = 0
+
+    }
+};
+
+void update_advert(uint8_t handle,ble_gap_adv_data_t p_data)
+{
+    ret_code_t err_code;
+    err_code = sd_ble_gap_adv_set_configure(handle, p_data, null);
+    APP_ERROR_CHECK(err_code);
+
+}
+
 
 /**@brief Function for application main entry.*/
 int main(void)

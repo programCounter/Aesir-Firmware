@@ -723,27 +723,28 @@ static void bsp_event_handler(bsp_event_t event)
     switch (event)
     {
         case BSP_EVENT_KEY_0:
-            nrf_drv_qspi_erase(NRF_QSPI_ERASE_LEN_4KB, 0); //Erase 4kB from &0
+            // Erase 4kB from &0 on QSPI and rewrite header (initialize first time flash)
+            //write_qspi(0,qspiAddress); // Operation 0 is replace header
             break;
 
         case BSP_EVENT_KEY_1:
             //Increment the button counter, only 4 LEDs so rolls over after 15.
-            pressCount ++;
-            if(pressCount > 15)
-            {
-              pressCount = 0;
-            }
-            ble_bas_battery_level_update(&m_bas,pressCount,BLE_CONN_HANDLE_ALL);
+            //pressCount ++;
+            //if(pressCount > 15)
+            //{
+            //  pressCount = 0;
+            //}
+            //ble_bas_battery_level_update(&m_bas,pressCount,BLE_CONN_HANDLE_ALL);
             break;
  
         case BSP_EVENT_KEY_2:
             //Write to qspi
-            lwrite_qspi = true;
+            //lwrite_qspi = true;
             break;
        
         case BSP_EVENT_KEY_3:
             //Read qspi
-            lread_qspi = true;
+            //lread_qspi = true;
             break;
         
         case BSP_EVENT_SLEEP:
@@ -937,11 +938,11 @@ int main(void)
         }
         if(lwrite_qspi == true)
         {
-          write_qspi(qspiAddress);
+          write_qspi(OpCode, qspiAddress);
         }
         if(lread_qspi == true)
         {
-          read_qspi(qspiAddress);
+          read_qspi(OpCode, qspiAddress);
         }
         idle_state_handle();
     }

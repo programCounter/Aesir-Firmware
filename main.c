@@ -901,6 +901,7 @@ static ble_gap_adv_data_t m_adv_data =
 
 void update_advert(void)
 {
+    
     ret_code_t err_code;
     ble_advdata_t advdata;
     uint8_t       flags = BLE_GAP_ADV_FLAG_BR_EDR_NOT_SUPPORTED;
@@ -992,7 +993,8 @@ int main(void)
         }
         if(UploadNow == true)
         {
-          
+          //There may be an issue with how the advert api plays with the code the update advert,
+          //based on what I read we should dodge the issues by only changing the config when the advertising is stopped.
           //we need the data from the flash
           read_qspi(qspiAddress);
           //we need to put that data into our advert

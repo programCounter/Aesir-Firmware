@@ -112,7 +112,8 @@
 #define MANUFACTURER_NAME               "RioT Wireless"                   /**< Manufacturer. Will be passed to Device Information Service. */
 #define APP_ADV_INTERVAL                300                                     /**< The advertising interval (in units of 0.625 ms. This value corresponds to 187.5 ms). */
 
-#define APP_ADV_DURATION                18000                                   /**< The advertising duration (180 seconds) in units of 10 milliseconds. */
+//#define APP_ADV_DURATION                18000                                   /**< The advertising duration (180 seconds) in units of 10 milliseconds. */
+#define APP_ADV_DURATION                180                                   /**< The advertising duration (180 seconds) in units of 10 milliseconds. */
 #define APP_BLE_OBSERVER_PRIO           3                                       /**< Application's BLE observer priority. You shouldn't need to modify this value. */
 #define APP_BLE_CONN_CFG_TAG            1                                       /**< A tag identifying the SoftDevice BLE configuration. */
 
@@ -884,13 +885,13 @@ static void advertising_start(bool erase_bonds)
 
 /**@brief Struct that contains pointers to the encoded advertising data. */
 static uint8_t              m_adv_handle = BLE_GAP_ADV_SET_HANDLE_NOT_SET; /**< Advertising handle used to identify an advertising set. */
-static uint8_t              m_enc_advdata[BLE_GAP_ADV_SET_DATA_SIZE_EXTENDED_MAX_SUPPORTED];  /**< Buffer for storing an encoded advertising set. */
+static uint8_t              m_enc_advdata[BLE_GAP_ADV_SET_DATA_SIZE_MAX];  /**< Buffer for storing an encoded advertising set. */
 static ble_gap_adv_data_t m_adv_data =
 {
     .adv_data =
     {
         .p_data = m_enc_advdata,
-        .len    = BLE_GAP_ADV_SET_DATA_SIZE_EXTENDED_MAX_SUPPORTED
+        .len    = BLE_GAP_ADV_SET_DATA_SIZE_MAX 
     },
     .scan_rsp_data =
     {
@@ -906,13 +907,13 @@ void update_advert(void)
     ret_code_t err_code;
     ble_advdata_t advdata;
     uint8_t       flags = BLE_GAP_ADV_FLAG_BR_EDR_NOT_SUPPORTED;
-
+    uint8_t junkvar = 9;
     // Build and set advertising data.
     memset(&advdata, 0, sizeof(advdata));
 
     advdata.name_type             = BLE_ADVDATA_NO_NAME;
     advdata.flags                 = flags;
-    advdata.p_manuf_specific_data = &m_buffer_tx;
+    advdata.p_manuf_specific_data = junkvar;
 
     err_code = ble_advdata_encode(&advdata, m_adv_data.adv_data.p_data, &m_adv_data.adv_data.len);
     APP_ERROR_CHECK(err_code);
@@ -997,7 +998,9 @@ int main(void)
           //There may be an issue with how the advert api plays with the code the update advert,
           //based on what I read we should dodge the issues by only changing the config when the advertising is stopped.
           //we need the data from the flash
+
           // read_qspi(qspiAddress); // *** TO BE DISCUSSED ***
+
           //we need to put that data into our advert
           update_advert();
           //Advertising should be stopped

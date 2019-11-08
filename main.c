@@ -994,19 +994,17 @@ int main(void)
         }
         if(UploadNow == true)
         {
-<<<<<<< HEAD
           read_qspi(OpCode, qspiAddress);
-=======
+
           //There may be an issue with how the advert api plays with the code the update advert,
           //based on what I read we should dodge the issues by only changing the config when the advertising is stopped.
           //we need the data from the flash
-          read_qspi(qspiAddress);
+          read_qspi(1,qspiAddress); // LB: 1 means is read from specified address
           //we need to put that data into our advert
           update_advert();
           //Advertising should be stopped
           advertising_start(erase_bonds);
           //The advertisment should then time out and stop.
->>>>>>> cb1a74b79bec53fa540e086766651c22c46b7055
         }
 //        if(lread_qspi == true)
 //        {

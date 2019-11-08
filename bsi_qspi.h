@@ -1,7 +1,7 @@
 extern bool m_finished; // used in the QSPI event
-//static volatile uint8_t m_buffer_tx[16];
-//static volatile uint8_t m_buffer_rx[16];
-//extern uint16_t pressCount;
+static volatile uint8_t m_buffer_tx[16];
+static volatile uint8_t m_buffer_rx[16];
+extern uint16_t pressCount;
 
 static uint8_t currentSector;
 extern bool lwrite_qspi;

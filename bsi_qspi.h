@@ -20,17 +20,17 @@ typedef struct BSI_Header {
 
 typedef struct QSPI_Page_ 
 { // each memory page is 1byte, but ours are the size of each sensor reading
-    uint16_t countMin; // minutes since Header StartTime[] (last Local Listener connection)
+    uint8_t countMin; // minutes since Header StartTime[] (last Local Listener connection)
     uint8_t sensorCh; // which sensor the following value is from (1=An1, 2=An2, or 9 = Pulse)
     uint16_t sensorValue; // the 16b reading from the sensor (10-bit ADC for An# or Bool for Pulse)    
-    uint8_t dataSpace; //maybe data needs spaces too :)
+    //uint8_t dataSpace; //maybe data needs spaces too :)
 }QSPI_Page;
 
 extern QSPI_Page CurrentPage;
 
 typedef struct QSPI_Sector { // if a QSPI_page is 5 bytes and a sector is 1024 Bytes...
-    struct QSPI_Page_ Page[204];//(SECTOR_SIZE/(sizeof(QSPI_Page)))];    // ... then there should be 204 QSPI pages in this array
-    bool xTransmitted; // *** HMM ERASED MEMORY IS STORED AS ALL 111111 soooo
+    struct QSPI_Page_ Page[(SECTOR_SIZE/(sizeof(QSPI_Page)))];    // ... then there should be 204 QSPI pages in this array
+    //bool xTransmitted; // *** HMM ERASED MEMORY IS STORED AS ALL 111111 soooo
     // sector related features go here?
 }QSPI_Sector;
 

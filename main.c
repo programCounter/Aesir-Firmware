@@ -1020,7 +1020,7 @@ int main(void)
           {
             write_qspi_page();
             CurrentPage.countMin += 1;
-            CurrentPage.sensorValue = 420;
+            CurrentPage.sensorValue = rand();
           }
           
           // write_qspi_header();

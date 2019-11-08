@@ -7,8 +7,8 @@ static uint8_t currentSector;
 extern bool lwrite_qspi;
 extern bool lread_qspi;
 // "In the C programming language, static is used with global variables and functions to set their scope to the containing file."
-static volatile uint32_t LastKnownAddr; // Attempt to track the most recent written memory block
-extern volatile uint8_t OpCode; //Used to specify type of read/write operation (9 is no operation
+//static volatile uint32_t LastKnownAddr; // Attempt to track the most recent written memory block
+
 
 typedef struct BSI_Header {
       char BSI_Name[16];
@@ -38,6 +38,13 @@ void qspi_handler(nrf_drv_qspi_evt_t event, void * p_context);
 
 void configure_memory(void);
 
-void write_qspi(uint8_t Opcode, uint32_t Address); //Address to write to
+void write_qspi(uint32_t Address);
+void write_qspi_page();
+void write_qspi_header();
 
-void read_qspi(uint8_t Opcode, uint32_t Address); //Address to read FROM
+void erase_qspi_sector(uint8_t Sector);
+
+void read_qspi(uint32_t Address); 
+void read_qspi_header();
+void read_qspi_page(uint32_t Address);
+void read_qspi_sector(uint8_t Sector);

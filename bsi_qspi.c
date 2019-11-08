@@ -22,12 +22,14 @@
 //Used to find start address for sector block 1
 const uint32_t SectorB1[] = {0,4096,8192,12288,16384,20480,24576,28672,32768,36864,40960,45056,49152,53248,57344,61440,65536};
 static uint8_t currentSector = 1; //sector 1 starts at address 4096 
-//uint16_t pressCount = 0;
+
+uint16_t pressCount = 0;
+
 bool lwrite_qspi = false;
 bool lread_qspi = false;
 bool m_finished = false; // used in the QSPI event
-volatile uint8_t OpCode = 9; // Used to specify type of read/write operation (9 is no operation)
-static volatile uint32_t LastKnownAddr = 4096; //start at beginning of 1st sector (do not use sector 0)
+
+//static volatile uint32_t LastKnownAddr = 4096; //start at beginning of 1st sector (do not use sector 0)
 
 BSI_Header Header = { // Entire first sector is reserved for header (prevent erasing)
     .BSI_Name = {'T','E','S','T','\0'},
@@ -51,9 +53,6 @@ QSPI_Sector ReadSector = {
     .Page = {0},  // set every page to all zeros (clear array)
     .xTransmitted = false,
     };
-
-
-
 
 Ad_gPacket Packet = {
     };
@@ -100,100 +99,166 @@ void configure_memory()
 // All Code seen below is for reading and writing from QSPI,
 // flag was? set in button event, method called in main
 
-// Operation 0 is replace header,
-// Operation 1 is write to address,
-// Operation 2 is erase a 4kB sector at address
-void write_qspi(uint8_t OpCode, uint32_t Address) 
+
+
+// ***********************************************************************************
+// used to ERASE the old header and UPDATE with new header!
+// I need to add another function for just updating start time (or just do it manually?)...
+// ...but one thing at a time...
+void write_qspi_header()
 {
-    ret_code_t err_code;
+          
+          ret_code_t err_code;
 
-    //bsp_board_leds_off();
-    
-    //memset(&m_buffer_tx, 0, sizeof(m_buffer_tx)); //try this to nuke the array.    
+          err_code = nrf_drv_qspi_erase(NRF_QSPI_ERASE_LEN_4KB, 0); //Erase 4kB from &0 (erase sector 0)
 
-     //err_code = nrf_drv_qspi_erase(NRF_QSPI_ERASE_LEN_64KB, 0);
-     //APP_ERROR_CHECK(err_code);
-     //nrf_drv_qspi_chip_erase();
-     //WAIT_FOR_PERIPH();
-
-     switch(OpCode)
-     {
-        case 0: // replace header
-          nrf_drv_qspi_erase(NRF_QSPI_ERASE_LEN_4KB, 0); //Erase 4kB from &0
-          err_code = nrf_drv_qspi_write(&Header, sizeof(Header), 0);
           APP_ERROR_CHECK(err_code);
           WAIT_FOR_PERIPH();
+
+          err_code = nrf_drv_qspi_write(&Header, sizeof(Header), 0);
+
+          APP_ERROR_CHECK(err_code);
+          WAIT_FOR_PERIPH();
+
           if(err_code == NRF_SUCCESS) { //If write was success...
             // If header update was success... do something?
           }
-          break;
 
-        case 1: // write to address
-           err_code = nrf_drv_qspi_write(&CurrentPage, sizeof(CurrentPage), LastKnownAddr);
-           APP_ERROR_CHECK(err_code);
-           WAIT_FOR_PERIPH();
-
-          if(err_code == NRF_SUCCESS) { //If write was success, then increment address
-            LastKnownAddr += (sizeof(CurrentPage));
-            // if sector pages == 77 then ...
-            // is current sector == 16? if no then increment current sector
-            //                          if yes then current sector = 2 (roll over)
-            //
-            // and increment lastknownaddress to 4096*current sector (the new number)
-            // before writing to new sector we should check if the sector was transmitted.....
-            //    if it isnt Tx'd then we have a BIG problem
-          }
-          break;
-
-        case 2: // erase 4kb sector from Address
-          nrf_drv_qspi_erase(NRF_QSPI_ERASE_LEN_4KB, Address);
-          break;
-     }
-     
-     lwrite_qspi = false; 
-     err_code = nrf_drv_qspi_write(&Header, sizeof(Header), LastKnownAddr);
-     APP_ERROR_CHECK(err_code);
-     WAIT_FOR_PERIPH();
-
-    if(err_code == NRF_SUCCESS) { //If write was success, then increment address (+1 so we start at a new place, no overlap)
-      LastKnownAddr += (sizeof(Header));
-      //Added code to write the last known address to the config so it survives power cycles.
-      bsi_config.lastKnownAddr = LastKnownAddr;
-      bsi_config.configChanged = true;
-    }
-
-     //bsp_board_leds_on();
+          lwrite_qspi = false; 
 }
 
 
-// eg. to read sector 1 (4096-8191) call "read_qspi(1,1)". Then ReadHeader is populated with that memory.
-void read_qspi(uint8_t OpCode, uint32_t Address)
+// ***********************************************************************************
+// Used to write pages to the memory using last known address (see page struct for more info)
+// populate CurrentPage with data, then call write_qspi_page to write it!
+// *** This should be used to write each sensor reading to memory ***
+void write_qspi_page()
+{
+          
+       ret_code_t err_code;
+
+       err_code = nrf_drv_qspi_write(&CurrentPage, sizeof(CurrentPage), bsi_config.lastKnownAddr);
+
+       APP_ERROR_CHECK(err_code);
+       WAIT_FOR_PERIPH();
+
+      if(err_code == NRF_SUCCESS) { //If write was success, then increment lastKnownAddr...
+        // ...and write the last known address to the config so it survives power cycles.
+        bsi_config.lastKnownAddr += (sizeof(CurrentPage));
+        bsi_config.configChanged = true;
+      }
+
+        // note to landon (self):
+        // if sector pages == 77 then ...
+        // is current sector == 16? if no then increment current sector
+        //                          if yes then current sector = 2 (roll over)
+        //
+        // and increment lastknownaddress to 4096*current sector (the new number)
+        // before writing to new sector we should check if the sector was transmitted.....
+        //    if it isnt Tx'd then we have a BIG problem
+        // end note
+
+      lwrite_qspi = false; 
+}
+
+// ***********************************************************************************
+// Used to erase an entire sector ( 1 - 15 , but hopefully not 0 which is the header )
+// Should only be called interally when end of memory is reached and a new empty sector is needed
+void erase_qspi_sector(uint8_t Sector)
+{
+
+      ret_code_t err_code;
+           
+      err_code = nrf_drv_qspi_erase(NRF_QSPI_ERASE_LEN_4KB, SectorB1[Sector]);
+      //nrf_drv_qspi_chip_erase(); // only to be used to erase entire chip 
+      APP_ERROR_CHECK(err_code);
+      WAIT_FOR_PERIPH();
+}
+
+// ***********************************************************************************
+// becoming "legacy" or deprecated
+// Used to write anything sizeof(m_buffer_tx) to a specific address
+void write_qspi(uint32_t Address) 
+{
+      ret_code_t err_code; 
+
+      err_code = nrf_drv_qspi_write(&Header, sizeof(Header), Address);
+      APP_ERROR_CHECK(err_code);
+      WAIT_FOR_PERIPH();
+
+      memset(&m_buffer_tx, 0, sizeof(m_buffer_tx)); //clean out tx buffer AFTER tx'ing 
+      lwrite_qspi = false; 
+}
+
+
+// ***********************************************************************************
+// becoming "legacy" or deprecated
+// Used to read anything sizeof(m_buffer_rx) from a specific address
+void read_qspi(uint32_t Address)
 {
   
     ret_code_t err_code;
-    switch(OpCode)
-    {
-      case 0: // read header
-          memset(&ReadHeader, 0, sizeof(ReadHeader)); //Clear the read header first
-          err_code = nrf_drv_qspi_read(&ReadHeader, sizeof(ReadHeader), 0);
-          APP_ERROR_CHECK(err_code);
-          WAIT_FOR_PERIPH();
-          break;
+    memset(&m_buffer_rx, 0, sizeof(m_buffer_rx)); //clear m_buffer_rx for next read
 
-       case 1: // Read from address
-          memset(&ReadPage, 0, sizeof(ReadPage)); //Clear the Read Page first
-          err_code = nrf_drv_qspi_read(&ReadHeader, sizeof(ReadHeader), Address);
-          APP_ERROR_CHECK(err_code);
-          WAIT_FOR_PERIPH();
-          break;
+    err_code = nrf_drv_qspi_read(m_buffer_rx, sizeof(m_buffer_rx), (Address));
 
-      case 2: // Read 4kB Sector
-         memset(&ReadSector, 0, sizeof(ReadSector)); //Clear the Read Sector first
-         err_code = nrf_drv_qspi_read(&ReadSector, sizeof(ReadSector)/*<4096*/, SectorB1[Address]);
-         break;
-   }
-        lread_qspi = false;
+    APP_ERROR_CHECK(err_code);
+    WAIT_FOR_PERIPH();
+    lread_qspi = false;
 }
 
+
+// ***********************************************************************************
+// used ONLY to read the header (sector 0) from the QSPI
+void read_qspi_header(){
+
+    ret_code_t err_code;
+    memset(&ReadHeader, 0, sizeof(ReadHeader)); //Clear the read header first
+
+    err_code = nrf_drv_qspi_read(&ReadHeader, sizeof(ReadHeader), 0); //Header is always kept at &0
+
+    APP_ERROR_CHECK(err_code);
+    WAIT_FOR_PERIPH();
+    lread_qspi = false;
+}
+
+
+// ***********************************************************************************
+// used to read out a page (see page struct) from any specified address
+// be cautious, passing an address that is not the start of a page will result in overlap
+void read_qspi_page(uint32_t Address){
+          
+    ret_code_t err_code;
+    memset(&ReadPage, 0, sizeof(ReadPage)); //Clear the Read Page first
+
+    err_code = nrf_drv_qspi_read(&ReadPage, sizeof(ReadPage), Address);
+
+    APP_ERROR_CHECK(err_code);
+    WAIT_FOR_PERIPH();
+    lread_qspi = false;
+}
+
+
+// ***********************************************************************************
+// Used to read an entire sector (4kB) of the QSPI using addresses in the sector table.
+// This will populate the struct ReadSector (which is less than 4kB) with all Pages...
+// ...read in the specified sector
+// You can select sector 1-15 (but should not 0, which is where header is stored)
+// *** This fxn should be used for populating the advertisement ***
+void read_qspi_sector(uint8_t Sector){
+    
+     ret_code_t err_code;
+     memset(&ReadSector, 0, sizeof(ReadSector)); //Clear the Read Sector first
+
+     err_code = nrf_drv_qspi_read(&ReadSector, sizeof(ReadSector)/*<4096*/, SectorB1[Sector]);
+
+     APP_ERROR_CHECK(err_code);
+     WAIT_FOR_PERIPH();
+     lread_qspi = false;
+}
+
+
+// ***********************************************************************************
+// dear landon:
 // write function to generate lots of data to populate the entire sector
 // then write another function to read it out and test its accuracy (and report errors)

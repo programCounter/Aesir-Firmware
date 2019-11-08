@@ -990,16 +990,14 @@ int main(void)
         }
         if(lwrite_qspi == true)
         {
-          write_qspi(OpCode, qspiAddress);
+          // write_qspi(qspiAddress); // *** TO BE DISCUSSED ***
         }
         if(UploadNow == true)
         {
-          read_qspi(OpCode, qspiAddress);
-
           //There may be an issue with how the advert api plays with the code the update advert,
           //based on what I read we should dodge the issues by only changing the config when the advertising is stopped.
           //we need the data from the flash
-          read_qspi(1,qspiAddress); // LB: 1 means is read from specified address
+          // read_qspi(qspiAddress); // *** TO BE DISCUSSED ***
           //we need to put that data into our advert
           update_advert();
           //Advertising should be stopped

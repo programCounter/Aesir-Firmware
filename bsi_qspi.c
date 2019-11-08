@@ -13,6 +13,7 @@
         m_finished = false;    \
     } while (0)
 
+
 // *********************************************************************************************
 //                            S o m e    T e r m i n o l o g y
 // *********************************************************************************************
@@ -44,9 +45,10 @@ BSI_Header ReadHeader = {
     };
 
 QSPI_Page CurrentPage = {
-    .countMin = 15, //minutes since Header StartTime[] (last Local Listener connection)
+    .countMin = 0, //minutes since Header StartTime[] (last Local Listener connection)
     .sensorCh = 1, //which sensor the following value is from (1=An1, 2=An2, or 9 = Pulse)
     .sensorValue = 420, //What reading did sensor take? (10b ADC or pulse)
+    .dataSpace = 0xaa
     };
 
 QSPI_Page ReadPage = { // Only used for checking an single, specific sensor reading
@@ -148,7 +150,7 @@ void write_qspi_page()
         // ...and write the last known address to the config so it survives power cycles.
         bsi_config.lastKnownAddr += (sizeof(CurrentPage));
         bsi_config.configChanged = true;
-        printf("QSPI page written successfully\n");
+        //printf("QSPI page written successfully\n");
       }
 
         // note to landon (self):
@@ -270,15 +272,9 @@ void read_qspi_sector(uint8_t Sector){
      ret_code_t err_code;
      memset(&ReadSector, 0, sizeof(ReadSector)); //Clear the Read Sector first
 
-     err_code = nrf_drv_qspi_read(&ReadSector, sizeof(ReadSector)/*<4096*/, SectorB1[Sector]);
+     err_code = nrf_drv_qspi_read(&ReadSector, sizeof(ReadSector), SectorB1[Sector]);
 
      APP_ERROR_CHECK(err_code);
      WAIT_FOR_PERIPH();
      lread_qspi = false;
 }
-
-
-// ***********************************************************************************
-// dear landon:
-// write function to generate lots of data to populate the entire sector
-// then write another function to read it out and test its accuracy (and report errors)

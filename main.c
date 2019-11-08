@@ -995,7 +995,13 @@ int main(void)
         }
         if(lwrite_qspi == true)
         {
-          write_qspi_page();
+          for(int i = 0; i < 204; i++) // 204 pages fit in 1kB (if 5 bytes per page)
+          {
+            write_qspi_page();
+            CurrentPage.countMin += 1;
+            CurrentPage.sensorValue = 420;
+          }
+          
           // write_qspi_header();
           // write_qspi(qspiAddress); // *** TO BE DISCUSSED ***
         }
@@ -1013,7 +1019,8 @@ int main(void)
         }
         if(lread_qspi == true)
         {
-          read_qspi_page(4096);
+          read_qspi_sector(1);
+          //read_qspi_page(4096);
           //read_qspi_header();
         }
         if(lerase_sector == true)

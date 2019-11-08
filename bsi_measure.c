@@ -14,8 +14,9 @@
 #include "bsi_measure.h"
 #include "nrf_gpio.h"
 #include "nrf_drv_gpiote.h"
+#include "nrf_delay.h"
 
-#define BUFFER_SIZE 1
+#define BUFFER_SIZE 3
 //Pin_map(port,pin)
 #define VREG_PWR NRF_GPIO_PIN_MAP(1,15) 
 #define ANLG_SENSOR1_PWR NRF_GPIO_PIN_MAP(0,12) 
@@ -79,8 +80,8 @@ void saadc_init(void)
     err_code = nrf_drv_saadc_channel_init(6, &vBatt_config);
     APP_ERROR_CHECK(err_code);
 
-    err_code = nrf_drv_saadc_buffer_convert(m_buffer, BUFFER_SIZE);
-    APP_ERROR_CHECK(err_code);
+    //err_code = nrf_drv_saadc_buffer_convert(m_buffer[0], BUFFER_SIZE); //possibly not needed, function samples all adc's and stores values into buffer
+    //APP_ERROR_CHECK(err_code);
 }
 
 nrf_saadc_value_t measureSensor(uint8_t channel)
@@ -89,9 +90,13 @@ nrf_saadc_value_t measureSensor(uint8_t channel)
   switch(channel)
   {
     case 0:
+      nrf_gpio_pin_write(VREG_PWR,1); //Power Regulator On
+      nrf_delay_ms(3);
       nrf_gpio_pin_write(ANLG_SENSOR1_PWR,1); //Sensor power on
+      nrf_delay_ms(1000);
       nrfx_saadc_sample_convert(channel,&p_ADC_Result);// This returns a single value from the specified ADC channel. THIS FUNCTION IS BLOCKING!
       nrf_gpio_pin_write(ANLG_SENSOR1_PWR,0); //Sensor power off
+      nrf_gpio_pin_write(VREG_PWR,0); //Power Regulator Off
       break;
     case 1:
       nrf_gpio_pin_write(ANLG_SENSOR2_PWR,1); //Sensor power on

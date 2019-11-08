@@ -1,4 +1,5 @@
 #include "bsi_config.h"
+#include <string.h>
 
 //Flash data storage. FDS
 

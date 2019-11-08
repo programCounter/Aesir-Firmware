@@ -735,27 +735,28 @@ static void bsp_event_handler(bsp_event_t event)
     switch (event)
     {
         case BSP_EVENT_KEY_0:
-            nrf_drv_qspi_erase(NRF_QSPI_ERASE_LEN_4KB, 0); //Erase 4kB from &0
+            // Erase 4kB from &0 on QSPI and rewrite header (initialize first time flash)
+            //write_qspi(0,qspiAddress); // Operation 0 is replace header
             break;
 
         case BSP_EVENT_KEY_1:
             //Increment the button counter, only 4 LEDs so rolls over after 15.
-            pressCount ++;
-            if(pressCount > 15)
-            {
-              pressCount = 0;
-            }
-            ble_bas_battery_level_update(&m_bas,pressCount,BLE_CONN_HANDLE_ALL);
+            //pressCount ++;
+            //if(pressCount > 15)
+            //{
+            //  pressCount = 0;
+            //}
+            //ble_bas_battery_level_update(&m_bas,pressCount,BLE_CONN_HANDLE_ALL);
             break;
  
         case BSP_EVENT_KEY_2:
             //Write to qspi
-            lwrite_qspi = true;
+            //lwrite_qspi = true;
             break;
        
         case BSP_EVENT_KEY_3:
             //Read qspi
-            lread_qspi = true;
+            //lread_qspi = true;
             break;
         
         case BSP_EVENT_SLEEP:
@@ -989,14 +990,14 @@ int main(void)
         }
         if(lwrite_qspi == true)
         {
-          write_qspi(qspiAddress);
+          // write_qspi(qspiAddress); // *** TO BE DISCUSSED ***
         }
         if(UploadNow == true)
         {
           //There may be an issue with how the advert api plays with the code the update advert,
           //based on what I read we should dodge the issues by only changing the config when the advertising is stopped.
           //we need the data from the flash
-          read_qspi(qspiAddress);
+          // read_qspi(qspiAddress); // *** TO BE DISCUSSED ***
           //we need to put that data into our advert
           update_advert();
           //Advertising should be stopped

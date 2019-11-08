@@ -46,7 +46,7 @@ BSI_Header ReadHeader = {
 
 QSPI_Page CurrentPage = {
     .countMin = 0, //minutes since Header StartTime[] (last Local Listener connection)
-    //.sensorCh = 1, //which sensor the following value is from (1=An1, 2=An2, or 9 = Pulse)
+    .sensorCh = 1, //which sensor the following value is from (1=An1, 2=An2, or 9 = Pulse)
     .sensorValue = 420, //What reading did sensor take? (10b ADC or pulse)
     //.dataSpace = 0xaa
     };
@@ -149,7 +149,7 @@ void write_qspi_page()
       if(err_code == NRF_SUCCESS) { //If write was success, then increment lastKnownAddr...
         // ...and write the last known address to the config so it survives power cycles.
         bsi_config.lastKnownAddr += (sizeof(CurrentPage));
-        //bsi_config.configChanged = true;
+        bsi_config.configChanged = true;
         //printf("QSPI page written successfully\n");
       }
 
@@ -179,7 +179,7 @@ void erase_qspi_sector(uint8_t Sector)
       
       //debugging
       bsi_config.lastKnownAddr = 4096; // point back to start of sector 1
-      //bsi_config.configChanged = true;
+      bsi_config.configChanged = true;
 
       //nrf_drv_qspi_chip_erase(); // only to be used to erase entire chip
       printf("QSPI sector %u erased\n", Sector);

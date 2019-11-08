@@ -153,7 +153,7 @@ static bool S2MeasureNow;
 static bool S3MeasureNow;
 static bool UploadNow;
 
-uint32_t qspiAddress = 0; //ONLY FOR DEBUG
+//uint32_t qspiAddress = 0; //ONLY FOR DEBUG
 
 /* YOUR_JOB: Declare all services structure your application is using
  *  BLE_XYZ_DEF(m_xyz);
@@ -1016,12 +1016,12 @@ int main(void)
         }
         if(lwrite_qspi == true)
         {
-          for(int i = 0; i < 204; i++) // 204 pages fit in 1kB (if 5 bytes per page)
-          {
+          //for(int i = 0; i < 204; i++) // 204 pages fit in 1kB (if 5 bytes per page)
+          //{
             write_qspi_page();
-            CurrentPage.countMin += 1;
-            CurrentPage.sensorValue = rand();
-          }
+            //CurrentPage.countMin += 1;
+            //CurrentPage.sensorValue = rand();
+          //}
           
           // write_qspi_header();
           // write_qspi(qspiAddress); // *** TO BE DISCUSSED ***

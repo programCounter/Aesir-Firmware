@@ -529,16 +529,16 @@ static void sleep_mode_enter(void)
 {
     ret_code_t err_code;
 
-    err_code = bsp_indication_set(BSP_INDICATE_IDLE);
-    APP_ERROR_CHECK(err_code);
-
-    // Prepare wakeup buttons.
-    err_code = bsp_btn_ble_sleep_mode_prepare();
-    APP_ERROR_CHECK(err_code);
-
-    // Go to system-off mode (this function will not return; wakeup will cause a reset).
-    err_code = sd_power_system_off();
-    APP_ERROR_CHECK(err_code);
+//    err_code = bsp_indication_set(BSP_INDICATE_IDLE);
+//    APP_ERROR_CHECK(err_code);
+//
+//    // Prepare wakeup buttons.
+//    err_code = bsp_btn_ble_sleep_mode_prepare();
+//    APP_ERROR_CHECK(err_code);
+//
+//    // Go to system-off mode (this function will not return; wakeup will cause a reset).
+//    err_code = sd_power_system_off();
+//    APP_ERROR_CHECK(err_code);
 }
 
 
@@ -977,12 +977,12 @@ int main(void)
 
           bsi_config.configChanged = false; // Written the config, set this back to false...
         }
-        if(S2MeasureNow == true)
+        if(S2MeasureNow == true && bsi_config.sensor2_config.sensorEnabled == true)
         {
           //Time to take a measurement on Analog S2
           S2MeasureNow = false;
         }
-        if(S3MeasureNow == true)
+        if(S3MeasureNow == true && bsi_config.sensor3_config.sensorEnabled == true)
         {
           //Time to take a measurement on Analog S3
           S3MeasureNow = false;

@@ -182,7 +182,7 @@ void erase_qspi_sector(uint8_t Sector)
       bsi_config.configChanged = true;
 
       //nrf_drv_qspi_chip_erase(); // only to be used to erase entire chip
-      printf("QSPI sector %u erased\n", Sector);
+      //printf("QSPI sector %u erased\n", Sector);
       lerase_sector = false;      
 }
 

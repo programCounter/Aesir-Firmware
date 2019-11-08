@@ -1,5 +1,7 @@
 #define SECTOR_SIZE 1024 //1kB
 
+#include "nrf_drv_qspi.h"
+
 extern bool m_finished; // used in the QSPI event
 static volatile uint8_t m_buffer_tx[16];
 static volatile uint8_t m_buffer_rx[16];

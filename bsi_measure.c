@@ -12,6 +12,7 @@
 
 
 #include "bsi_measure.h"
+#include "bsi_qspi.h"
 #include "nrf_gpio.h"
 #include "nrf_drv_gpiote.h"
 #include "nrf_delay.h"
@@ -91,17 +92,21 @@ nrf_saadc_value_t measureSensor(uint8_t channel)
   {
     case 0:
       nrf_gpio_pin_write(VREG_PWR,1); //Power Regulator On
-      nrf_delay_ms(3);
+      nrf_delay_ms(1);
       nrf_gpio_pin_write(ANLG_SENSOR1_PWR,1); //Sensor power on
-      nrf_delay_ms(1000);
+      nrf_delay_ms(105);
       nrfx_saadc_sample_convert(channel,&p_ADC_Result);// This returns a single value from the specified ADC channel. THIS FUNCTION IS BLOCKING!
       nrf_gpio_pin_write(ANLG_SENSOR1_PWR,0); //Sensor power off
       nrf_gpio_pin_write(VREG_PWR,0); //Power Regulator Off
       break;
     case 1:
+      nrf_gpio_pin_write(VREG_PWR,1); //Power Regulator On
+      nrf_delay_ms(1);
       nrf_gpio_pin_write(ANLG_SENSOR2_PWR,1); //Sensor power on
+      nrf_delay_ms(105);
       nrfx_saadc_sample_convert(channel,&p_ADC_Result);// This returns a single value from the specified ADC channel. THIS FUNCTION IS BLOCKING!
       nrf_gpio_pin_write(ANLG_SENSOR2_PWR,0); //Sensor power off
+      nrf_gpio_pin_write(VREG_PWR,0); //Power Regulator Off
       break;
     case 6:
       //Check the battery level.
@@ -109,6 +114,8 @@ nrf_saadc_value_t measureSensor(uint8_t channel)
       break;
     default:
       break;
-  }
+  } 
+  CurrentPage.sensorCh = channel;
+  CurrentPage.sensorValue = p_ADC_Result;
   return p_ADC_Result;
 }

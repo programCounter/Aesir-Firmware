@@ -973,8 +973,8 @@ int main(void)
     configure_memory();
     m_finished = false;
     
-//    saadc_init();
-//    gpio_init();
+    saadc_init();
+    gpio_init();
 //    nrf_drv_qspi_erase(NRF_QSPI_ERASE_LEN_64KB, 0);
 //    WAIT_FOR_PERIPH();
     
@@ -1005,7 +1005,7 @@ int main(void)
         {
           sensor_value_characteristic_update(&m_cus,measureSensor(0));
           //ADC TEST
-          ble_bas_battery_level_update(&m_bas,measureSensor(0),BLE_CONN_HANDLE_ALL);
+          //ble_bas_battery_level_update(&m_bas,measureSensor(0),BLE_CONN_HANDLE_ALL);
           //Time to take a measurement on Analog S2
           S2MeasureNow = false;
         }
@@ -1018,9 +1018,10 @@ int main(void)
         {
           for(int i = 0; i < 204; i++) // 204 pages fit in 1kB (if 5 bytes per page)
           {
+            measureSensor(0);
             write_qspi_page();
             CurrentPage.countMin += 1;
-            CurrentPage.sensorValue = rand();
+            //CurrentPage.sensorValue = rand();
           }
           
           // write_qspi_header();

@@ -1,0 +1,6 @@
+# ignore objects and archives, anywhere in the tree.
+    *.[oa]
+# ignore d files (d stands for what?)
+    *.d
+# ignore o files (o stands for object?)
+    *.o

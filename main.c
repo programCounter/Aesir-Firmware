@@ -109,7 +109,7 @@
 
 #define DEBUG 
 
-#define DEVICE_NAME                     "AEsir BSI 1"                       /**< Name of device. Will be included in the advertising data. */
+#define DEVICE_NAME                     "BUTTHOLE"                       /**< Name of device. Will be included in the advertising data. */
 #define MANUFACTURER_NAME               "RioT Wireless"                   /**< Manufacturer. Will be passed to Device Information Service. */
 #define APP_ADV_INTERVAL                300                                     /**< The advertising interval (in units of 0.625 ms. This value corresponds to 187.5 ms). */
 
@@ -1038,14 +1038,14 @@ int main(void)
         }
         if(lwrite_qspi == true)
         {
-<<<<<<< HEAD
+
           //for(int i = 0; i < 204; i++) // 204 pages fit in 1kB (if 5 bytes per page)
           //{
             write_qspi_page();
             //CurrentPage.countMin += 1;
             //CurrentPage.sensorValue = rand();
           //}
-=======
+
         sensor_value_characteristic_update(&m_cus,measureSensor(0));
           for(int i = 0; i < 255; i++) // 256 pages fit in 1kB (if 4 bytes per page)
           {
@@ -1059,7 +1059,7 @@ int main(void)
             
             //CurrentPage.sensorValue = rand();
           }
->>>>>>> c81a276ac9e307d87ac22d8830de28e501ac7397
+
           
           // write_qspi_header();
           // write_qspi(qspiAddress); // *** TO BE DISCUSSED ***

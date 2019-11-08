@@ -65,6 +65,7 @@ uint32_t ble_cus_init(ble_cus_t * p_cus, const ble_cus_init_t * p_cus_init)
     //#define CUSTOM_CHAR_UUID_SENS_CNFG        0x1410 // The sensors attached to the device. PULSE,ANLG,ANLG. 1 = connected, 0 = disconnected. ie 110.
     //#define CUSTOM_CHAR_UUID_SENS_ADDRS       0x1411 // The Addresses of the attached sensors (uint-16, uint-16, uint-16). 
     //#define CUSTOM_CHAR_UUID_UPLD_INTV        0x1412 // The interval that the BSI uploads the data. 
+    //#define CUSTOM_CHAR_UUID_SENS_DATA        0x1413 // The Sensor Data for debugging
 
     // Add Custom Value characteristic 
     custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_S2_MEAS_INTV,"Analog 1 Measurement Interval");
@@ -79,6 +80,7 @@ uint32_t ble_cus_init(ble_cus_t * p_cus, const ble_cus_init_t * p_cus_init)
     custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_SENS_CNFG,"Sensor Configuration");
     //custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_SENS_ADDRS,"Sensor Addresses");
     custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_UPLD_INTV,"Upload Interval");
+    custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_SENS_DATA,"Sensor 1 Data");
     return 0;
 }
 
@@ -244,6 +246,9 @@ void on_write(ble_cus_t * p_cus, ble_evt_t const * p_ble_evt)
      case CUSTOM_CHAR_UUID_UPLD_INTV:
        // The interval that the BSI uploads the data.
        bsi_config.uploadInterval = p_evt_write->data[0];
+       break;
+     case CUSTOM_CHAR_UUID_SENS_DATA:
+       //bsi_config.uploadSize = p_evt_write->data[0];
        break;
     }
     //We are going to want to switch on the uuid of the written event

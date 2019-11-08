@@ -112,8 +112,8 @@
 #define MANUFACTURER_NAME               "RioT Wireless"                   /**< Manufacturer. Will be passed to Device Information Service. */
 #define APP_ADV_INTERVAL                300                                     /**< The advertising interval (in units of 0.625 ms. This value corresponds to 187.5 ms). */
 
-//#define APP_ADV_DURATION                18000                                   /**< The advertising duration (180 seconds) in units of 10 milliseconds. */
-#define APP_ADV_DURATION                180                                   /**< The advertising duration (180 seconds) in units of 10 milliseconds. */
+#define APP_ADV_DURATION                18000                                   /**< The advertising duration (180 seconds) in units of 10 milliseconds. */
+//#define APP_ADV_DURATION                180                                   /**< The advertising duration (180 seconds) in units of 10 milliseconds. */
 #define APP_BLE_OBSERVER_PRIO           3                                       /**< Application's BLE observer priority. You shouldn't need to modify this value. */
 #define APP_BLE_CONN_CFG_TAG            1                                       /**< A tag identifying the SoftDevice BLE configuration. */
 
@@ -928,6 +928,23 @@ void update_advert(void)
 
 }
 
+//function for updating chracteristic value
+void sensor_value_characteristic_update(ble_cus_t * p_cus, int16_t data)
+{
+    ble_gatts_value_t  gatts_value;
+
+        // Initialize value struct.
+    memset(&gatts_value, 0, sizeof(gatts_value));
+
+    gatts_value.len     = sizeof(uint16_t);
+    gatts_value.offset  = 0;
+    gatts_value.p_value = &data;
+
+        // Update database.
+    sd_ble_gatts_value_set(BLE_CONN_HANDLE_INVALID,
+                                          p_cus->custom_value_handles.value_handle,
+                                          &gatts_value);
+}
 
 /**@brief Function for application main entry.*/
 int main(void)
@@ -986,6 +1003,9 @@ int main(void)
         }
         if(S2MeasureNow == true && bsi_config.sensor2_config.sensorEnabled == true)
         {
+          sensor_value_characteristic_update(&m_cus,measureSensor(0));
+          //ADC TEST
+          ble_bas_battery_level_update(&m_bas,measureSensor(0),BLE_CONN_HANDLE_ALL);
           //Time to take a measurement on Analog S2
           S2MeasureNow = false;
         }

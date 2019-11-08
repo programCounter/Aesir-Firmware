@@ -1,7 +1,11 @@
 #include "nrf_drv_qspi.h"
 #include "bsi_qspi.h"
 #include "bsp_btn_ble.h"
+<<<<<<< HEAD
 #include <string.h>
+=======
+#include "bsi_config.h"
+>>>>>>> cb1a74b79bec53fa540e086766651c22c46b7055
 
 #define QSPI_STD_CMD_WRSR   0x01
 #define QSPI_STD_CMD_RSTEN  0x66
@@ -114,6 +118,7 @@ void write_qspi(uint8_t OpCode, uint32_t Address)
      //nrf_drv_qspi_chip_erase();
      //WAIT_FOR_PERIPH();
 
+<<<<<<< HEAD
      switch(OpCode)
      {
         case 0: // replace header
@@ -149,6 +154,19 @@ void write_qspi(uint8_t OpCode, uint32_t Address)
      }
      
      lwrite_qspi = false; 
+=======
+     err_code = nrf_drv_qspi_write(&TestHeader, sizeof(TestHeader), LastKnownAddr);
+     APP_ERROR_CHECK(err_code);
+     WAIT_FOR_PERIPH();
+
+    if(err_code == NRF_SUCCESS) { //If write was success, then increment address (+1 so we start at a new place, no overlap)
+      LastKnownAddr += (sizeof(TestHeader));
+      //Added code to write the last known address to the config so it survives power cycles.
+      bsi_config.lastKnownAddr = LastKnownAddr;
+      bsi_config.configChanged = true;
+    }
+ 
+>>>>>>> cb1a74b79bec53fa540e086766651c22c46b7055
      //bsp_board_leds_on();
 }
 

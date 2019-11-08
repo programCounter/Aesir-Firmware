@@ -147,8 +147,10 @@ static uint16_t m_conn_handle = BLE_CONN_HANDLE_INVALID;                        
 
 static uint32_t ticksS2;
 static uint32_t ticksS3;
+static uint32_t ticksTUpload; // nUmber of ticks to be compared against upload interval
 static bool S2MeasureNow;
 static bool S3MeasureNow;
+static bool UploadNow;
 
 uint32_t qspiAddress = 0; //ONLY FOR DEBUG
 
@@ -441,6 +443,16 @@ static void minute_timer_timeout_handler(void * p_context)
   //Wake up and increment the time variable
   //If the variable 
   UNUSED_PARAMETER(p_context);
+  
+  
+  ticksTUpload++;//Increment our minutes since last upload.
+  if(ticksTUpload >= bsi_config.uploadInterval)
+  {
+    // It is now time to initiate our upload
+    UploadNow = true;
+    ticksTUpload=0;
+  }
+
 
   if(bsi_config.sensor2_config.sensorEnabled == true) // IF the sensors not enabled dont even increment the count
   {
@@ -517,16 +529,16 @@ static void sleep_mode_enter(void)
 {
     ret_code_t err_code;
 
-    err_code = bsp_indication_set(BSP_INDICATE_IDLE);
-    APP_ERROR_CHECK(err_code);
-
-    // Prepare wakeup buttons.
-    err_code = bsp_btn_ble_sleep_mode_prepare();
-    APP_ERROR_CHECK(err_code);
-
-    // Go to system-off mode (this function will not return; wakeup will cause a reset).
-    err_code = sd_power_system_off();
-    APP_ERROR_CHECK(err_code);
+//    err_code = bsp_indication_set(BSP_INDICATE_IDLE);
+//    APP_ERROR_CHECK(err_code);
+//
+//    // Prepare wakeup buttons.
+//    err_code = bsp_btn_ble_sleep_mode_prepare();
+//    APP_ERROR_CHECK(err_code);
+//
+//    // Go to system-off mode (this function will not return; wakeup will cause a reset).
+//    err_code = sd_power_system_off();
+//    APP_ERROR_CHECK(err_code);
 }
 
 
@@ -870,6 +882,46 @@ static void advertising_start(bool erase_bonds)
     }
 }
 
+/**@brief Struct that contains pointers to the encoded advertising data. */
+static uint8_t              m_adv_handle = BLE_GAP_ADV_SET_HANDLE_NOT_SET; /**< Advertising handle used to identify an advertising set. */
+static uint8_t              m_enc_advdata[BLE_GAP_ADV_SET_DATA_SIZE_EXTENDED_MAX_SUPPORTED];  /**< Buffer for storing an encoded advertising set. */
+static ble_gap_adv_data_t m_adv_data =
+{
+    .adv_data =
+    {
+        .p_data = m_enc_advdata,
+        .len    = BLE_GAP_ADV_SET_DATA_SIZE_EXTENDED_MAX_SUPPORTED
+    },
+    .scan_rsp_data =
+    {
+        .p_data = NULL,
+        .len    = 0
+
+    }
+};
+
+void update_advert(void)
+{
+    
+    ret_code_t err_code;
+    ble_advdata_t advdata;
+    uint8_t       flags = BLE_GAP_ADV_FLAG_BR_EDR_NOT_SUPPORTED;
+
+    // Build and set advertising data.
+    memset(&advdata, 0, sizeof(advdata));
+
+    advdata.name_type             = BLE_ADVDATA_NO_NAME;
+    advdata.flags                 = flags;
+    advdata.p_manuf_specific_data = &m_buffer_tx;
+
+    err_code = ble_advdata_encode(&advdata, m_adv_data.adv_data.p_data, &m_adv_data.adv_data.len);
+    APP_ERROR_CHECK(err_code);
+
+    err_code = sd_ble_gap_adv_set_configure(&m_adv_handle, &m_adv_data, NULL);
+    APP_ERROR_CHECK(err_code);
+
+}
+
 
 /**@brief Function for application main entry.*/
 int main(void)
@@ -926,12 +978,12 @@ int main(void)
 
           bsi_config.configChanged = false; // Written the config, set this back to false...
         }
-        if(S2MeasureNow == true)
+        if(S2MeasureNow == true && bsi_config.sensor2_config.sensorEnabled == true)
         {
           //Time to take a measurement on Analog S2
           S2MeasureNow = false;
         }
-        if(S3MeasureNow == true)
+        if(S3MeasureNow == true && bsi_config.sensor3_config.sensorEnabled == true)
         {
           //Time to take a measurement on Analog S3
           S3MeasureNow = false;
@@ -940,10 +992,26 @@ int main(void)
         {
           write_qspi(OpCode, qspiAddress);
         }
-        if(lread_qspi == true)
+        if(UploadNow == true)
         {
+<<<<<<< HEAD
           read_qspi(OpCode, qspiAddress);
+=======
+          //There may be an issue with how the advert api plays with the code the update advert,
+          //based on what I read we should dodge the issues by only changing the config when the advertising is stopped.
+          //we need the data from the flash
+          read_qspi(qspiAddress);
+          //we need to put that data into our advert
+          update_advert();
+          //Advertising should be stopped
+          advertising_start(erase_bonds);
+          //The advertisment should then time out and stop.
+>>>>>>> cb1a74b79bec53fa540e086766651c22c46b7055
         }
+//        if(lread_qspi == true)
+//        {
+//          read_qspi(qspiAddress);
+//        }
         idle_state_handle();
     }
 }

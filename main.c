@@ -990,13 +990,13 @@ int main(void)
         }
         if(S3MeasureNow == true && bsi_config.sensor3_config.sensorEnabled == true)
         {
-          //Time to take a measurement on Analog S3
+          // Time to take a measurement on Analog S3
           S3MeasureNow = false;
         }
         if(lwrite_qspi == true)
         {
-          //write_qspi_page();
-          //write_qspi_header();
+          write_qspi_page();
+          // write_qspi_header();
           // write_qspi(qspiAddress); // *** TO BE DISCUSSED ***
         }
         if(UploadNow == true)
@@ -1013,12 +1013,12 @@ int main(void)
         }
         if(lread_qspi == true)
         {
-          //read_qspi_page(4096);
+          read_qspi_page(4096);
           //read_qspi_header();
         }
         if(lerase_sector == true)
         {
-          //erase_qspi_sector(1);
+          erase_qspi_sector(1);
         }
         idle_state_handle();
     }

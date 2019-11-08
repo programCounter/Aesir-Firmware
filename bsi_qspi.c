@@ -148,6 +148,7 @@ void write_qspi_page()
         // ...and write the last known address to the config so it survives power cycles.
         bsi_config.lastKnownAddr += (sizeof(CurrentPage));
         bsi_config.configChanged = true;
+        printf("QSPI page written successfully\n");
       }
 
         // note to landon (self):
@@ -179,6 +180,7 @@ void erase_qspi_sector(uint8_t Sector)
       bsi_config.configChanged = true;
 
       //nrf_drv_qspi_chip_erase(); // only to be used to erase entire chip
+      printf("QSPI sector %u erased\n", Sector);
       lerase_sector = false;      
 }
 
@@ -242,6 +244,17 @@ void read_qspi_page(uint32_t Address){
 
     APP_ERROR_CHECK(err_code);
     WAIT_FOR_PERIPH();
+    if(err_code == NRF_SUCCESS) 
+    {
+      printf("QSPI page read successfully...\n");
+      printf("Page at &%u :\n",Address);
+      printf("  countMin: %u\n", ReadPage.countMin);
+      printf("  sensorCh: %u\n", ReadPage.sensorCh);
+      printf("  sensorValue: %u\n", ReadPage.sensorValue);
+      printf("*******************\n\n");
+      
+    }
+
     lread_qspi = false;
 }
 

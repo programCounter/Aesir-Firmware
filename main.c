@@ -107,8 +107,9 @@
         m_finished = false;    \
     } while (0)
 
+#define DEBUG 
 
-#define DEVICE_NAME                     "AEsir BSI"                       /**< Name of device. Will be included in the advertising data. */
+#define DEVICE_NAME                     "AEsir BSI 1"                       /**< Name of device. Will be included in the advertising data. */
 #define MANUFACTURER_NAME               "RioT Wireless"                   /**< Manufacturer. Will be passed to Device Information Service. */
 #define APP_ADV_INTERVAL                300                                     /**< The advertising interval (in units of 0.625 ms. This value corresponds to 187.5 ms). */
 
@@ -447,7 +448,11 @@ static void minute_timer_timeout_handler(void * p_context)
   
   
   ticksTUpload++;//Increment our minutes since last upload.
+  #ifdef DEBUG
+  if(ticksTUpload >= 1)
+  #else
   if(ticksTUpload >= bsi_config.uploadInterval)
+  #endif
   {
     // It is now time to initiate our upload
     UploadNow = true;
@@ -455,7 +460,12 @@ static void minute_timer_timeout_handler(void * p_context)
   }
 
 
+
+  #ifdef DEBUG
+  if(true) //for debugging only, will ensure sensor 1 data is received
+  #else
   if(bsi_config.sensor2_config.sensorEnabled == true) // IF the sensors not enabled dont even increment the count
+  #endif
   {
     ticksS2++;
     if(ticksS2 > bsi_config.sensor2_config.measInterval)
@@ -973,8 +983,8 @@ int main(void)
     configure_memory();
     m_finished = false;
     
-//    saadc_init();
-//    gpio_init();
+    saadc_init();
+    gpio_init();
 //    nrf_drv_qspi_erase(NRF_QSPI_ERASE_LEN_64KB, 0);
 //    WAIT_FOR_PERIPH();
     
@@ -992,6 +1002,10 @@ int main(void)
     //somejunkvar = true;
     //ble_bas_battery_level_update(&m_bas, 5, BLE_CONN_HANDLE_ALL);
     // Enter main loop.
+    #ifdef DEBUG
+    lerase_sector = true;  //debug
+    #else
+    #endif
     for (;;)
     {
         if(bsi_config.configChanged == true)
@@ -1003,28 +1017,57 @@ int main(void)
         }
         if(S2MeasureNow == true && bsi_config.sensor2_config.sensorEnabled == true)
         {
-          sensor_value_characteristic_update(&m_cus,measureSensor(0));
-          //ADC TEST
-          ble_bas_battery_level_update(&m_bas,measureSensor(0),BLE_CONN_HANDLE_ALL);
+          #ifdef DEBUG
+            sensor_value_characteristic_update(&m_cus,measureSensor(0)); //debug
+          #else
+          sensorMeasure(0);
+          #endif
+          
           //Time to take a measurement on Analog S2
           S2MeasureNow = false;
         }
         if(S3MeasureNow == true && bsi_config.sensor3_config.sensorEnabled == true)
         {
+          #ifdef DEBUG
+            sensor_value_characteristic_update(&m_cus,measureSensor(1)); //debug
+          #else
+          sensorMeasure(1);
+          #endif
           // Time to take a measurement on Analog S3
           S3MeasureNow = false;
         }
         if(lwrite_qspi == true)
         {
+<<<<<<< HEAD
           //for(int i = 0; i < 204; i++) // 204 pages fit in 1kB (if 5 bytes per page)
           //{
             write_qspi_page();
             //CurrentPage.countMin += 1;
             //CurrentPage.sensorValue = rand();
           //}
+=======
+        sensor_value_characteristic_update(&m_cus,measureSensor(0));
+          for(int i = 0; i < 255; i++) // 256 pages fit in 1kB (if 4 bytes per page)
+          {
+            #ifdef DEBUG
+              measureSensor(0);  //debug
+              write_qspi_page();   //debug
+              CurrentPage.countMin += 1;
+            #else
+              write_qspi_page();
+            #endif
+            
+            //CurrentPage.sensorValue = rand();
+          }
+>>>>>>> c81a276ac9e307d87ac22d8830de28e501ac7397
           
           // write_qspi_header();
           // write_qspi(qspiAddress); // *** TO BE DISCUSSED ***
+          #ifdef DEBUG
+            //lread_qspi = true;  //debug
+          #else
+          #endif
+          
         }
         if(UploadNow == true)
         {
@@ -1033,22 +1076,31 @@ int main(void)
           //we need the data from the flash
 
           // read_qspi(qspiAddress); // *** TO BE DISCUSSED ***
-
+          read_qspi_sector(1);
           //we need to put that data into our advert
-          update_advert();
+          //update_advert();
           //Advertising should be stopped
-          advertising_start(erase_bonds);
+          //advertising_start(erase_bonds);
           //The advertisment should then time out and stop.
         }
         if(lread_qspi == true)
         {
-          read_qspi_sector(1);
+          #ifdef DEBUG
+            read_qspi_sector(1);
+          #else
+          #endif
+            
           //read_qspi_page(4096);
           //read_qspi_header();
         }
         if(lerase_sector == true)
         {
-          erase_qspi_sector(1);
+          #ifdef DEBUG
+            lwrite_qspi = true;  //debug
+            erase_qspi_sector(1);
+          #else
+            erase_qspi_sector(1);
+          #endif
         }
         idle_state_handle();
     }

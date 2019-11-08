@@ -85,6 +85,7 @@ BSI_Config bsi_config = {
 //  .sensor3_config = s3_config,
     .uploadSize     = 9,
     .uploadInterval = 0,
+    .lastKnownAddr  = 0,
 };
 
 //Create FDS record for Sensor1

@@ -46,18 +46,19 @@ BSI_Header ReadHeader = {
 
 QSPI_Page CurrentPage = {
     .countMin = 0, //minutes since Header StartTime[] (last Local Listener connection)
-    .sensorCh = 1, //which sensor the following value is from (1=An1, 2=An2, or 9 = Pulse)
-    .sensorValue = 420, //What reading did sensor take? (10b ADC or pulse)
-    .dataSpace = 0xaa
+    //.sensorCh = 1, //which sensor the following value is from (1=An1, 2=An2, or 9 = Pulse)
+    .sensorValue = 1234, //What reading did sensor take? (10b ADC or pulse)
+    //.dataSpace = 0,
     };
 
 QSPI_Page ReadPage = { // Only used for checking an single, specific sensor reading
     };
 
-QSPI_Sector ReadSector = {
+/*QSPI_Sector ReadSector = {
     .Page = {0},  // set every page to all zeros (clear array)
-    .xTransmitted = false,
-    };
+    };*/
+
+QSPI_Page ReadSector[] = {0}; // set every page to all zeros (clear array)
 
 Ad_gPacket Packet = {
     };
@@ -142,27 +143,16 @@ void write_qspi_page()
        ret_code_t err_code;
 
        err_code = nrf_drv_qspi_write(&CurrentPage, sizeof(CurrentPage), bsi_config.lastKnownAddr);
-
-       APP_ERROR_CHECK(err_code);
+       //APP_ERROR_CHECK(err_code);
        WAIT_FOR_PERIPH();
+       //APP_ERROR_CHECK(err_code);
 
-      if(err_code == NRF_SUCCESS) { //If write was success, then increment lastKnownAddr...
+       if(err_code == NRF_SUCCESS) { //If write was success, then increment lastKnownAddr...
         // ...and write the last known address to the config so it survives power cycles.
-        bsi_config.lastKnownAddr += (sizeof(CurrentPage));
-        bsi_config.configChanged = true;
+        bsi_config.lastKnownAddr += (sizeof(CurrentPage.sensorValue));
+        bsi_config.configChanged = false;
         //printf("QSPI page written successfully\n");
       }
-
-        // note to landon (self):
-        // if sector pages == 77 then ...
-        // is current sector == 16? if no then increment current sector
-        //                          if yes then current sector = 2 (roll over)
-        //
-        // and increment lastknownaddress to 4096*current sector (the new number)
-        // before writing to new sector we should check if the sector was transmitted.....
-        //    if it isnt Tx'd then we have a BIG problem
-        // end note
-
       lwrite_qspi = false; 
 }
 
@@ -179,7 +169,7 @@ void erase_qspi_sector(uint8_t Sector)
       
       //debugging
       bsi_config.lastKnownAddr = 4096; // point back to start of sector 1
-      bsi_config.configChanged = true;
+      bsi_config.configChanged = false;
 
       //nrf_drv_qspi_chip_erase(); // only to be used to erase entire chip
       printf("QSPI sector %u erased\n", Sector);
@@ -251,7 +241,7 @@ void read_qspi_page(uint32_t Address){
       printf("QSPI page read successfully...\n");
       printf("Page at &%u :\n",Address);
       printf("  countMin: %u\n", ReadPage.countMin);
-      printf("  sensorCh: %u\n", ReadPage.sensorCh);
+      //printf("  sensorCh: %u\n", ReadPage.sensorCh);
       printf("  sensorValue: %u\n", ReadPage.sensorValue);
       printf("*******************\n\n");
       

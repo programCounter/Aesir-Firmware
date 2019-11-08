@@ -736,8 +736,10 @@ static void bsp_event_handler(bsp_event_t event)
     switch (event)
     {
         case BSP_EVENT_KEY_0:
-            // Erase 4kB from &0 on QSPI and rewrite header (initialize first time flash)
-            //write_qspi(0,qspiAddress); // Operation 0 is replace header
+            //LB: Just going to use this for QSPI debug...
+            // Will write header to Sector 0 ( needs to be moved to first time initialization though)
+            // Parameters of header are pre-defined for now in struct BSI_Header Header;
+            lwrite_qspi = true;            
             break;
 
         case BSP_EVENT_KEY_1:
@@ -748,6 +750,9 @@ static void bsp_event_handler(bsp_event_t event)
             //  pressCount = 0;
             //}
             //ble_bas_battery_level_update(&m_bas,pressCount,BLE_CONN_HANDLE_ALL);
+            //LB: Just me debugging again :)
+            //PLS ERASE SECTOR 1 and return LastKnownAddress to 4096 (start of Sector 1)
+            lerase_sector = true;
             break;
  
         case BSP_EVENT_KEY_2:
@@ -756,8 +761,8 @@ static void bsp_event_handler(bsp_event_t event)
             break;
        
         case BSP_EVENT_KEY_3:
-            //Read qspi
-            //lread_qspi = true;
+            //LB: Just going to use this for QSPI debug...
+            lread_qspi = true;
             break;
         
         case BSP_EVENT_SLEEP:
@@ -986,11 +991,13 @@ int main(void)
         }
         if(S3MeasureNow == true && bsi_config.sensor3_config.sensorEnabled == true)
         {
-          //Time to take a measurement on Analog S3
+          // Time to take a measurement on Analog S3
           S3MeasureNow = false;
         }
         if(lwrite_qspi == true)
         {
+          write_qspi_page();
+          // write_qspi_header();
           // write_qspi(qspiAddress); // *** TO BE DISCUSSED ***
         }
         if(UploadNow == true)
@@ -1007,10 +1014,15 @@ int main(void)
           advertising_start(erase_bonds);
           //The advertisment should then time out and stop.
         }
-//        if(lread_qspi == true)
-//        {
-//          read_qspi(qspiAddress);
-//        }
+        if(lread_qspi == true)
+        {
+          read_qspi_page(4096);
+          //read_qspi_header();
+        }
+        if(lerase_sector == true)
+        {
+          erase_qspi_sector(1);
+        }
         idle_state_handle();
     }
 }

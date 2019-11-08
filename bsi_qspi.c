@@ -4,7 +4,6 @@
 #include <string.h>
 #include "bsi_config.h"
 
-
 #define QSPI_STD_CMD_WRSR   0x01
 #define QSPI_STD_CMD_RSTEN  0x66
 #define QSPI_STD_CMD_RST    0x99
@@ -14,12 +13,15 @@
         m_finished = false;    \
     } while (0)
 
+// *********************************************************************************************
+//                            S o m e    T e r m i n o l o g y
+// *********************************************************************************************
 // a "memory page" is 1Byte (each address represents this minimum value)
 // however, our "QSPI PAGE" is the size of each sensor reading data set (much larger than 1 byte)
 // a memory sector is 4kB
 // a memory block is 64kB (thus there are 16 sectors per block!)
 
-//Used to find start address for sector block 1
+// Below is a "look-up table" used to find start address for sector block 1
 const uint32_t SectorB1[] = {0,4096,8192,12288,16384,20480,24576,28672,32768,36864,40960,45056,49152,53248,57344,61440,65536};
 static uint8_t currentSector = 1; //sector 1 starts at address 4096 
 
@@ -27,6 +29,7 @@ uint16_t pressCount = 0;
 
 bool lwrite_qspi = false;
 bool lread_qspi = false;
+bool lerase_sector = false;
 bool m_finished = false; // used in the QSPI event
 
 //static volatile uint32_t LastKnownAddr = 4096; //start at beginning of 1st sector (do not use sector 0)
@@ -41,9 +44,9 @@ BSI_Header ReadHeader = {
     };
 
 QSPI_Page CurrentPage = {
-    .countMin = 0, //minutes since Header StartTime[] (last Local Listener connection)
-    .sensorCh = 0, //which sensor the following value is from (1=An1, 2=An2, or 9 = Pulse)
-    .sensorValue = 0, //What reading did sensor take? (10b ADC or pulse)
+    .countMin = 15, //minutes since Header StartTime[] (last Local Listener connection)
+    .sensorCh = 1, //which sensor the following value is from (1=An1, 2=An2, or 9 = Pulse)
+    .sensorValue = 420, //What reading did sensor take? (10b ADC or pulse)
     };
 
 QSPI_Page ReadPage = { // Only used for checking an single, specific sensor reading
@@ -107,13 +110,12 @@ void configure_memory()
 // ...but one thing at a time...
 void write_qspi_header()
 {
-          
           ret_code_t err_code;
 
-          err_code = nrf_drv_qspi_erase(NRF_QSPI_ERASE_LEN_4KB, 0); //Erase 4kB from &0 (erase sector 0)
-
-          APP_ERROR_CHECK(err_code);
+          nrf_drv_qspi_erase(NRF_QSPI_ERASE_LEN_4KB, 0); //Erase 4kB from &0 (erase sector 0)
           WAIT_FOR_PERIPH();
+          //APP_ERROR_CHECK(err_code);
+          
 
           err_code = nrf_drv_qspi_write(&Header, sizeof(Header), 0);
 
@@ -121,7 +123,7 @@ void write_qspi_header()
           WAIT_FOR_PERIPH();
 
           if(err_code == NRF_SUCCESS) { //If write was success...
-            // If header update was success... do something?
+            //bsp_board_led_on(3);// If header update was success... do something?
           }
 
           lwrite_qspi = false; 
@@ -146,6 +148,7 @@ void write_qspi_page()
         // ...and write the last known address to the config so it survives power cycles.
         bsi_config.lastKnownAddr += (sizeof(CurrentPage));
         bsi_config.configChanged = true;
+        printf("QSPI page written successfully\n");
       }
 
         // note to landon (self):
@@ -169,10 +172,16 @@ void erase_qspi_sector(uint8_t Sector)
 
       ret_code_t err_code;
            
-      err_code = nrf_drv_qspi_erase(NRF_QSPI_ERASE_LEN_4KB, SectorB1[Sector]);
-      //nrf_drv_qspi_chip_erase(); // only to be used to erase entire chip 
-      APP_ERROR_CHECK(err_code);
+      nrf_drv_qspi_erase(NRF_QSPI_ERASE_LEN_4KB, SectorB1[Sector]);
       WAIT_FOR_PERIPH();
+      
+      //debugging
+      bsi_config.lastKnownAddr = 4096; // point back to start of sector 1
+      bsi_config.configChanged = true;
+
+      //nrf_drv_qspi_chip_erase(); // only to be used to erase entire chip
+      printf("QSPI sector %u erased\n", Sector);
+      lerase_sector = false;      
 }
 
 // ***********************************************************************************
@@ -229,12 +238,23 @@ void read_qspi_header(){
 void read_qspi_page(uint32_t Address){
           
     ret_code_t err_code;
-    memset(&ReadPage, 0, sizeof(ReadPage)); //Clear the Read Page first
+    memset(&ReadPage, 0, sizeof(ReadPage)); //Clear ReadPage first
 
     err_code = nrf_drv_qspi_read(&ReadPage, sizeof(ReadPage), Address);
 
     APP_ERROR_CHECK(err_code);
     WAIT_FOR_PERIPH();
+    if(err_code == NRF_SUCCESS) 
+    {
+      printf("QSPI page read successfully...\n");
+      printf("Page at &%u :\n",Address);
+      printf("  countMin: %u\n", ReadPage.countMin);
+      printf("  sensorCh: %u\n", ReadPage.sensorCh);
+      printf("  sensorValue: %u\n", ReadPage.sensorValue);
+      printf("*******************\n\n");
+      
+    }
+
     lread_qspi = false;
 }
 

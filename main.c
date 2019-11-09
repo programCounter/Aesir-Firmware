@@ -56,6 +56,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+
 #include "nordic_common.h"
 #include "nrf.h"
 #include "app_error.h"
@@ -89,6 +90,7 @@
 #include "sdk_config.h"
 #include "nrf_delay.h"
 #include "app_util_platform.h"
+
 
 #include "bsi_config.h"
 #include "bsi_qspi.h"

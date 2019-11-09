@@ -29,6 +29,7 @@ typedef struct QSPI_Page_
 }QSPI_Page;
 
 extern QSPI_Page CurrentPage;
+extern QSPI_Page ReadPage;
 
 typedef struct QSPI_Sector { // if a QSPI_page is 5 bytes and a sector is 1024 Bytes...
     struct QSPI_Page_ Page[(SECTOR_SIZE/(sizeof(QSPI_Page)))];    // ... then there should be 204 QSPI pages in this array

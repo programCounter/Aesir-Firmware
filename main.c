@@ -107,8 +107,9 @@
         m_finished = false;    \
     } while (0)
 
+/************************DEBUG DEFINITIONS**************************************************************************/
 #define DEBUG 
-
+/*******************************************************************************************************************/
 #define DEVICE_NAME                     "AEsir BSI 1"                       /**< Name of device. Will be included in the advertising data. */
 #define MANUFACTURER_NAME               "RioT Wireless"                   /**< Manufacturer. Will be passed to Device Information Service. */
 #define APP_ADV_INTERVAL                300                                     /**< The advertising interval (in units of 0.625 ms. This value corresponds to 187.5 ms). */
@@ -179,8 +180,11 @@ static volatile uint8_t m_advert_data[1650]; // 256 bytes on air at one time, ma
 
 static uint32_t NumFlashAddrs = 16777215; // the device is configured in 24bit addressing mode so 2^24 adresses are possible
 
-
+#ifdef DEBUG
+#define MINUTE_TIMER_TICK APP_TIMER_TICKS(1000) // 1 second, debuggin time mudda fuxa
+#else
 #define MINUTE_TIMER_TICK APP_TIMER_TICKS(60000) //1 min, lowest resolution of time we will think about.
+#endif
 //#define SENSOR_MEASURE_TICK APP_TIMER_TICKS(3600000) //1 hour. default measurement time for analog sensors
 
 APP_TIMER_DEF(m_minute_timer_id);                                  
@@ -449,7 +453,7 @@ static void minute_timer_timeout_handler(void * p_context)
   
   ticksTUpload++;//Increment our minutes since last upload.
   #ifdef DEBUG
-  if(ticksTUpload >= 1)
+  if(ticksTUpload >= 60) //every minute
   #else
   if(ticksTUpload >= bsi_config.uploadInterval)
   #endif
@@ -468,7 +472,11 @@ static void minute_timer_timeout_handler(void * p_context)
   #endif
   {
     ticksS2++;
-    if(ticksS2 > bsi_config.sensor2_config.measInterval)
+    #ifdef DEBUG
+    if(ticksS2 >= 13) //measure sensor at 13 seconds
+    #else
+    if(ticksS2 >= bsi_config.sensor2_config.measInterval)
+    #endif
     {
       S2MeasureNow = true;
       ticksS2 = 0;
@@ -478,7 +486,7 @@ static void minute_timer_timeout_handler(void * p_context)
   if(bsi_config.sensor3_config.sensorEnabled == true) // IF the sensors not enabled dont even increment the count
   {
     ticksS3++;
-    if(ticksS3 > bsi_config.sensor3_config.measInterval)
+    if(ticksS3 >= bsi_config.sensor3_config.measInterval)
     {
       S3MeasureNow = true;
       ticksS3 = 0;
@@ -941,8 +949,9 @@ void update_advert(void)
 //function for updating chracteristic value
 void sensor_value_characteristic_update(ble_cus_t * p_cus, int16_t data)
 {
+    //little endian converter::::::: -> swapped = (num>>8) | (num<<8);
     ble_gatts_value_t  gatts_value;
-
+    //data = (data>>8) | (data<<8);
         // Initialize value struct.
     memset(&gatts_value, 0, sizeof(gatts_value));
 
@@ -1015,10 +1024,16 @@ int main(void)
 
           bsi_config.configChanged = false; // Written the config, set this back to false...
         }
+        #ifdef DEBUG
+        if(S2MeasureNow == true)
+        #else
         if(S2MeasureNow == true && bsi_config.sensor2_config.sensorEnabled == true)
+        #endif
         {
           #ifdef DEBUG
             sensor_value_characteristic_update(&m_cus,measureSensor(0)); //debug
+            measureSensor(0);
+            lwrite_qspi = true;
           #else
           sensorMeasure(0);
           #endif
@@ -1029,7 +1044,7 @@ int main(void)
         if(S3MeasureNow == true && bsi_config.sensor3_config.sensorEnabled == true)
         {
           #ifdef DEBUG
-            sensor_value_characteristic_update(&m_cus,measureSensor(1)); //debug
+            sensor_value_characteristic_update(&m_cus,measureSensor(0)); //debug
           #else
           sensorMeasure(1);
           #endif
@@ -1038,20 +1053,20 @@ int main(void)
         }
         if(lwrite_qspi == true)
         {
-        sensor_value_characteristic_update(&m_cus,measureSensor(0));
-          for(int i = 0; i < 255; i++) // 256 pages fit in 1kB (if 4 bytes per page)
-          {
-            #ifdef DEBUG
-              measureSensor(0);  //debug
+        
+        #ifdef DEBUG
+          //for(int i = 0; i < 255; i++) // 256 pages fit in 1kB (if 4 bytes per page)
+          //{
+            
+             // measureSensor(0);  //debug
               write_qspi_page();   //debug
               CurrentPage.countMin += 1;
-            #else
-              write_qspi_page();
-            #endif
-            
-            //CurrentPage.sensorValue = rand();
-          }
-          
+              //CurrentPage.sensorValue = rand();
+          //}
+         #else
+           write_qspi_page();
+         #endif
+
           // write_qspi_header();
           // write_qspi(qspiAddress); // *** TO BE DISCUSSED ***
           #ifdef DEBUG
@@ -1065,14 +1080,17 @@ int main(void)
           //There may be an issue with how the advert api plays with the code the update advert,
           //based on what I read we should dodge the issues by only changing the config when the advertising is stopped.
           //we need the data from the flash
-
+          
           // read_qspi(qspiAddress); // *** TO BE DISCUSSED ***
+          //read_qspi_page(4096 + sizeof(CurrentPage));
           read_qspi_sector(1);
           //we need to put that data into our advert
           //update_advert();
           //Advertising should be stopped
           //advertising_start(erase_bonds);
           //The advertisment should then time out and stop.
+          UploadNow = false;
+
         }
         if(lread_qspi == true)
         {
@@ -1087,11 +1105,12 @@ int main(void)
         if(lerase_sector == true)
         {
           #ifdef DEBUG
-            lwrite_qspi = true;  //debug
+            //lwrite_qspi = true;  //debug
             erase_qspi_sector(1);
           #else
             erase_qspi_sector(1);
           #endif
+          lerase_sector =false;
         }
         idle_state_handle();
     }

@@ -96,8 +96,6 @@
 #include "bsi_qspi.h"
 #include "BLE_CUS.h"
 #include "bsi_measure.h"
-
-
 //#define QSPI_STD_CMD_WRSR   0x01
 //#define QSPI_STD_CMD_RSTEN  0x66
 //#define QSPI_STD_CMD_RST    0x99
@@ -110,9 +108,8 @@
     } while (0)
 
 #define DEBUG 
-#define TICKS_EQUAL_TO_MINUTE 60000                                       /* This value (in 1ms) is the number of ticks between each "minute" count */
 
-#define DEVICE_NAME                     "AEsir BSI"                       /**< Name of device. Will be included in the advertising data. */
+#define DEVICE_NAME                     "BUTTHOLE"                       /**< Name of device. Will be included in the advertising data. */
 #define MANUFACTURER_NAME               "RioT Wireless"                   /**< Manufacturer. Will be passed to Device Information Service. */
 #define APP_ADV_INTERVAL                300                                     /**< The advertising interval (in units of 0.625 ms. This value corresponds to 187.5 ms). */
 
@@ -183,7 +180,7 @@ static volatile uint8_t m_advert_data[1650]; // 256 bytes on air at one time, ma
 static uint32_t NumFlashAddrs = 16777215; // the device is configured in 24bit addressing mode so 2^24 adresses are possible
 
 
-#define MINUTE_TIMER_TICK APP_TIMER_TICKS(TICKS_EQUAL_TO_MINUTE) //1 min, lowest resolution of time we will think about.
+#define MINUTE_TIMER_TICK APP_TIMER_TICKS(60000) //1 min, lowest resolution of time we will think about.
 //#define SENSOR_MEASURE_TICK APP_TIMER_TICKS(3600000) //1 hour. default measurement time for analog sensors
 
 APP_TIMER_DEF(m_minute_timer_id);                                  

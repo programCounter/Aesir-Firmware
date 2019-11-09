@@ -467,7 +467,7 @@ static void minute_timer_timeout_handler(void * p_context)
   {
     ticksS2++;
     #ifdef DEBUG
-    if(ticksS2 >= 13) //measure sensor at 13 seconds
+    if(ticksS2 >= 15) //measure sensor at 15 seconds
     #else
     if(ticksS2 >= bsi_config.sensor2_config.measInterval)
     #endif
@@ -477,10 +477,18 @@ static void minute_timer_timeout_handler(void * p_context)
     }
   }
 
+  #ifdef DEBUG
+  if(true) //for debugging only, will ensure sensor 1 data is received
+  #else
   if(bsi_config.sensor3_config.sensorEnabled == true) // IF the sensors not enabled dont even increment the count
+  #endif
   {
     ticksS3++;
-    if(ticksS3 >= bsi_config.sensor3_config.measInterval)
+    #ifdef DEBUG
+    if(ticksS3 >= 15) //measure sensor at 15 seconds
+    #else
+    if(ticksS3 >= bsi_config.sensor2_config.measInterval)
+    #endif
     {
       S3MeasureNow = true;
       ticksS3 = 0;
@@ -1029,22 +1037,47 @@ int main(void)
             measureSensor(0);
             lwrite_qspi = true;
           #else
-          sensorMeasure(0);
+          measureSensor(0);
+          lwrite_qspi = true;
           #endif
           
           //Time to take a measurement on Analog S2
           S2MeasureNow = false;
         }
-        if(S3MeasureNow == true && bsi_config.sensor3_config.sensorEnabled == true)
+        #ifdef DEBUG
+        else if(S3MeasureNow == true)
+        #else
+        else if(S3MeasureNow == true && bsi_config.sensor3_config.sensorEnabled == true)
+        #endif
         {
           #ifdef DEBUG
-            sensor_value_characteristic_update(&m_cus,measureSensor(0)); //debug
+            sensor_value_characteristic_update(&m_cus,measureSensor(1)); //debug
+            measureSensor(1);
+            lwrite_qspi = true;
           #else
-          sensorMeasure(1);
+          measureSensor(1);
+          lwrite_qspi = true;
           #endif
           // Time to take a measurement on Analog S3
           S3MeasureNow = false;
         }
+        else if(UploadNow == true)
+        {
+          //There may be an issue with how the advert api plays with the code the update advert,
+          //based on what I read we should dodge the issues by only changing the config when the advertising is stopped.
+          //we need the data from the flash
+          
+          // read_qspi(qspiAddress); // *** TO BE DISCUSSED ***
+          //read_qspi_page(4096 + sizeof(CurrentPage));
+          read_qspi_sector(1);
+          //we need to put that data into our advert
+          //update_advert();
+          //Advertising should be stopped
+          //advertising_start(erase_bonds);
+          //The advertisment should then time out and stop.
+          UploadNow = false;
+        }
+
         if(lwrite_qspi == true)
         {
         
@@ -1069,23 +1102,6 @@ int main(void)
           #endif
           
         }
-        if(UploadNow == true)
-        {
-          //There may be an issue with how the advert api plays with the code the update advert,
-          //based on what I read we should dodge the issues by only changing the config when the advertising is stopped.
-          //we need the data from the flash
-          
-          // read_qspi(qspiAddress); // *** TO BE DISCUSSED ***
-          //read_qspi_page(4096 + sizeof(CurrentPage));
-          read_qspi_sector(1);
-          //we need to put that data into our advert
-          //update_advert();
-          //Advertising should be stopped
-          //advertising_start(erase_bonds);
-          //The advertisment should then time out and stop.
-          UploadNow = false;
-
-        }
         if(lread_qspi == true)
         {
           #ifdef DEBUG
@@ -1104,7 +1120,6 @@ int main(void)
           #else
             erase_qspi_sector(1);
           #endif
-          lerase_sector =false;
         }
         idle_state_handle();
     }

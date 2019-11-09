@@ -179,6 +179,7 @@ static volatile uint8_t m_advert_data[1650]; // 256 bytes on air at one time, ma
 
 static uint32_t NumFlashAddrs = 16777215; // the device is configured in 24bit addressing mode so 2^24 adresses are possible
 
+//aaaaJUSTMERGE
 
 #define MINUTE_TIMER_TICK APP_TIMER_TICKS(60000) //1 min, lowest resolution of time we will think about.
 //#define SENSOR_MEASURE_TICK APP_TIMER_TICKS(3600000) //1 hour. default measurement time for analog sensors

@@ -23,7 +23,7 @@ typedef struct BSI_Header {
 typedef struct QSPI_Page_ 
 { // each memory page is 1byte, but ours are the size of each sensor reading
     uint16_t countMin; // minutes since Header StartTime[] (last Local Listener connection)
-    uint16_t sensorCh; // which sensor the following value is from (1=An1, 2=An2, or 9 = Pulse)
+    //uint16_t sensorCh; // which sensor the following value is from (1=An1, 2=An2, or 9 = Pulse)
     uint16_t sensorValue; // the 16b reading from the sensor (10-bit ADC for An# or Bool for Pulse)    
     //uint8_t dataSpace; //maybe data needs spaces too :)
 }QSPI_Page;

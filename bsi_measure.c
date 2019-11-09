@@ -115,7 +115,9 @@ nrf_saadc_value_t measureSensor(uint8_t channel)
     default:
       break;
   } 
-  CurrentPage.sensorCh = channel;
-  CurrentPage.sensorValue = p_ADC_Result;
+  //CurrentPage.sensorCh = channel;
+  //CurrentPage.sensorValue = p_ADC_Result;
+  CurrentPage.sensorValue = p_ADC_Result<<4;
+  CurrentPage.sensorValue | channel;
   return p_ADC_Result;
 }

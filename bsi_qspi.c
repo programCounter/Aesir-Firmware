@@ -174,7 +174,7 @@ void erase_qspi_sector(uint8_t Sector)
 
       ret_code_t err_code;
            
-      nrf_drv_qspi_erase(NRF_QSPI_ERASE_LEN_4KB, SectorB1[Sector]);
+      err_code = nrf_drv_qspi_erase(NRF_QSPI_ERASE_LEN_4KB, SectorB1[Sector]);
       WAIT_FOR_PERIPH();
       
       //debugging

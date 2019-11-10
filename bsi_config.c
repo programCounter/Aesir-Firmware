@@ -177,6 +177,7 @@ ret_code_t write_fds(uint16_t sensorFile, uint16_t sensorKey)
   //switch on the retCode, are we updating or making a new file?
   switch(retCode)
   {
+
     case FDS_SUCCESS:
       //The file exists, we can update it.
       retCode = fds_record_update(&descript, &FDS_BSI_record);
@@ -187,6 +188,12 @@ ret_code_t write_fds(uint16_t sensorFile, uint16_t sensorKey)
       retCode = fds_record_write(&descript, &FDS_BSI_record);
       break;
   }
+
+  retCode = fds_gc();
+  /* Wait for fds to initialize. */
+  //(void) sd_app_evt_wait();//Sleep till next event. This line requires a soft device to be present.
+
+  fds_record_close(&descript);//Have to close it when were done to that garbage collection can happen
   return retCode;
 }
 

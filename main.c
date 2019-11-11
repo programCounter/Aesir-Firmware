@@ -110,11 +110,11 @@
 /************************DEBUG DEFINITIONS**************************************************************************/
 #define DEBUG 
 /*******************************************************************************************************************/
-#define DEVICE_NAME                     "AEsir BSI 1"                       /**< Name of device. Will be included in the advertising data. */
+#define DEVICE_NAME                     "AEsir"                       /**< Name of device. Will be included in the advertising data. */
 #define MANUFACTURER_NAME               "RioT Wireless"                   /**< Manufacturer. Will be passed to Device Information Service. */
 #define APP_ADV_INTERVAL                300                                     /**< The advertising interval (in units of 0.625 ms. This value corresponds to 187.5 ms). */
 
-#define APP_ADV_DURATION                18000                                   /**< The advertising duration (180 seconds) in units of 10 milliseconds. */
+#define APP_ADV_DURATION                0                                   /**< The advertising duration (180 seconds) in units of 10 milliseconds. */
 //#define APP_ADV_DURATION                180                                   /**< The advertising duration (180 seconds) in units of 10 milliseconds. */
 #define APP_BLE_OBSERVER_PRIO           3                                       /**< Application's BLE observer priority. You shouldn't need to modify this value. */
 #define APP_BLE_CONN_CFG_TAG            1                                       /**< A tag identifying the SoftDevice BLE configuration. */
@@ -832,7 +832,7 @@ static void advertising_init(void)
     init.config.ble_adv_fast_enabled      = true;
     init.config.ble_adv_fast_interval     = APP_ADV_INTERVAL;
     init.config.ble_adv_fast_timeout      = APP_ADV_DURATION;
-    init.config.ble_adv_extended_enabled  = true;
+    init.config.ble_adv_extended_enabled  = false;
     //init.config.
     init.evt_handler = on_adv_evt;
 

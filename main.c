@@ -789,6 +789,10 @@ static void bsp_event_handler(bsp_event_t event)
             sleep_mode_enter();
             break; // BSP_EVENT_SLEEP
 
+        case BSP_EVENT_RESET:
+            NVIC_SystemReset();
+            break; // Will completely reset system :O RIP
+
         case BSP_EVENT_DISCONNECT:
             err_code = sd_ble_gap_disconnect(m_conn_handle,
                                              BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);

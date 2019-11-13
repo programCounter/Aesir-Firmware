@@ -1001,6 +1001,7 @@ int main(void)
     
     saadc_init();
     gpio_init();
+    fatfs_init();
 //    nrf_drv_qspi_erase(NRF_QSPI_ERASE_LEN_64KB, 0);
 //    WAIT_FOR_PERIPH();
     
@@ -1122,7 +1123,7 @@ int main(void)
           #ifdef DEBUG
             //lwrite_qspi = true;  //debug
             erase_qspi_sector(1);
-            fatfs_example();
+            fatfs_write();
           #else
             erase_qspi_sector(1);
           #endif

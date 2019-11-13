@@ -96,6 +96,7 @@
 #include "bsi_qspi.h"
 #include "BLE_CUS.h"
 #include "bsi_measure.h"
+#include "fatfs.h"
 //#define QSPI_STD_CMD_WRSR   0x01
 //#define QSPI_STD_CMD_RSTEN  0x66
 //#define QSPI_STD_CMD_RST    0x99
@@ -1121,6 +1122,7 @@ int main(void)
           #ifdef DEBUG
             //lwrite_qspi = true;  //debug
             erase_qspi_sector(1);
+            fatfs_example();
           #else
             erase_qspi_sector(1);
           #endif

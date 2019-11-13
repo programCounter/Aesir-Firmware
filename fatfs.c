@@ -38,23 +38,24 @@ void fatfs_write()
 {
     uint32_t bytes_written;
     FRESULT ff_result;
+    char file_name[20];
+    strcpy(file_name, "HELLO2.txt");
 
     #ifdef DEBUG
-    strcpy(fatfs_write_buffer.data, "HELLO");
-    //fatfs_write_buffer.data[6] = {'H','E','L','L','O','\0'};
-    fatfs_write_buffer.length = 5;  //length of "HELLO" as int
+    strcpy(fatfs_write_buffer.data, "HELLO2");
+    fatfs_write_buffer.length = 6;  //length of "HELLO" as int
     #endif
 
     //NRF_LOG_INFO("Writing to file " FILE_NAME "...");
     #ifdef DEBUG
-    printf("Writing to file " FILE_NAME "...");
+    printf("Writing to file hello...");
     #endif
-    ff_result = f_open(&file, FILE_NAME, FA_READ | FA_WRITE | FA_OPEN_APPEND);
+    ff_result = f_open(&file, file_name, FA_READ | FA_WRITE | FA_OPEN_APPEND);
     if (ff_result != FR_OK)
     {
       //NRF_LOG_INFO("Unable to open or create file: " FILE_NAME ".");
       #ifdef DEBUG
-      printf("Unable to open or create file: " FILE_NAME ".");
+      printf("Unable to open or create file: HELLO.");
       #endif
       
     }

@@ -18,7 +18,7 @@ typedef struct fatfs_write_buffer_t_ {
 
 typedef struct BSI_Att_t_ {
       char BSI_Name[16];
-      uint8_t StartTime[8]; //7 bytes (5+ 2byte year) YYYY/MM/DD/HH/MM/SS
+      uint8_t StartTime[8];
 }BSI_Att_t;
 
 typedef struct BSI_Data_t_ {
@@ -35,3 +35,4 @@ void fatfs_example(void);
 void fatfs_init(void);
 void fatfs_write(BSI_Data_t * BSI_Value);
 void data_ch_decode(BSI_Data_t * tempValue);
+void current_time(uint16_t minutes, uint8_t *CurrentTime);

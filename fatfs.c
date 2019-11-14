@@ -19,7 +19,10 @@ static FATFS fs;
 static FIL file;
 
 fatfs_write_buffer_t fatfs_write_buffer = {};      //redefine the extern struct in fatfs.h
-BSI_Att_t BSI_Attribute = {};
+BSI_Att_t BSI_Attribute = {
+          .BSI_Name = {},
+          .StartTime = {20, 19, 12, 31, 23, 59},
+          };
 BSI_Data_t BSI_Data = {};
 
 NRF_BLOCK_DEV_SDC_DEFINE(
@@ -42,28 +45,91 @@ void data_ch_decode(BSI_Data_t * tempValue)
   tempValue->SensorCh = tempValue->SensorValue & 0x000F;
   tempValue->SensorValue = (tempValue->SensorValue >> 4);
 }
-void current_time(uint16_t minutes)
-{
-    //uint8_t StartTime[8]; //7 bytes (5+ 2byte year) YYYY/MM/DD/HH/MM/SS
-    minutes += BSI_Attribute.StartTime[5];
 
-    BSI_Attribute.StartTime[4] += minutes/60;
-    if(BSI_Attribute.StartTime[4] > 24)
+//function to calculate the time that a measurement occured based on the minutes received
+void current_time(uint16_t minutes, uint8_t *CurrentTime)
+{
+    uint8_t days_in_month, days, hours, mins;
+    
+    days = minutes/1440;            //this will ensure that time added to array is not greater the one increment for rollover
+    hours = (minutes - (1440*days))/60;
+    mins = (minutes - (1440*days) - (60*hours));
+
+
+    //uint8_t StartTime[8]; //7 bytes (5+ 2byte year) YY/YY/MM/DD/HH/MM/SS
+    //                                               [0][1][2][3][4][5][6]
+
+    CurrentTime[5] += mins;
+    CurrentTime[4] += hours;
+    CurrentTime[3] += days;
+    
+    if(CurrentTime[5] >= 60) //rollover minutes & increment hours
     {
-        BSI_Attribute.StartTime[3] += BSI_Attribute.StartTime[4]/24
-        BSI_Attribute.StartTime[4] %= 24;
-        
+      CurrentTime[4]++;
+      CurrentTime[5] %= 60;  //assign the remainder to the array
     }
+    if(CurrentTime[4] >= 24) //rollover hours & increment days
+    {
+      CurrentTime[3]++;
+      CurrentTime[4] %= 24;  //assign the remainder to the array
+    }
+    if(CurrentTime[2] == 1 ||
+         CurrentTime[2] == 3 ||
+         CurrentTime[2] == 5 ||
+         CurrentTime[2] == 7 ||
+         CurrentTime[2] == 8 ||
+         CurrentTime[2] == 10 ||
+         CurrentTime[2] == 12) //if the month has 31 days
+    {
+      days_in_month = 31;
+    }
+    else if(CurrentTime[2] == 2) //if it is feb
+    {
+      if((CurrentTime[1] % 4) == 0) //if it is a leap year
+      {
+        days_in_month = 29;
+      }
+      else
+      {
+        days_in_month = 28;
+      }
+    }
+    else
+    {
+      days_in_month = 30;
+    }
+    if(CurrentTime[3] > days_in_month) //rollover days & increment months
+    {
+      
+      CurrentTime[2]++;
+      CurrentTime[3] %= days_in_month;  //assign the remainder to the array
+    }
+    if(CurrentTime[2] > 12) //rollover months & increment year
+    {
+      CurrentTime[1]++;
+      CurrentTime[2] = 1;  //reset months
+    }
+    if(CurrentTime[1] > 99) //rollover year & increment centuries
+    {
+      
+      CurrentTime[0]++;
+      CurrentTime[1] = 0;  //reset
+    }
+
 }
+
 void fatfs_write(BSI_Data_t * BSI_Value)
 {
     uint32_t bytes_written;
     FRESULT ff_result;
-    
-    BSI_Value->CountMin = 5;
-    data_ch_decode(BSI_Value);
-    
     char SensorValTemp[5];
+    uint8_t CurrentTimeTemp[8];
+    char CurrentTimeStr[15];
+    
+    strcpy(CurrentTimeTemp, BSI_Attribute.StartTime);
+    data_ch_decode(BSI_Value);
+    current_time(BSI_Value->CountMin, CurrentTimeTemp);
+    
     //uint16_t fake_adc_val = 512;
     //strcpy(file_name, "HELLO2.txt");
 

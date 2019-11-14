@@ -17,7 +17,10 @@
 
 static FATFS fs;
 static FIL file;
+
 fatfs_write_buffer_t fatfs_write_buffer = {};      //redefine the extern struct in fatfs.h
+BSI_Att_t BSI_Attribute = {};
+BSI_Data_t BSI_Data = {};
 
 NRF_BLOCK_DEV_SDC_DEFINE(
         m_block_dev_sdc,
@@ -34,28 +37,53 @@ static diskio_blkdev_t drives[] =
             DISKIO_BLOCKDEV_CONFIG(NRF_BLOCKDEV_BASE_ADDR(m_block_dev_sdc, block_dev), NULL)
 };
 
-void fatfs_write()
+void data_ch_decode(BSI_Data_t * tempValue)
+{
+  tempValue->SensorCh = tempValue->SensorValue & 0x000F;
+  tempValue->SensorValue = (tempValue->SensorValue >> 4);
+}
+void current_time(uint16_t minutes)
+{
+    //uint8_t StartTime[8]; //7 bytes (5+ 2byte year) YYYY/MM/DD/HH/MM/SS
+    minutes += BSI_Attribute.StartTime[5];
+
+    BSI_Attribute.StartTime[4] += minutes/60;
+    if(BSI_Attribute.StartTime[4] > 24)
+    {
+        BSI_Attribute.StartTime[3] += BSI_Attribute.StartTime[4]/24
+        BSI_Attribute.StartTime[4] %= 24;
+        
+    }
+}
+void fatfs_write(BSI_Data_t * BSI_Value)
 {
     uint32_t bytes_written;
     FRESULT ff_result;
-    char file_name[20];
-    strcpy(file_name, "HELLO2.txt");
+    
+    BSI_Value->CountMin = 5;
+    data_ch_decode(BSI_Value);
+    
+    char SensorValTemp[5];
+    //uint16_t fake_adc_val = 512;
+    //strcpy(file_name, "HELLO2.txt");
 
-    #ifdef DEBUG
-    strcpy(fatfs_write_buffer.data, "HELLO2");
-    fatfs_write_buffer.length = 6;  //length of "HELLO" as int
-    #endif
-
+    utoa(BSI_Value->SensorValue, SensorValTemp, 10); //convert sensor data to buffer data
+    utoa(BSI_Value->SensorCh, fatfs_write_buffer.data, 10);
+    strncat(fatfs_write_buffer.data, ",", 1);
+    strncat(fatfs_write_buffer.data, SensorValTemp, 4); //convert format to [ch, data]
+    //strcpy(fatfs_write_buffer.data, fake_adc_val);
+    fatfs_write_buffer.length = 6;  
+    
     //NRF_LOG_INFO("Writing to file " FILE_NAME "...");
     #ifdef DEBUG
-    printf("Writing to file hello...");
+    printf("Writing to file TEST...");
     #endif
-    ff_result = f_open(&file, file_name, FA_READ | FA_WRITE | FA_OPEN_APPEND);
+    ff_result = f_open(&file, BSI_Attribute.BSI_Name, FA_READ | FA_WRITE | FA_OPEN_APPEND);
     if (ff_result != FR_OK)
     {
       //NRF_LOG_INFO("Unable to open or create file: " FILE_NAME ".");
       #ifdef DEBUG
-      printf("Unable to open or create file: HELLO.");
+      printf("Unable to open or create file: TEST.");
       #endif
       
     }

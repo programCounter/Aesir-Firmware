@@ -1123,7 +1123,9 @@ int main(void)
           #ifdef DEBUG
             //lwrite_qspi = true;  //debug
             erase_qspi_sector(1);
-            fatfs_write();
+            BSI_Data.SensorValue = 0X0ff1;
+            strcpy(BSI_Attribute.BSI_Name, "BSI_TEST.txt");
+            fatfs_write(&BSI_Data);
           #else
             erase_qspi_sector(1);
           #endif

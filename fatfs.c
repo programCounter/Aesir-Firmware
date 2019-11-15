@@ -1,3 +1,19 @@
+/*
+//example used in debugging/testing
+            strcpy(BSI_Attribute.BSI_Name, "BSI_TEST.txt");
+            for(uint8_t inc; inc < 13; inc++)
+            {
+              BSI_Data.SensorValue = 0X0ff1;
+              BSI_Data.CountMin = inc*20;       
+              fatfs_write(&BSI_Data);
+            }
+This file contains the functions to pull data from input data stream, format it and store it to an SD card
+Currently the variable that must be written to are:
+-BSI_Attribute.BSI_Name
+-BSI_Attribute.StartTime
+-BSI_Data.SensorValue
+-BSI_Data.CountMin
+*/
 #include "bsp.h"
 #include "ff.h"
 #include "diskio_blkdev.h"
@@ -124,21 +140,49 @@ void fatfs_write(BSI_Data_t * BSI_Value)
     FRESULT ff_result;
     char SensorValTemp[5];
     uint8_t CurrentTimeTemp[8];
-    char CurrentTimeStr[15];
-    
+    char CurrentTimeStr[20];
+    char TempStr[2];
+
+    memset(CurrentTimeStr, 0, 20);
     strcpy(CurrentTimeTemp, BSI_Attribute.StartTime);
     data_ch_decode(BSI_Value);
     current_time(BSI_Value->CountMin, CurrentTimeTemp);
     
+    for(uint8_t i = 0; i <= 5; i++) //for loop will contruct a char array of the time-date format form the int array passed
+    {
+      utoa(CurrentTimeTemp[i], TempStr, 10);
+      //uint8_t StartTime[8]; //7 bytes (5+ 2byte year) YY/YY/MM/DD/HH/MM/SS
+      //                                               [0][1][2][3][4][5][6]
+      if(CurrentTimeTemp[i] < 10)
+      {
+        TempStr[1] = TempStr[0];
+        TempStr[0] = '0';
+      }
+      if(i >= 2 && i <= 4)
+      {
+        strncat(CurrentTimeStr, "/", 1);
+      }
+      else if (i > 4)
+      {
+        strncat(CurrentTimeStr, ":", 1);
+      }
+      strncat(CurrentTimeStr, TempStr, 2);
+    }
     //uint16_t fake_adc_val = 512;
     //strcpy(file_name, "HELLO2.txt");
 
     utoa(BSI_Value->SensorValue, SensorValTemp, 10); //convert sensor data to buffer data
-    utoa(BSI_Value->SensorCh, fatfs_write_buffer.data, 10);
+    utoa(BSI_Value->SensorCh, TempStr, 10);
+    memset(fatfs_write_buffer.data, 0, strlen(fatfs_write_buffer.data));
+     //convert format to [time,ch,data]
+    strncat(fatfs_write_buffer.data, CurrentTimeStr, strlen(CurrentTimeStr)); 
     strncat(fatfs_write_buffer.data, ",", 1);
-    strncat(fatfs_write_buffer.data, SensorValTemp, 4); //convert format to [ch, data]
-    //strcpy(fatfs_write_buffer.data, fake_adc_val);
-    fatfs_write_buffer.length = 6;  
+    strncat(fatfs_write_buffer.data, TempStr, 1);
+    strncat(fatfs_write_buffer.data, ",", 1);
+    strncat(fatfs_write_buffer.data, SensorValTemp, 4);
+    strncat(fatfs_write_buffer.data, "\n", 1);
+    
+    fatfs_write_buffer.length = strlen(fatfs_write_buffer.data);  
     
     //NRF_LOG_INFO("Writing to file " FILE_NAME "...");
     #ifdef DEBUG

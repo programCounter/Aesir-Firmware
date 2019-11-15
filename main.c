@@ -1123,13 +1123,14 @@ int main(void)
           #ifdef DEBUG
             //lwrite_qspi = true;  //debug
             erase_qspi_sector(1);
-            //BSI_Attribute.StartTime[0] = {20, 19, 12, 31, 23, 59};
-            BSI_Data.SensorValue = 0X0ff1;
-            BSI_Data.CountMin = 5;
             strcpy(BSI_Attribute.BSI_Name, "BSI_TEST.txt");
-            fatfs_write(&BSI_Data);
-            BSI_Data.CountMin = 10;
-            fatfs_write(&BSI_Data);
+            for(uint8_t inc; inc < 13; inc++)
+            {
+              BSI_Data.SensorValue = 0X0ff1;
+              BSI_Data.CountMin = inc*20;       
+              fatfs_write(&BSI_Data);
+            }
+            
           #else
             erase_qspi_sector(1);
           #endif

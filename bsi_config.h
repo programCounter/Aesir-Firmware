@@ -1,8 +1,6 @@
 //#include <stdint.h>
 #include "fds.h"
 
-
-
 typedef struct BSISensorConfig { 
   bool configChanged;
   bool sensorEnabled;

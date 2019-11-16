@@ -207,7 +207,6 @@ void write_qspi(uint32_t Address)
 // Used to read anything sizeof(m_buffer_rx) from a specific address
 void read_qspi(uint32_t Address)
 {
-  
     ret_code_t err_code;
     memset(&m_buffer_rx, 0, sizeof(m_buffer_rx)); //clear m_buffer_rx for next read
 

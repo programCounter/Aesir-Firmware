@@ -91,12 +91,23 @@
 #include "nrf_delay.h"
 #include "app_util_platform.h"
 
+//#include "ble_nus.h"
+//#include "app_uart.h"
+//#if defined (UART_PRESENT)
+//#include "nrf_uart.h"
+//#endif
+//#if defined (UARTE_PRESENT)
+//#include "nrf_uarte.h"
+//#endif
 
 #include "bsi_config.h"
 #include "bsi_qspi.h"
 #include "BLE_CUS.h"
 #include "bsi_measure.h"
 #include "fatfs.h"
+#include "bsi_uart.h"
+
+
 //#define QSPI_STD_CMD_WRSR   0x01
 //#define QSPI_STD_CMD_RSTEN  0x66
 //#define QSPI_STD_CMD_RST    0x99
@@ -138,6 +149,8 @@
 #define SEC_PARAM_MIN_KEY_SIZE          7                                       /**< Minimum encryption key size. */
 #define SEC_PARAM_MAX_KEY_SIZE          16                                      /**< Maximum encryption key size. */
 
+
+
 #define DEAD_BEEF                       0xDEADBEEF                              /**< Value used as error code on stack dump, can be used to identify stack location on stack unwind. */
 
 //from the custom service tutorial
@@ -155,7 +168,7 @@ static uint32_t ticksTUpload; // nUmber of ticks to be compared against upload i
 static bool S2MeasureNow;
 static bool S3MeasureNow;
 static bool UploadNow;
-
+static bool pushData;
 uint32_t qspiAddress = 0; //ONLY FOR DEBUG
 
 /* YOUR_JOB: Declare all services structure your application is using
@@ -167,6 +180,8 @@ BLE_BAS_DEF(m_bas);
 static ble_uuid_t m_adv_uuids[] =                                               /**< Universally unique service identifiers. */
 {
     {BLE_UUID_DEVICE_INFORMATION_SERVICE, BLE_UUID_TYPE_BLE}//,
+    //{BLE_UUID_NUS_SERVICE, NUS_SERVICE_UUID_TYPE} // exposes the uart service
+    //,
     //{CONFIG_SERVICE_UUID, BLE_UUID_TYPE_VENDOR_BEGIN } /**< Universally unique service identifiers. Doesnt need to be here, has no effect on the service*/
     //{BLE_UUID_BATTERY_SERVICE,            BLE_UUID_TYPE_BLE},
    
@@ -182,7 +197,7 @@ static volatile uint8_t m_advert_data[1650]; // 256 bytes on air at one time, ma
 static uint32_t NumFlashAddrs = 16777215; // the device is configured in 24bit addressing mode so 2^24 adresses are possible
 
 #ifdef DEBUG
-#define MINUTE_TIMER_TICK APP_TIMER_TICKS(1000) // 1 second, debuggin time mudda fuxa
+#define MINUTE_TIMER_TICK APP_TIMER_TICKS(10000) // 1 second, debuggin time mudda fuxa
 #else
 #define MINUTE_TIMER_TICK APP_TIMER_TICKS(60000) //1 min, lowest resolution of time we will think about.
 #endif
@@ -445,6 +460,7 @@ static void minute_timer_timeout_handler(void * p_context)
   //If the variable 
   UNUSED_PARAMETER(p_context);
   
+  pushData = true;
   
   ticksTUpload++;//Increment our minutes since last upload.
   #ifdef DEBUG
@@ -989,6 +1005,7 @@ int main(void)
     gatt_init();
 
     services_init();
+    nServices_init();
     advertising_init();
     
     conn_params_init();
@@ -1012,7 +1029,7 @@ int main(void)
     // Start execution.
     //NRF_LOG_INFO("Template example started.");
     application_timers_start();
-
+    uart_init();
     advertising_start(erase_bonds);
     
     //somejunkvar = true;
@@ -1126,6 +1143,12 @@ int main(void)
           #else
             erase_qspi_sector(1);
           #endif
+        }
+
+        if(pushData == true)
+        {
+          uart_data_send(0,0,m_conn_handle);
+          pushData = false;
         }
         idle_state_handle();
     }

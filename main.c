@@ -966,6 +966,7 @@ void update_advert(void)
 
     err_code = sd_ble_gap_adv_set_configure(&m_adv_handle, &m_adv_data, NULL);
     APP_ERROR_CHECK(err_code);
+    
 
 }
 

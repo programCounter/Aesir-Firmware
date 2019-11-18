@@ -31,4 +31,5 @@ Output/ble_app_template_pca10056_s140\ Debug/Obj/bsi_config.o: \
  E:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.22/include/__crossworks.h \
  ../../../../../../components/libraries/util/sdk_errors.h \
  ../../../../../../components/libraries/util/nordic_common.h \
- ../../../../../../components/libraries/util/app_error_weak.h
+ ../../../../../../components/libraries/util/app_error_weak.h \
+ E:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.22/include/string.h

@@ -39,6 +39,5 @@ Output/ble_app_template_pca10056_s140\ Debug/Obj/nrf_atfifo.o: \
  ../../../../../../components/libraries/util/app_util.h \
  ../../../../../../components/libraries/util/sdk_macros.h \
  ../../../../../../components/libraries/util/nrf_assert.h \
- ../../../../../../components/libraries/strerror/nrf_strerror.h \
  ../../../../../../components/libraries/log/src/nrf_log_internal.h \
  ../../../../../../components/libraries/log/nrf_log_types.h

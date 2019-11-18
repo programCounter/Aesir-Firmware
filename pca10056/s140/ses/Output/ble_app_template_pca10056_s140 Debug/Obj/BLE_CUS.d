@@ -76,7 +76,6 @@ Output/ble_app_template_pca10056_s140\ Debug/Obj/BLE_CUS.o: \
  ../../../../../../components/boards/pca10056.h \
  ../../../../../../components/libraries/log/nrf_log.h \
  ../../../../../../components/libraries/experimental_section_vars/nrf_section.h \
- ../../../../../../components/libraries/strerror/nrf_strerror.h \
  ../../../../../../components/libraries/log/src/nrf_log_internal.h \
  ../../../../../../components/libraries/log/nrf_log_instance.h \
  ../../../../../../components/libraries/log/nrf_log_types.h \

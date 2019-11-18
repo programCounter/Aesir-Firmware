@@ -106,7 +106,6 @@ Output/ble_app_template_pca10056_s140\ Debug/Obj/main.o: \
  ../../../../../../components/libraries/pwr_mgmt/nrf_pwr_mgmt.h \
  ../../../../../../components/libraries/log/nrf_log.h \
  ../../../../../../components/libraries/experimental_section_vars/nrf_section.h \
- ../../../../../../components/libraries/strerror/nrf_strerror.h \
  ../../../../../../components/libraries/log/src/nrf_log_internal.h \
  ../../../../../../components/libraries/log/nrf_log_instance.h \
  ../../../../../../components/libraries/log/nrf_log_types.h \
@@ -114,8 +113,6 @@ Output/ble_app_template_pca10056_s140\ Debug/Obj/main.o: \
  ../../../../../../components/libraries/log/nrf_log_ctrl.h \
  ../../../../../../components/libraries/log/src/nrf_log_ctrl_internal.h \
  ../../../../../../components/libraries/log/nrf_log_backend_interface.h \
- ../../../../../../components/libraries/memobj/nrf_memobj.h \
- ../../../../../../components/libraries/balloc/nrf_balloc.h \
  ../../../../../../components/libraries/log/nrf_log_default_backends.h \
  ../../../../../../components/ble/ble_services/ble_bas/ble_bas.h \
  ../../../../../../integration/nrfx/legacy/nrf_drv_qspi.h \
@@ -128,4 +125,15 @@ Output/ble_app_template_pca10056_s140\ Debug/Obj/main.o: \
  E:\dev\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\examples\ble_peripheral\Aesir-Firmware\bsi_measure.h \
  ../../../../../../integration/nrfx/legacy/nrf_drv_saadc.h \
  ../../../../../../modules/nrfx/drivers/include/nrfx_saadc.h \
- ../../../../../../modules/nrfx/hal/nrf_saadc.h
+ ../../../../../../modules/nrfx/hal/nrf_saadc.h \
+ E:\dev\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\examples\ble_peripheral\Aesir-Firmware\fatfs.h \
+ ../../../../../../components/libraries/bsp/bsp.h \
+ ../../../../../../external/fatfs/src/ff.h \
+ ../../../../../../external/fatfs/src/integer.h \
+ ../../../../../../external/fatfs/src/ffconf.h \
+ ../../../../../../external\fatfs\port/diskio_blkdev.h \
+ ../../../../../../external/fatfs/src/diskio.h \
+ ../../../../../../components\libraries\block_dev/nrf_block_dev.h \
+ ../../../../../../components/libraries/block_dev/sdc/nrf_block_dev_sdc.h \
+ ../../../../../../components/libraries/sdcard/app_sdcard.h \
+ E:\dev\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\examples\ble_peripheral\Aesir-Firmware\bsi_uart.h

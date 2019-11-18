@@ -54,8 +54,13 @@ Output/ble_app_template_pca10056_s140\ Debug/Obj/bsi_measure.o: \
  ../../../../../../components/softdevice/s140/headers/nrf_sd_def.h \
  ../../../../../../modules/nrfx/drivers/nrfx_errors.h \
  ../../../../../../modules/nrfx/hal/nrf_saadc.h \
+ E:\dev\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\examples\ble_peripheral\Aesir-Firmware\bsi_qspi.h \
+ ../../../../../../integration/nrfx/legacy/nrf_drv_qspi.h \
+ ../../../../../../modules/nrfx/drivers/include/nrfx_qspi.h \
+ ../../../../../../modules/nrfx/hal/nrf_qspi.h \
  ../../../../../../modules/nrfx/hal/nrf_gpio.h \
  ../../../../../../integration/nrfx/legacy/nrf_drv_gpiote.h \
  ../../../../../../modules/nrfx/drivers/include/nrfx_gpiote.h \
  ../../../../../../modules/nrfx/hal/nrf_gpiote.h \
- ../../../../../../modules/nrfx/hal/nrf_gpio.h
+ ../../../../../../modules/nrfx/hal/nrf_gpio.h \
+ ../../../../../../components/libraries/delay/nrf_delay.h

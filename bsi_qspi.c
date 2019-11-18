@@ -277,3 +277,15 @@ void read_qspi_sector(uint8_t Sector){
      WAIT_FOR_PERIPH();
      lread_qspi = false;
 }
+
+
+// ***********************************************************************************
+// This will automatically populate the extern gPacket (general packet) with the current
+//    header and the specified sector of data from QSPI. Good luck?
+void qspi_prepare_packet(uint8_t Sector){
+
+     read_qspi_header();
+     gPacket.Header = ReadHeader;
+     read_qspi_sector(Sector);
+     gPacket.Sector = ReadSector;
+}

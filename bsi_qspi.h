@@ -30,9 +30,8 @@ typedef struct QSPI_Page_
 
 extern QSPI_Page CurrentPage;
 
-typedef struct QSPI_Sector { // if a QSPI_page is 5 bytes and a sector is 1024 Bytes...
-    struct QSPI_Page_ Page[(SECTOR_SIZE/(sizeof(QSPI_Page)))];    // ... then there should be 204 QSPI pages in this array
-    //bool xTransmitted; // *** HMM ERASED MEMORY IS STORED AS ALL 111111 soooo
+typedef struct QSPI_Sector{ // if a QSPI_page is 4 bytes and a sector is 1024 Bytes...
+    struct QSPI_Page_ Page[(SECTOR_SIZE/(sizeof(QSPI_Page)))];    // ... then there should be 256 QSPI pages in this array
     // sector related features go here?
 }QSPI_Sector;
 
@@ -41,6 +40,8 @@ typedef struct Advertisement_General_Packet {
     struct BSI_Header Header;
     struct QSPI_Sector Sector;
 }Ad_gPacket;
+
+extern Ad_gPacket gPacket; //General packet used for sending header + a sector of data 
 
 
 //************************************************************
@@ -59,3 +60,5 @@ void read_qspi(uint32_t Address);
 void read_qspi_header();
 void read_qspi_page(uint32_t Address);
 void read_qspi_sector(uint8_t Sector);
+
+void qspi_prepare_packet(uint8_t Sector);

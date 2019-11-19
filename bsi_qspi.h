@@ -37,6 +37,8 @@ typedef struct QSPI_Sector{ // if a QSPI_page is 4 bytes and a sector is 1024 By
 
 
 typedef struct Advertisement_General_Packet {
+    char imSendingYouData[3];
+    uint16_t datalength;
     struct BSI_Header Header;
     struct QSPI_Sector Sector;
 }Ad_gPacket;

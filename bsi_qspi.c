@@ -1,3 +1,5 @@
+#define SECTOR_SIZE 4096 //4kB
+
 #include "nrf_drv_qspi.h"
 #include "bsi_qspi.h"
 #include "bsp_btn_ble.h"
@@ -24,7 +26,7 @@
 
 // Below is a "look-up table" used to find start address for sector block 1
 const uint32_t SectorB1[] = {0,4096,8192,12288,16384,20480,24576,28672,32768,36864,40960,45056,49152,53248,57344,61440,65536};
-static uint8_t currentSector = 1; //sector 1 starts at address 4096 
+static uint8_t currentSector;  //sector 1 starts at address 4096 
 
 uint16_t pressCount = 0;
 
@@ -59,7 +61,8 @@ QSPI_Sector ReadSector = {
     //.xTransmitted = false,
     };
 
-Ad_gPacket Packet = {
+Ad_gPacket gPacket = {
+    .imSendingYouData = {'#','#','#'},
     };
 
 //Event called when the QSPI completes an action
@@ -98,6 +101,9 @@ void configure_memory()
     cinstr_cfg.length = NRF_QSPI_CINSTR_LEN_2B;
     err_code = nrf_drv_qspi_cinstr_xfer(&cinstr_cfg, &temporary, NULL);
     APP_ERROR_CHECK(err_code);
+
+    //landon added code past here
+    currentSector = (bsi_config.lastKnownAddr/SECTOR_SIZE); // Which sector are we in after waking up?
 }
 
 
@@ -146,25 +152,34 @@ void write_qspi_page()
        APP_ERROR_CHECK(err_code);
        WAIT_FOR_PERIPH();
 
-      if(err_code == NRF_SUCCESS) { //If write was success, then increment lastKnownAddr...
+
+        //If write was success, then increment lastKnownAddr...
         // ...and write the last known address to the config so it survives power cycles.
-        bsi_config.lastKnownAddr += (sizeof(CurrentPage));
-        bsi_config.configChanged = true;
-        //printf("QSPI page written successfully\n");
-      }
+        if(err_code == NRF_SUCCESS) 
+        { 
+          bsi_config.lastKnownAddr += (sizeof(CurrentPage));
+          bsi_config.configChanged = true;
+          
+          // if we have reached a new sector...
+          if(bsi_config.lastKnownAddr > (currentSector*SECTOR_SIZE))
+          {
+            if(currentSector == 16)
+            {
+               currentSector = 1; //needs to erase sectors :(
+            }
+            else
+            {
+               currentSector++;
+            }
 
-        // note to landon (self):
-        // if sector pages == 77 then ...
-        // is current sector == 16? if no then increment current sector
-        //                          if yes then current sector = 2 (roll over)
-        //
-        // and increment lastknownaddress to 4096*current sector (the new number)
-        // before writing to new sector we should check if the sector was transmitted.....
-        //    if it isnt Tx'd then we have a BIG problem
-        // end note
-
+            erase_qspi_sector(currentSector); //erase this sector so we can reuse it
+            bsi_config.lastKnownAddr = SectorB1[currentSector];
+          }//end of if new sector
+                   
+        }//end if(err_code == NRF_SUCCESS)
       lwrite_qspi = false; 
-}
+}//end write_qspi_page()
+
 
 // ***********************************************************************************
 // Used to erase an entire sector ( 1 - 15 , but hopefully not 0 which is the header )
@@ -178,8 +193,8 @@ void erase_qspi_sector(uint8_t Sector)
       WAIT_FOR_PERIPH();
       
       //debugging
-      bsi_config.lastKnownAddr = 4096; // point back to start of sector 1
-      bsi_config.configChanged = true;
+      //bsi_config.lastKnownAddr = 4096; // point back to start of sector 1
+      //bsi_config.configChanged = true;
 
       //nrf_drv_qspi_chip_erase(); // only to be used to erase entire chip
       //printf("QSPI sector %u erased\n", Sector);
@@ -288,4 +303,5 @@ void qspi_prepare_packet(uint8_t Sector){
      gPacket.Header = ReadHeader;
      read_qspi_sector(Sector);
      gPacket.Sector = ReadSector;
+     gPacket.datalength = sizeof(gPacket);
 }

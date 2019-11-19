@@ -1156,7 +1156,15 @@ int main(void)
 
         if(pushData == true)
         {
-          uart_data_send(0,0,m_conn_handle);
+          qspi_prepare_packet(0);
+
+          //gPacket.Header
+          //gPacket.Sector
+//          uint32_t sOf = sizeof(gPacket);
+          uint32_t sOf = sizeof(uint32_t);
+          uart_data_send(&sOf,sOf,m_conn_handle);
+          //uart_data_send(&gPacket,sOf,m_conn_handle);
+
           pushData = false;
         }
         idle_state_handle();

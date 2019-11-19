@@ -59,7 +59,7 @@ QSPI_Sector ReadSector = {
     //.xTransmitted = false,
     };
 
-Ad_gPacket Packet = {
+Ad_gPacket gPacket = {
     };
 
 //Event called when the QSPI completes an action

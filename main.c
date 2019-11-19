@@ -104,7 +104,6 @@
 #include "bsi_qspi.h"
 #include "BLE_CUS.h"
 #include "bsi_measure.h"
-#include "fatfs.h"
 #include "bsi_uart.h"
 
 
@@ -1019,7 +1018,6 @@ int main(void)
     
     saadc_init();
     gpio_init();
-    fatfs_init();
 //    nrf_drv_qspi_erase(NRF_QSPI_ERASE_LEN_64KB, 0);
 //    WAIT_FOR_PERIPH();
     
@@ -1138,20 +1136,7 @@ int main(void)
         }
         if(lerase_sector == true)
         {
-          #ifdef DEBUG
-            //lwrite_qspi = true;  //debug
-            erase_qspi_sector(1);
-            strcpy(BSI_Attribute.BSI_Name, "BSI_TEST.txt");
-            for(uint8_t inc; inc < 13; inc++)
-            {
-              BSI_Data.SensorValue = 0X0ff1;
-              BSI_Data.CountMin = inc*20;       
-              fatfs_write(&BSI_Data);
-            }
-            
-          #else
-            erase_qspi_sector(1);
-          #endif
+            erase_qspi_sector(1);            
         }
 
         if(pushData == true)

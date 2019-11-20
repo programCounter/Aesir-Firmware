@@ -1160,10 +1160,8 @@ int main(void)
 
           //gPacket.Header
           //gPacket.Sector
-//          uint32_t sOf = sizeof(gPacket);
-          uint32_t sOf = sizeof(uint32_t);
-          uart_data_send(&sOf,sOf,m_conn_handle);
-          //uart_data_send(&gPacket,sOf,m_conn_handle);
+
+          uart_data_send(&gPacket,gPacket.datalength,m_conn_handle);
 
           pushData = false;
         }

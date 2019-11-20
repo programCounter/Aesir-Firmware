@@ -127,7 +127,7 @@ void nServices_init(void)
  */
 /**@snippet [Handling the data received over UART] */
 
-void uart_data_send(uint8_t * p_data, uint32_t dLen, uint16_t m_conn_handle)
+void uart_data_send(uint8_t * p_data, uint16_t dLen, uint16_t m_conn_handle)
 {
     static uint8_t index = 0;
     uint32_t       err_code;
@@ -142,8 +142,7 @@ void uart_data_send(uint8_t * p_data, uint32_t dLen, uint16_t m_conn_handle)
     {
       for(int xx =0; xx<dLen; xx+=BLE_NUS_MAX_DATA_LEN)
       {
-        //memcpy(*receivedData,*p_data,data_len);
-        memcpy(*chunk_array,*p_data,BLE_NUS_MAX_DATA_LEN);
+        memcpy(*chunk_array,(*p_data + xx),BLE_NUS_MAX_DATA_LEN);
         err_code = ble_nus_data_send(&m_nus, chunk_array, 242, m_conn_handle);
       }
     }

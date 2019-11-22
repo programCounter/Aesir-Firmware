@@ -168,8 +168,12 @@ static bool S2MeasureNow;
 static bool S3MeasureNow;
 static bool UploadNow;
 static bool pushData;
+static bool bleConnected;
 uint32_t qspiAddress = 0; //ONLY FOR DEBUG
 
+uint32_t p_reset_reason; //holds a register(RESETREAS) indicating the reason the device was reset
+// https://infocenter.nordicsemi.com/index.jsp?topic=%2Fcom.nordic.infocenter.nrf52832.ps.v1.1%2Fpower.html
+uint32_t Vbat_reset = 0b100000000000000000000; // 1 at bit 21 should be "Reset due to wake up from System OFF mode by VBUS rising into valid range"
 /* YOUR_JOB: Declare all services structure your application is using
  *  BLE_XYZ_DEF(m_xyz);
  */
@@ -459,7 +463,7 @@ static void minute_timer_timeout_handler(void * p_context)
   //If the variable 
   UNUSED_PARAMETER(p_context);
   
-  pushData = true;
+  //pushData = true;
   
   ticksTUpload++;//Increment our minutes since last upload.
   #ifdef DEBUG
@@ -632,6 +636,7 @@ static void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context)
             // LED indication will be changed when advertising starts.
 
             on_disconnect(p_cus, p_ble_evt); //from BLE_CUS.c
+            bleConnected = false;
             break;
 
         case BLE_GAP_EVT_CONNECTED:
@@ -642,8 +647,8 @@ static void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context)
             err_code = nrf_ble_qwr_conn_handle_assign(&m_qwr, m_conn_handle);
             APP_ERROR_CHECK(err_code);
 
-
             on_connect(p_cus, p_ble_evt);//from BLE_CUS.c
+            bleConnected = true;
             break;
 
         case BLE_GAP_EVT_PHY_UPDATE_REQUEST:
@@ -853,6 +858,8 @@ static void advertising_init(void)
     init.config.ble_adv_fast_interval     = APP_ADV_INTERVAL;
     init.config.ble_adv_fast_timeout      = APP_ADV_DURATION;
     init.config.ble_adv_extended_enabled  = false;
+    
+
     //init.config.
     init.evt_handler = on_adv_evt;
 
@@ -915,6 +922,7 @@ static void idle_state_handle(void)
 /**@brief Function for starting advertising.*/
 static void advertising_start(bool erase_bonds)
 {
+    uint16_t whatPHY;
     if (erase_bonds == true)
     {
         delete_bonds();
@@ -922,8 +930,22 @@ static void advertising_start(bool erase_bonds)
     }
     else
     {
+        if((Vbat_reset&p_reset_reason)==true)// if the result of the bitwise AND is > 0, should mean we woke from power being power-cycled
+        {
+            whatPHY  = BLE_GAP_PHY_1MBPS;
+        }
+        else
+        {
+            whatPHY  = BLE_GAP_PHY_CODED;
+        }
+        
         ret_code_t err_code = ble_advertising_start(&m_advertising, BLE_ADV_MODE_FAST);
-
+        ble_gap_phys_t const phys =
+        {
+          .rx_phys  = whatPHY,
+          .tx_phys  = whatPHY, 
+        };
+        err_code = sd_ble_gap_phy_update(m_conn_handle, &phys);
         APP_ERROR_CHECK(err_code);
     }
 }
@@ -946,28 +968,26 @@ static ble_gap_adv_data_t m_adv_data =
     }
 };
 
-void update_advert(void)
-{
-    
-    ret_code_t err_code;
-    ble_advdata_t advdata;
-    uint8_t       flags = BLE_GAP_ADV_FLAG_BR_EDR_NOT_SUPPORTED;
-    uint8_t junkvar = 9;
-    // Build and set advertising data.
-    memset(&advdata, 0, sizeof(advdata));
-
-    advdata.name_type             = BLE_ADVDATA_NO_NAME;
-    advdata.flags                 = flags;
-    advdata.p_manuf_specific_data = junkvar;
-
-    err_code = ble_advdata_encode(&advdata, m_adv_data.adv_data.p_data, &m_adv_data.adv_data.len);
-    APP_ERROR_CHECK(err_code);
-
-    err_code = sd_ble_gap_adv_set_configure(&m_adv_handle, &m_adv_data, NULL);
-    APP_ERROR_CHECK(err_code);
-    
-
-}
+//void update_advert(void) //depricated, now using UART
+//{
+//    
+//    ret_code_t err_code;
+//    ble_advdata_t advdata;
+//    uint8_t       flags = BLE_GAP_ADV_FLAG_BR_EDR_NOT_SUPPORTED;
+//    uint8_t junkvar = 9;
+//    // Build and set advertising data.
+//    memset(&advdata, 0, sizeof(advdata));
+//
+//    advdata.name_type             = BLE_ADVDATA_NO_NAME;
+//    advdata.flags                 = flags;
+//    advdata.p_manuf_specific_data = junkvar;
+//
+//    err_code = ble_advdata_encode(&advdata, m_adv_data.adv_data.p_data, &m_adv_data.adv_data.len);
+//    APP_ERROR_CHECK(err_code);
+//
+//    err_code = sd_ble_gap_adv_set_configure(&m_adv_handle, &m_adv_data, NULL);
+//    APP_ERROR_CHECK(err_code);
+//}
 
 //function for updating chracteristic value
 void sensor_value_characteristic_update(ble_cus_t * p_cus, int16_t data)
@@ -992,9 +1012,10 @@ void sensor_value_characteristic_update(ble_cus_t * p_cus, int16_t data)
 int main(void)
 {
     ret_code_t retCode;
+    uint32_t responce;
     bool erase_bonds;
     nrf_drv_qspi_config_t config = NRF_DRV_QSPI_DEFAULT_CONFIG;
-
+    
     // Initialize.
     log_init();
     timers_init();
@@ -1006,6 +1027,9 @@ int main(void)
 
     services_init();
     nServices_init();
+    // uint32_t sd_power_reset_reason_get(uint32_t *p_reset_reason)
+    responce = sd_power_reset_reason_get(&p_reset_reason);
+
     advertising_init();
     
     conn_params_init();
@@ -1030,6 +1054,7 @@ int main(void)
     //NRF_LOG_INFO("Template example started.");
     application_timers_start();
     uart_init();
+    
     advertising_start(erase_bonds);
     
     //somejunkvar = true;
@@ -1083,22 +1108,22 @@ int main(void)
           // Time to take a measurement on Analog S3
           S3MeasureNow = false;
         }
-        else if(UploadNow == true)
-        {
-          //There may be an issue with how the advert api plays with the code the update advert,
-          //based on what I read we should dodge the issues by only changing the config when the advertising is stopped.
-          //we need the data from the flash
-          
-          // read_qspi(qspiAddress); // *** TO BE DISCUSSED ***
-          //read_qspi_page(4096 + sizeof(CurrentPage));
-          read_qspi_sector(1);
-          //we need to put that data into our advert
-          //update_advert();
-          //Advertising should be stopped
-          //advertising_start(erase_bonds);
-          //The advertisment should then time out and stop.
-          UploadNow = false;
-        }
+//        else if(UploadNow == true)
+//        {
+//          //There may be an issue with how the advert api plays with the code the update advert,
+//          //based on what I read we should dodge the issues by only changing the config when the advertising is stopped.
+//          //we need the data from the flash
+//          
+//          // read_qspi(qspiAddress); // *** TO BE DISCUSSED ***
+//          //read_qspi_page(4096 + sizeof(CurrentPage));
+//          read_qspi_sector(1);
+//          //we need to put that data into our advert
+//          //update_advert();
+//          //Advertising should be stopped
+//          //advertising_start(erase_bonds);
+//          //The advertisment should then time out and stop.
+//          UploadNow = false;
+//        }
 
         if(lwrite_qspi == true)
         {
@@ -1141,16 +1166,24 @@ int main(void)
 
         if(pushData == true)
         {
-          qspi_prepare_packet(0);
+          //Start a CODED PHY Advertisement. We are going to need two types of advertising. Coded and un-coded.
+          if(bleConnected = true) //If we dont have a connection, dont send data.
+          {
 
-          //gPacket.Header
-          //gPacket.Sector
-//          uint32_t sOf = sizeof(gPacket);
-          uint32_t sOf = sizeof(uint32_t);
-          uart_data_send(&sOf,sOf,m_conn_handle);
-          //uart_data_send(&gPacket,sOf,m_conn_handle);
+            advertising_start(erase_bonds);
+            qspi_prepare_packet(0);
 
-          pushData = false;
+            //gPacket.Header
+            //gPacket.Sector
+            uint32_t sOf = sizeof(gPacket);
+  //          uint32_t sOf = sizeof(uint32_t);
+  //          uart_data_send(&sOf,sOf,m_conn_handle);
+            uart_data_send(&gPacket,sOf,m_conn_handle);
+            pushData = false;
+            
+            //Data is all done, break the connection...
+
+          }
         }
         idle_state_handle();
     }

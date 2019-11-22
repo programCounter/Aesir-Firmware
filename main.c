@@ -1166,6 +1166,7 @@ int main(void)
 
         if(pushData == true)
         {
+
           //Start a CODED PHY Advertisement. We are going to need two types of advertising. Coded and un-coded.
           if(bleConnected = true) //If we dont have a connection, dont send data.
           {
@@ -1182,6 +1183,7 @@ int main(void)
             pushData = false;
             
             //Data is all done, break the connection...
+
 
           }
         }

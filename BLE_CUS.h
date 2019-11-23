@@ -28,7 +28,8 @@ This code is based on the following nordic tutorial
 #define CUSTOM_CHAR_UUID_SENS_CNFG        0x1410 // The sensors attached to the device. PULSE,ANLG,ANLG. 1 = connected, 0 = disconnected. ie 110.
 #define CUSTOM_CHAR_UUID_SENS_ADDRS       0x1411 // The Addresses of the attached sensors (uint-16, uint-16, uint-16). 
 #define CUSTOM_CHAR_UUID_UPLD_INTV        0x1412 // The interval that the BSI uploads the data. 
-#define CUSTOM_CHAR_UUID_SENS_DATA        0x1413 // The Sensor Data for debugging
+#define CUSTOM_CHAR_UUID_BSI_NAME         0x1413 // Byte array that holds the BSI Name
+#define CUSTOM_CHAR_UUID_SENS_DATA        0x1414 // The Sensor Data for debugging
 /**@brief   Macro for defining a ble_cus instance.
  *
  * @param   _name   Name of the instance.

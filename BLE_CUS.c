@@ -65,9 +65,11 @@ uint32_t ble_cus_init(ble_cus_t * p_cus, const ble_cus_init_t * p_cus_init)
     //#define CUSTOM_CHAR_UUID_SENS_CNFG        0x1410 // The sensors attached to the device. PULSE,ANLG,ANLG. 1 = connected, 0 = disconnected. ie 110.
     //#define CUSTOM_CHAR_UUID_SENS_ADDRS       0x1411 // The Addresses of the attached sensors (uint-16, uint-16, uint-16). 
     //#define CUSTOM_CHAR_UUID_UPLD_INTV        0x1412 // The interval that the BSI uploads the data. 
-    //#define CUSTOM_CHAR_UUID_SENS_DATA        0x1413 // The Sensor Data for debugging
+    //#define CUSTOM_CHAR_UUID_BSI_NAME         0x1413 // Byte array that holds the BSI Name
+    //#define CUSTOM_CHAR_UUID_SENS_DATA        0x1414 // The Sensor Data for debugging
 
     // Add Custom Value characteristic 
+    custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_BSI_NAME,"BSI Name");
     custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_S2_MEAS_INTV,"Analog 1 Measurement Interval");
     custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_S3_MEAS_INTV,"Analog 2 Measurement Interval");
     custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_DT_ALRM_ON,"Delta Time Alarm On");
@@ -99,7 +101,7 @@ static uint32_t custom_value_char_add(ble_cus_t * p_cus, const ble_cus_init_t * 
     ble_gatts_attr_t    attr_char_value;
     ble_uuid_t          ble_uuid;
     ble_gatts_attr_md_t attr_md;
-
+    char p_noVal = 0;
     memset(&char_md, 0, sizeof(char_md));
 
     char_md.char_props.read         = 1;
@@ -135,10 +137,21 @@ static uint32_t custom_value_char_add(ble_cus_t * p_cus, const ble_cus_init_t * 
 
     attr_char_value.p_uuid    = &ble_uuid;
     attr_char_value.p_attr_md = &attr_md;
-    attr_char_value.init_len  = sizeof(uint16_t);
     attr_char_value.init_offs = 0;
-    attr_char_value.max_len   = sizeof(uint16_t);
-    attr_char_value.p_value   = 0;
+    attr_char_value.p_value   = &p_noVal;
+
+    if(&p_cus_uuid == CUSTOM_CHAR_UUID_BSI_NAME)
+    {
+     attr_char_value.init_len  = 16;
+     attr_char_value.max_len   = 16;
+    }
+    else 
+    { 
+      attr_char_value.init_len  = sizeof(uint16_t);
+      attr_char_value.max_len   = sizeof(uint16_t);
+    }
+
+
     
     err_code = sd_ble_gatts_characteristic_add(p_cus->service_handle, &char_md,
                                                &attr_char_value,

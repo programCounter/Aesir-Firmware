@@ -121,7 +121,7 @@
 /************************DEBUG DEFINITIONS**************************************************************************/
 #define DEBUG 
 /*******************************************************************************************************************/
-#define DEVICE_NAME                     "AEsir"                       /**< Name of device. Will be included in the advertising data. */
+#define DEVICE_NAME                     "AEsir2"                       /**< Name of device. Will be included in the advertising data. */
 #define MANUFACTURER_NAME               "RioT Wireless"                   /**< Manufacturer. Will be passed to Device Information Service. */
 #define APP_ADV_INTERVAL                300                                     /**< The advertising interval (in units of 0.625 ms. This value corresponds to 187.5 ms). */
 
@@ -945,9 +945,9 @@ static void advertising_start(bool erase_bonds)
           .rx_phys  = whatPHY,
           .tx_phys  = whatPHY, 
         };
-        err_code = sd_ble_gap_phy_update(m_conn_handle, &phys);
-        APP_ERROR_CHECK(err_code);
-    }
+//        err_code = sd_ble_gap_phy_update(m_conn_handle, &phys);
+//        APP_ERROR_CHECK(err_code);
+     }
 }
 
 /**@brief Struct that contains pointers to the encoded advertising data. */
@@ -1028,7 +1028,7 @@ int main(void)
     services_init();
     nServices_init();
     // uint32_t sd_power_reset_reason_get(uint32_t *p_reset_reason)
-    responce = sd_power_reset_reason_get(&p_reset_reason);
+    //responce = sd_power_reset_reason_get(&p_reset_reason);
 
     advertising_init();
     
@@ -1053,7 +1053,7 @@ int main(void)
     // Start execution.
     //NRF_LOG_INFO("Template example started.");
     application_timers_start();
-    uart_init();
+    //uart_init();
     
     advertising_start(erase_bonds);
     

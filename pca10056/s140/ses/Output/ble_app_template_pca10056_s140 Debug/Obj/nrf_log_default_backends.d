@@ -1,10 +1,10 @@
 Output/ble_app_template_pca10056_s140\ Debug/Obj/nrf_log_default_backends.o: \
- E:\dev\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\components\libraries\log\src\nrf_log_default_backends.c \
+ C:\dev\nRF5_SDK_15.3.0\components\libraries\log\src\nrf_log_default_backends.c \
  ../../../../../../components/libraries/util/sdk_common.h \
- E:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.22/include/stdint.h \
- E:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.22/include/stdbool.h \
- E:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.22/include/string.h \
- E:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.22/include/__crossworks.h \
+ C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.18/include/stdint.h \
+ C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.18/include/stdbool.h \
+ C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.18/include/string.h \
+ C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.18/include/__crossworks.h \
  ../config/sdk_config.h \
  ../../../../../../components/libraries/util/nordic_common.h \
  ../../../../../../modules/nrfx/mdk/compiler_abstraction.h \
@@ -12,7 +12,7 @@ Output/ble_app_template_pca10056_s140\ Debug/Obj/nrf_log_default_backends.o: \
  ../../../../../../components/libraries/util/sdk_errors.h \
  ../../../../../../components/softdevice/s140/headers/nrf_error.h \
  ../../../../../../components/libraries/util/app_util.h \
- E:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.22/include/stddef.h \
+ C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.18/include/stddef.h \
  ../../../../../../modules/nrfx/mdk/nrf.h \
  ../../../../../../modules/nrfx/mdk/nrf52840.h \
  ../../../../../../components/toolchain/cmsis/include/core_cm4.h \
@@ -28,4 +28,31 @@ Output/ble_app_template_pca10056_s140\ Debug/Obj/nrf_log_default_backends.o: \
  ../../../../../../components/softdevice/s140/headers/nrf52/nrf_mbr.h \
  ../../../../../../components/softdevice/s140/headers/nrf_svc.h \
  ../../../../../../components/libraries/util/sdk_macros.h \
- ../../../../../../components/libraries/util/nrf_assert.h
+ ../../../../../../components/libraries/util/nrf_assert.h \
+ ../../../../../../components/libraries/log/nrf_log_default_backends.h \
+ ../../../../../../components/libraries/util/sdk_errors.h \
+ ../../../../../../components/libraries/log/nrf_log_ctrl.h \
+ ../../../../../../components/libraries/log/nrf_log_types.h \
+ ../../../../../../components/libraries/log/src/nrf_log_ctrl_internal.h \
+ ../../../../../../components/libraries/log/nrf_log_backend_interface.h \
+ ../../../../../../components/libraries/memobj/nrf_memobj.h \
+ C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.18/include/stdlib.h \
+ ../../../../../../components/libraries/balloc/nrf_balloc.h \
+ ../../../../../../components/libraries/util/app_util_platform.h \
+ ../../../../../../components/softdevice/s140/headers/nrf_soc.h \
+ ../../../../../../components/softdevice/s140/headers/nrf_svc.h \
+ ../../../../../../components/softdevice/s140/headers/nrf_error.h \
+ ../../../../../../components/softdevice/s140/headers/nrf_error_soc.h \
+ ../../../../../../components/softdevice/s140/headers/nrf_nvic.h \
+ ../../../../../../components/libraries/util/app_error.h \
+ C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.18/include/stdio.h \
+ ../../../../../../components/libraries/util/app_error_weak.h \
+ ../../../../../../components/libraries/util/app_util.h \
+ ../../../../../../components/libraries/log/nrf_log_instance.h \
+ ../../../../../../components/libraries/experimental_section_vars/nrf_section.h \
+ ../../../../../../components/libraries/util/nordic_common.h \
+ C:\dev\nRF5_SDK_15.3.0\components\libraries\log\src\nrf_log_internal.h \
+ ../../../../../../components/libraries/log/nrf_log_types.h \
+ ../../../../../../components/libraries/util/nrf_assert.h \
+ ../../../../../../components/libraries/log/nrf_log_backend_rtt.h \
+ ../../../../../../components/libraries/log/nrf_log_backend_uart.h

@@ -13,6 +13,7 @@
 
 #include "bsi_measure.h"
 #include "bsi_qspi.h"
+#include "BLE_CUS.h"
 #include "nrf_gpio.h"
 #include "nrf_drv_gpiote.h"
 #include "nrf_delay.h"
@@ -25,7 +26,12 @@
 #define ANLG_SENSOR2_PWR NRF_GPIO_PIN_MAP(0,11) 
 #define PULSE_SENSOR_INP NRF_GPIO_PIN_MAP(1,04) 
 
+#define pulseInterval 60 //needs to be set up in config, need to talk to will about changing characteristics
+
 static nrf_saadc_value_t m_buffer[BUFFER_SIZE];
+uint32_t ticksPulse;
+bool pulseAlarmOn;
+bool pulseWriteNow;
 
 void saadc_callback(nrf_drv_saadc_evt_t const * p_event)
 {
@@ -38,8 +44,30 @@ void saadc_callback(nrf_drv_saadc_evt_t const * p_event)
     }
 }
 
+void pulse_alarm_check(bool alarmOn)
+{
+  if(alarmOn)
+  {
+    if((pulseInterval/(ticksPulse - bsi_config.pulseTime)) > bsi_config.sensor1_config.deltaMeasAlarmOff)
+    {
+      //shut off alarm
+    }
+  }
+  else
+  {
+    if((pulseInterval/(ticksPulse - bsi_config.pulseTime)) > bsi_config.sensor1_config.deltaMeasAlarmOn)
+    {
+      //enter alarm mode
+    }
+  }
+}
+
 void pulse_evt_handler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
 {
+    bsi_config.pulseNum++;
+    pulse_alarm_check(pulseAlarmOn);
+    bsi_config.pulseTime = ticksPulse;
+    bsi_config.configChanged = true;
     // What happens when we get a pulse?
     //nrf_drv_gpiote_out_toggle(PIN_OUT);
 }
@@ -108,6 +136,11 @@ nrf_saadc_value_t measureSensor(uint8_t channel)
       nrfx_saadc_sample_convert(channel,&p_ADC_Result);// This returns a single value from the specified ADC channel. THIS FUNCTION IS BLOCKING!
       nrf_gpio_pin_write(ANLG_SENSOR2_PWR,0); //Sensor power off
       nrf_gpio_pin_write(VREG_PWR,0); //Power Regulator Off
+      break;
+     case 2:
+      //pulse sensor data upload
+      p_ADC_Result = bsi_config.pulseNum;
+      bsi_config.pulseNum = 0;
       break;
     case 6:
       //Check the battery level.

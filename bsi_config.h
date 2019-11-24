@@ -26,6 +26,8 @@ typedef struct BSIConfig {
     uint16_t uploadSize; //in KB
     uint32_t uploadInterval; //Duration in minutes between broadcasting data.
     uint32_t lastKnownAddr;
+    uint16_t pulseTime;
+    uint16_t pulseNum; 
 
 }BSI_Config;
 

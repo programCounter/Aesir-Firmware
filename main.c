@@ -148,7 +148,7 @@
 #define SEC_PARAM_MIN_KEY_SIZE          7                                       /**< Minimum encryption key size. */
 #define SEC_PARAM_MAX_KEY_SIZE          16                                      /**< Maximum encryption key size. */
 
-
+#define pulseInterval 60 //needs to be set up in config, need to talk to will about changing characteristics
 
 #define DEAD_BEEF                       0xDEADBEEF                              /**< Value used as error code on stack dump, can be used to identify stack location on stack unwind. */
 
@@ -169,7 +169,10 @@ static bool S3MeasureNow;
 static bool UploadNow;
 static bool pushData;
 static bool bleConnected;
+
+#ifdef DEBUG
 uint32_t qspiAddress = 0; //ONLY FOR DEBUG
+#endif
 
 uint32_t p_reset_reason; //holds a register(RESETREAS) indicating the reason the device was reset
 // https://infocenter.nordicsemi.com/index.jsp?topic=%2Fcom.nordic.infocenter.nrf52832.ps.v1.1%2Fpower.html
@@ -477,6 +480,14 @@ static void minute_timer_timeout_handler(void * p_context)
     ticksTUpload=0;
   }
 
+  if(bsi_config.sensor1_config.sensorEnabled == true) // IF the sensors not enabled dont even increment the count
+  {
+    ticksPulse++;
+    if(!(ticksPulse % pulseInterval)) //if the current time is not a multiple of the interval
+    {
+      pulseWriteNow = true;
+    }
+  }
 
 
   #ifdef DEBUG
@@ -1079,6 +1090,12 @@ int main(void)
           APP_ERROR_CHECK(retCode);
 
           bsi_config.configChanged = false; // Written the config, set this back to false...
+        }
+        if(pulseWriteNow == true)
+        {
+            measureSensor(2);
+            lwrite_qspi = true;
+          pulseWriteNow = false;
         }
         #ifdef DEBUG
         if(S2MeasureNow == true)

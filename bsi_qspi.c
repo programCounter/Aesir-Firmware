@@ -178,6 +178,7 @@ void write_qspi_page()
                    
         }//end if(err_code == NRF_SUCCESS)
       lwrite_qspi = false; 
+
 }//end write_qspi_page()
 
 

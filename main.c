@@ -1024,9 +1024,15 @@ int main(void)
     ble_stack_init();
     gap_params_init();
     gatt_init();
+    
+    //If we have a configuration already we should load it into the characteristics.
+    retCode = init_fds();
+    APP_ERROR_CHECK(retCode);
+    retCode = read_fds(fds_BSI_File,fds_BSI_Key, &bsi_config);
 
-    services_init();
-    nServices_init();
+    services_init(); //Initialises the basic services and calls ble_cus_init which inits the custom service and charateristics for configuring the BSI
+    nServices_init(); //Initialises the NUS(for UART) and the qued write module
+
     // uint32_t sd_power_reset_reason_get(uint32_t *p_reset_reason)
     //responce = sd_power_reset_reason_get(&p_reset_reason);
 
@@ -1045,15 +1051,16 @@ int main(void)
 //    nrf_drv_qspi_erase(NRF_QSPI_ERASE_LEN_64KB, 0);
 //    WAIT_FOR_PERIPH();
     
-    retCode = init_fds();
-    APP_ERROR_CHECK(retCode);
-    retCode = read_fds(fds_BSI_File,fds_BSI_Key, &bsi_config);
+//    retCode = init_fds();
+//    APP_ERROR_CHECK(retCode);
+//    retCode = read_fds(fds_BSI_File,fds_BSI_Key, &bsi_config);
+
     //APP_ERROR_CHECK(retCode);
 
     // Start execution.
     //NRF_LOG_INFO("Template example started.");
     application_timers_start();
-    //uart_init();
+    uart_init();
     
     advertising_start(erase_bonds);
     

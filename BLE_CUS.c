@@ -52,37 +52,28 @@ uint32_t ble_cus_init(ble_cus_t * p_cus, const ble_cus_init_t * p_cus_init)
     {
         return err_code;
     }
-
-    //#define CUSTOM_CHAR_UUID_S2_MEAS_INTV     0x1401 // The time in minutes between each measurment, 1440 mins in a day
-    //#define CUSTOM_CHAR_UUID_S3_MEAS_INTV     0x1402 // The time in minutes between each measurment, 1440 mins in a day
-    //#define CUSTOM_CHAR_UUID_DT_ALRM_ON       0x1403 // The Delta T for pulses that sets an alarm state. 
-    //#define CUSTOM_CHAR_UUID_DT_ALRM_OFF      0x1404 // The Delta T for pulses that sets an alarm state. 
-    //#define CUSTOM_CHAR_UUID_DM_ALRM_S2_ON    0x1405 // The Delta for measurements that sets an alarm state. 
-    //#define CUSTOM_CHAR_UUID_DM_ALRM_S2_OFF   0x1406 // The Delta for measurements that sets an alarm state. 
-    //#define CUSTOM_CHAR_UUID_DM_ALRM_S3_ON    0x1407 // The Delta for measurements that sets an alarm state. 
-    //#define CUSTOM_CHAR_UUID_DM_ALRM_S3_OFF   0x1408 // The Delta for measurements that sets an alarm state. 
-    //#define CUSTOM_CHAR_UUID_UPLD_SZE         0x1409 // The size of data we are going to upload. in kb, 5 = 5kbyte
-    //#define CUSTOM_CHAR_UUID_SENS_CNFG        0x1410 // The sensors attached to the device. PULSE,ANLG,ANLG. 1 = connected, 0 = disconnected. ie 110.
-    //#define CUSTOM_CHAR_UUID_SENS_ADDRS       0x1411 // The Addresses of the attached sensors (uint-16, uint-16, uint-16). 
-    //#define CUSTOM_CHAR_UUID_UPLD_INTV        0x1412 // The interval that the BSI uploads the data. 
-    //#define CUSTOM_CHAR_UUID_BSI_NAME         0x1413 // Byte array that holds the BSI Name
-    //#define CUSTOM_CHAR_UUID_SENS_DATA        0x1414 // The Sensor Data for debugging
-
+    
+    //we need to reverse the method we used to enable sensors from the int so we can re-load the configuration up to the user.
+    char sensorConfig = bsi_config.sensor1_config.sensorEnabled|(bsi_config.sensor2_config.sensorEnabled<<1)|(bsi_config.sensor3_config.sensorEnabled<<2);
+    
+    //Refer to .h for characteristic UUID and names...
     // Add Custom Value characteristic 
-    custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_BSI_NAME,"BSI Name");
-    custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_S2_MEAS_INTV,"Analog 1 Measurement Interval");
-    custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_S3_MEAS_INTV,"Analog 2 Measurement Interval");
-    custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_DT_ALRM_ON,"Delta Time Alarm On");
-    custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_DT_ALRM_OFF,"Delta Time Alarm Off");
-    custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_DM_ALRM_S2_ON,"Delta Measurment S2 Alarm On");
-    custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_DM_ALRM_S2_OFF,"Delta Measurment S2 Alarm Off");
-    custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_DM_ALRM_S3_ON,"Delta Measurment S3 Alarm On");
-    custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_DM_ALRM_S3_OFF,"Delta Measurment S3 Alarm Off");
-    custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_UPLD_SZE,"Upload Size");
-    custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_SENS_CNFG,"Sensor Configuration");
+    custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_BSI_NAME,"BSI Name",&bsi_config.BSI_Name);
+    custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_S2_MEAS_INTV,"Analog 1 Measurement Interval",&bsi_config.sensor2_config.measInterval);
+    custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_S3_MEAS_INTV,"Analog 2 Measurement Interval",&bsi_config.sensor3_config.measInterval);
+    custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_DT_ALRM_ON,"Delta Time Alarm On",&bsi_config.sensor1_config.deltaTimeAlarmOn);
+    custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_DT_ALRM_OFF,"Delta Time Alarm Off",&bsi_config.sensor1_config.deltaTimeAlarmOff);
+    custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_DM_ALRM_S2_ON,"Delta Measurment S2 Alarm On",&bsi_config.sensor2_config.deltaMeasAlarmOn);
+    custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_DM_ALRM_S2_OFF,"Delta Measurment S2 Alarm Off",&bsi_config.sensor2_config.deltaMeasAlarmOff);
+    custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_DM_ALRM_S3_ON,"Delta Measurment S3 Alarm On",&bsi_config.sensor3_config.deltaMeasAlarmOn);
+    custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_DM_ALRM_S3_OFF,"Delta Measurment S3 Alarm Off",&bsi_config.sensor3_config.deltaMeasAlarmOff);
+    custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_UPLD_SZE,"Upload Size",&bsi_config.uploadSize);
+    custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_SENS_CNFG,"Sensor Configuration",&sensorConfig);
     //custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_SENS_ADDRS,"Sensor Addresses");
-    custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_UPLD_INTV,"Upload Interval");
-    custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_SENS_DATA,"Sensor 1 Data");
+    //custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_UPLD_INTV,"Upload Interval");
+    custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_PON_DLY_S2,"Power On Delay S2",&bsi_config.sensor2_config.pwrOnDelay);
+    custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_PON_DLY_S3,"Power On Delay S3",&bsi_config.sensor3_config.pwrOnDelay);
+    //custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_SENS_DATA,"Sensor 1 Data");
     return 0;
 }
 
@@ -93,7 +84,7 @@ uint32_t ble_cus_init(ble_cus_t * p_cus, const ble_cus_init_t * p_cus_init)
  *
  * @return      NRF_SUCCESS on success, otherwise an error code.
  */
-static uint32_t custom_value_char_add(ble_cus_t * p_cus, const ble_cus_init_t * p_cus_init, ble_uuid_t * p_cus_uuid, char * uuid_Desc)
+static uint32_t custom_value_char_add(ble_cus_t * p_cus, const ble_cus_init_t * p_cus_init, ble_uuid_t * p_cus_uuid, char * uuid_Desc, uint16_t * p_defVal)
 {
     uint32_t            err_code;
     ble_gatts_char_md_t char_md;
@@ -101,7 +92,7 @@ static uint32_t custom_value_char_add(ble_cus_t * p_cus, const ble_cus_init_t * 
     ble_gatts_attr_t    attr_char_value;
     ble_uuid_t          ble_uuid;
     ble_gatts_attr_md_t attr_md;
-    char p_noVal = 0;
+    char p_Val[16] = {0};//The longest value we have is BSI Name at 16 chars
     memset(&char_md, 0, sizeof(char_md));
 
     char_md.char_props.read         = 1;
@@ -129,7 +120,7 @@ static uint32_t custom_value_char_add(ble_cus_t * p_cus, const ble_cus_init_t * 
     attr_md.rd_auth    = 0;
     attr_md.wr_auth    = 0;
     attr_md.vlen       = 0;
-
+    
     ble_uuid.type = p_cus->uuid_type;
     //ble_uuid.uuid = CUSTOM_CHAR_UUID_MEAS_INTV;//Specified in the BLE_CUS.h file.
     ble_uuid.uuid = (int)p_cus_uuid;
@@ -138,20 +129,26 @@ static uint32_t custom_value_char_add(ble_cus_t * p_cus, const ble_cus_init_t * 
     attr_char_value.p_uuid    = &ble_uuid;
     attr_char_value.p_attr_md = &attr_md;
     attr_char_value.init_offs = 0;
-    attr_char_value.p_value   = &p_noVal;
-
-    if(&p_cus_uuid == CUSTOM_CHAR_UUID_BSI_NAME)
+//    if(ble_uuid.uuid == CUSTOM_CHAR_UUID_PON_DLY_S3 || ble_uuid.uuid == CUSTOM_CHAR_UUID_PON_DLY_S2)
+//    {
+//      p_defVal[0] = 105;
+//    }
+    
+    
+    if(ble_uuid.uuid == CUSTOM_CHAR_UUID_BSI_NAME)
     {
+     memcpy(&p_Val,p_defVal,16);
      attr_char_value.init_len  = 16;
      attr_char_value.max_len   = 16;
     }
     else 
     { 
+      memcpy(&p_Val,p_defVal,2);
       attr_char_value.init_len  = sizeof(uint16_t);
       attr_char_value.max_len   = sizeof(uint16_t);
     }
 
-
+    attr_char_value.p_value   = &p_Val;
     
     err_code = sd_ble_gatts_characteristic_add(p_cus->service_handle, &char_md,
                                                &attr_char_value,
@@ -187,24 +184,17 @@ void on_disconnect(ble_cus_t * p_cus, ble_evt_t const * p_ble_evt)
 
 void on_write(ble_cus_t * p_cus, ble_evt_t const * p_ble_evt)
 {
-//    #define CUSTOM_CHAR_UUID_S2_MEAS_INTV     0x1401 // The time in minutes between each measurment, 1440 mins in a day
-//    #define CUSTOM_CHAR_UUID_S3_MEAS_INTV     0x1402 // The time in minutes between each measurment, 1440 mins in a day
-//    #define CUSTOM_CHAR_UUID_DT_ALRM_ON       0x1403 // The Delta T for pulses that sets an alarm state.
-//    #define CUSTOM_CHAR_UUID_DT_ALRM_OFF      0x1404 // The Delta T for pulses that sets an alarm state. 
-//    #define CUSTOM_CHAR_UUID_DM_ALRM_S2_ON    0x1405 // The Delta for measurements that sets an alarm state. 
-//    #define CUSTOM_CHAR_UUID_DM_ALRM_S2_OFF   0x1406 // The Delta for measurements that sets an alarm state. 
-//    #define CUSTOM_CHAR_UUID_DM_ALRM_S3_ON    0x1407 // The Delta for measurements that sets an alarm state. 
-//    #define CUSTOM_CHAR_UUID_DM_ALRM_S3_OFF   0x1408 // The Delta for measurements that sets an alarm state. 
-//    #define CUSTOM_CHAR_UUID_UPLD_SZE         0x1409 // The size of data we are going to upload. in kb, 5 = 5kbyte
-//    #define CUSTOM_CHAR_UUID_SENS_CNFG        0x1410 // The sensors attached to the device. PULSE,ANLG,ANLG. 1 = connected, 0 = disconnected. ie 110.
-//    #define CUSTOM_CHAR_UUID_SENS_ADDRS       0x1411 // The Addresses of the attached sensors (uint-16, uint-16, uint-16). 
-//    #define CUSTOM_CHAR_UUID_UPLD_INTV        0x1412 // The interval that the BSI uploads the data.  
+    //Refer to .h for characteristic UUID and names... 
     ble_gatts_evt_write_t * p_evt_write = &p_ble_evt->evt.gatts_evt.params.write;
     
     bsi_config.configChanged = true;
     
     switch(p_evt_write->uuid.uuid)
      {
+     case CUSTOM_CHAR_UUID_BSI_NAME:
+       memset(&bsi_config.BSI_Name, 0, sizeof(bsi_config.BSI_Name));
+       memcpy(&bsi_config.BSI_Name,&p_evt_write->data,p_evt_write->len);
+       break;
      case CUSTOM_CHAR_UUID_S2_MEAS_INTV:     
        // The time in minutes between each measurment.
        //sensor2_config.configChanged     = true;
@@ -259,6 +249,14 @@ void on_write(ble_cus_t * p_cus, ble_evt_t const * p_ble_evt)
      case CUSTOM_CHAR_UUID_UPLD_INTV:
        // The interval that the BSI uploads the data.
        bsi_config.uploadInterval = p_evt_write->data[0];
+       break;
+     case CUSTOM_CHAR_UUID_PON_DLY_S2:
+       // The delay between turning the sensor on and taking a reading from the ADC
+       bsi_config.sensor2_config.pwrOnDelay = p_evt_write->data[0];
+       break;
+     case CUSTOM_CHAR_UUID_PON_DLY_S3:
+       // The delay between turning the sensor on and taking a reading from the ADC
+       bsi_config.sensor3_config.pwrOnDelay = p_evt_write->data[0];
        break;
      case CUSTOM_CHAR_UUID_SENS_DATA:
        //bsi_config.uploadSize = p_evt_write->data[0];

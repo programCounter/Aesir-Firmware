@@ -16,6 +16,7 @@
 #include "nrf_gpio.h"
 #include "nrf_drv_gpiote.h"
 #include "nrf_delay.h"
+#include "bsi_config.h"
 
 #define BUFFER_SIZE 3
 //Pin_map(port,pin)
@@ -94,7 +95,7 @@ nrf_saadc_value_t measureSensor(uint8_t channel)
       nrf_gpio_pin_write(VREG_PWR,1); //Power Regulator On
       nrf_delay_ms(1);
       nrf_gpio_pin_write(ANLG_SENSOR1_PWR,1); //Sensor power on
-      nrf_delay_ms(105);
+      nrf_delay_ms(bsi_config.sensor2_config.pwrOnDelay); //Just pull the mS ammount from the config struct.
       nrfx_saadc_sample_convert(channel,&p_ADC_Result);// This returns a single value from the specified ADC channel. THIS FUNCTION IS BLOCKING!
       nrf_gpio_pin_write(ANLG_SENSOR1_PWR,0); //Sensor power off
       nrf_gpio_pin_write(VREG_PWR,0); //Power Regulator Off
@@ -103,7 +104,7 @@ nrf_saadc_value_t measureSensor(uint8_t channel)
       nrf_gpio_pin_write(VREG_PWR,1); //Power Regulator On
       nrf_delay_ms(1);
       nrf_gpio_pin_write(ANLG_SENSOR2_PWR,1); //Sensor power on
-      nrf_delay_ms(105);
+      nrf_delay_ms(bsi_config.sensor3_config.pwrOnDelay);//Just pull the mS ammount from the config struct.
       nrfx_saadc_sample_convert(channel,&p_ADC_Result);// This returns a single value from the specified ADC channel. THIS FUNCTION IS BLOCKING!
       nrf_gpio_pin_write(ANLG_SENSOR2_PWR,0); //Sensor power off
       nrf_gpio_pin_write(VREG_PWR,0); //Power Regulator Off

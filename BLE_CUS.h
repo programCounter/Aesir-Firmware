@@ -29,7 +29,9 @@ This code is based on the following nordic tutorial
 #define CUSTOM_CHAR_UUID_SENS_ADDRS       0x1411 // The Addresses of the attached sensors (uint-16, uint-16, uint-16). 
 #define CUSTOM_CHAR_UUID_UPLD_INTV        0x1412 // The interval that the BSI uploads the data. 
 #define CUSTOM_CHAR_UUID_BSI_NAME         0x1413 // Byte array that holds the BSI Name
-#define CUSTOM_CHAR_UUID_SENS_DATA        0x1414 // The Sensor Data for debugging
+#define CUSTOM_CHAR_UUID_PON_DLY_S2       0x1414 // Holds the power on delay configuration. this is in mS. ie 100 = 100ms
+#define CUSTOM_CHAR_UUID_PON_DLY_S3       0x1415 // Holds the power on delay configuration. this is in mS. ie 100 = 100ms
+#define CUSTOM_CHAR_UUID_SENS_DATA        0x1416 // The Sensor Data for debugging
 /**@brief   Macro for defining a ble_cus instance.
  *
  * @param   _name   Name of the instance.
@@ -60,7 +62,7 @@ typedef struct ble_cus_s ble_cus_t;
  *
  * @return      NRF_SUCCESS on success, otherwise an error code.
  */
-static uint32_t custom_value_char_add(ble_cus_t * p_cus, const ble_cus_init_t * p_cus_init, ble_uuid_t * p_cus_uuid, char * uuid_Desc);
+static uint32_t custom_value_char_add(ble_cus_t * p_cus, const ble_cus_init_t * p_cus_init, ble_uuid_t * p_cus_uuid, char * uuid_Desc, uint16_t * p_defVal);
 
 
 /**@brief Custom Service structure. This contains various status information for the service. */

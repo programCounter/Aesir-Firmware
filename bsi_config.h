@@ -10,6 +10,7 @@ typedef struct BSISensorConfig {
   uint16_t deltaTimeAlarmOff;
   uint16_t deltaMeasAlarmOn;
   uint16_t deltaMeasAlarmOff;
+  uint16_t pwrOnDelay;
 }BSI_Sensor_Config; 
 
 //extern BSI_Sensor_Config sensor1_config;
@@ -25,6 +26,7 @@ typedef struct BSIConfig {
     uint16_t uploadSize; //in KB
     uint32_t uploadInterval; //Duration in minutes between broadcasting data.
     uint32_t lastKnownAddr;
+
 }BSI_Config;
 
 extern BSI_Config bsi_config;

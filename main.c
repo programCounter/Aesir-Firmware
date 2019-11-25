@@ -1106,10 +1106,6 @@ int main(void)
     //somejunkvar = true;
     //ble_bas_battery_level_update(&m_bas, 5, BLE_CONN_HANDLE_ALL);
     // Enter main loop.
-    #ifdef DEBUG
-    lerase_sector = true;  //debug
-    #else
-    #endif
     for (;;)
     {
         if(bsi_config.configChanged == true)

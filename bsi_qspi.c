@@ -140,7 +140,7 @@ void write_qspi_header()
           WAIT_FOR_PERIPH();
           //APP_ERROR_CHECK(err_code);
           
-
+          memcpy(&Header.BSI_Name, &bsi_config.BSI_Name, sizeof(Header.BSI_Name)); 
           err_code = nrf_drv_qspi_write(&Header, sizeof(Header), 0);
 
           APP_ERROR_CHECK(err_code);

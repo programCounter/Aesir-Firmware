@@ -1239,7 +1239,7 @@ int main(void)
           {
 
             advertising_start(erase_bonds);
-            qspi_prepare_packet(0);
+            qspi_prepare_packet(bsi_config.qspi_currentSector);
 
             //gPacket.Header
             //gPacket.Sector

@@ -24,7 +24,7 @@ This code is based on the following nordic tutorial
 #define CUSTOM_CHAR_UUID_DM_ALRM_S2_OFF   0x1406 // The Delta for measurements that sets an alarm state. IF measurments increase by y since last measure, turn alarm off.
 #define CUSTOM_CHAR_UUID_DM_ALRM_S3_ON    0x1407 // The Delta for measurements that sets an alarm state. IF measurments increase by x since last measure, set alarm.
 #define CUSTOM_CHAR_UUID_DM_ALRM_S3_OFF   0x1408 // The Delta for measurements that sets an alarm state. IF measurments increase by y since last measure, turn alarm off.
-#define CUSTOM_CHAR_UUID_UPLD_SZE         0x1409 // The size what size of data are we going to upload. in kb, 5 = 5kbyte
+#define CUSTOM_CHAR_UUID_UPLD_SZE         0x1409 // The size what size of data are we going to upload. in bytes, 1024 = 1KB
 #define CUSTOM_CHAR_UUID_SENS_CNFG        0x1410 // The sensors attached to the device. PULSE,ANLG,ANLG. 1 = connected, 0 = disconnected. ie 110.
 #define CUSTOM_CHAR_UUID_SENS_ADDRS       0x1411 // The Addresses of the attached sensors (uint-16, uint-16, uint-16). 
 #define CUSTOM_CHAR_UUID_UPLD_INTV        0x1412 // The interval that the BSI uploads the data. 

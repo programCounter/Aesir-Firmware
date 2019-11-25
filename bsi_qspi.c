@@ -313,11 +313,25 @@ void read_qspi_sector(uint8_t Sector){
 // ***********************************************************************************
 // This will automatically populate the extern gPacket (general packet) with the current
 //    header and the specified sector of data from QSPI. Good luck?
-void qspi_prepare_packet(uint8_t Sector){
+void qspi_prepare_packet(uint8_t Sector)
+{
+      read_qspi_header();
+      gPacket.Header = ReadHeader;
+      read_qspi_sector(Sector);
+      gPacket.Sector = ReadSector;
+      gPacket.datalength = sizeof(gPacket);
 
-     read_qspi_header();
-     gPacket.Header = ReadHeader;
-     read_qspi_sector(Sector);
-     gPacket.Sector = ReadSector;
-     gPacket.datalength = sizeof(gPacket);
+      // Because we sent data (hopefully), we should start writing at the next sector
+      if(bsi_config.qspi_currentSector == 15)
+      {
+         bsi_config.qspi_currentSector = 1; //needs to erase sectors :(
+         bsi_config.lastKnownAddr = 4096;   // = SectorB1[bsi_config.qspi_currentSector];
+      }
+      else
+      {
+         bsi_config.qspi_currentSector+=1;
+         bsi_config.lastKnownAddr = SectorB1[bsi_config.qspi_currentSector];
+      }
+      bsi_config.configChanged = true;
+      erase_qspi_sector(bsi_config.qspi_currentSector); //erase this sector so we can reuse it
 }

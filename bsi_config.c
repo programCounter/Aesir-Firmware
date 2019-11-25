@@ -83,8 +83,8 @@ BSI_Config bsi_config = {
 //  .sensor1_config = s1_config,
 //  .sensor2_config = s2_config,
 //  .sensor3_config = s3_config,
-    .uploadSize     = 9,
-    .uploadInterval = 0,
+    .uploadSize     = 1024,
+    .uploadInterval = 1,
     .lastKnownAddr  = 4096,  //LB: Start writing data at the start of sector 1
     .qspi_currentSector = 1, //LB: Same as above :)
 };

@@ -25,7 +25,8 @@ typedef struct BSIConfig {
     BSI_Sensor_Config sensor3_config;
     uint16_t uploadSize; //in KB
     uint32_t uploadInterval; //Duration in minutes between broadcasting data.
-    uint32_t lastKnownAddr;
+    uint32_t lastKnownAddr; //Used in QSPI to find write position
+    uint8_t qspi_currentSector; //Used in QSPI to find read position
     uint16_t pulseTime;
     uint16_t pulseNum; 
 

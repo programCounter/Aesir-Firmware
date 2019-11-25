@@ -119,7 +119,8 @@
     } while (0)
 
 /************************DEBUG DEFINITIONS**************************************************************************/
-#define DEBUG 
+#define DEBUG
+//#define DEBUG_QSPI 
 /*******************************************************************************************************************/
 #define DEVICE_NAME                     "AEsir2"                       /**< Name of device. Will be included in the advertising data. */
 #define MANUFACTURER_NAME               "RioT Wireless"                   /**< Manufacturer. Will be passed to Device Information Service. */
@@ -169,9 +170,17 @@ static bool S3MeasureNow;
 static bool UploadNow;
 static bool pushData;
 static bool bleConnected;
+static bool factoryReset;
 
 #ifdef DEBUG
-uint32_t qspiAddress = 0; //ONLY FOR DEBUG
+//uint32_t qspiAddress = 0; //ONLY FOR DEBUG
+bool StressTest_FAILED = false;
+#endif
+
+#ifdef DEBUG_QSPI // Button-press-factory-reset
+static bool factoryReset = true;
+#else
+static bool factoryReset = false;
 #endif
 
 uint32_t p_reset_reason; //holds a register(RESETREAS) indicating the reason the device was reset
@@ -788,10 +797,7 @@ static void bsp_event_handler(bsp_event_t event)
     switch (event)
     {
         case BSP_EVENT_KEY_0:
-            //LB: Just going to use this for QSPI debug...
-            // Will write header to Sector 0 ( needs to be moved to first time initialization though)
-            // Parameters of header are pre-defined for now in struct BSI_Header Header;
-            lwrite_qspi = true;            
+            //doesn't work
             break;
 
         case BSP_EVENT_KEY_1:
@@ -808,13 +814,15 @@ static void bsp_event_handler(bsp_event_t event)
             break;
  
         case BSP_EVENT_KEY_2:
-            //Write to qspi
-            //lwrite_qspi = true;
+            #ifdef DEBUG_QSPI
+            lwrite_qspi = true;
+            #endif
             break;
        
         case BSP_EVENT_KEY_3:
-            //LB: Just going to use this for QSPI debug...
+            #ifdef DEBUG_QSPI
             lread_qspi = true;
+            #endif
             break;
         
         case BSP_EVENT_SLEEP:
@@ -1000,7 +1008,7 @@ static ble_gap_adv_data_t m_adv_data =
 //    APP_ERROR_CHECK(err_code);
 //}
 
-//function for updating chracteristic value
+//function for updating characteristic value
 void sensor_value_characteristic_update(ble_cus_t * p_cus, int16_t data)
 {
     //little endian converter::::::: -> swapped = (num>>8) | (num<<8);
@@ -1035,11 +1043,8 @@ int main(void)
     ble_stack_init();
     gap_params_init();
     gatt_init();
-    
-    //If we have a configuration already we should load it into the characteristics.
     retCode = init_fds();
     APP_ERROR_CHECK(retCode);
-    retCode = read_fds(fds_BSI_File,fds_BSI_Key, &bsi_config);
 
     services_init(); //Initialises the basic services and calls ble_cus_init which inits the custom service and charateristics for configuring the BSI
     nServices_init(); //Initialises the NUS(for UART) and the qued write module
@@ -1056,6 +1061,19 @@ int main(void)
 
     configure_memory();
     m_finished = false;
+
+    //LB: Moving towards code that can be reset with a button
+    if(factoryReset) 
+    {
+      //nrf_drv_qspi_chip_erase(); //erase the QSPI flash
+      bsi_config.configChanged = true; //set flash bsi_config to defaults
+      factoryReset = false;
+    }
+    else
+    {
+      //If we have a configuration already we should load it into the characteristics.
+      retCode = read_fds(fds_BSI_File,fds_BSI_Key, &bsi_config);
+    } //
     
     saadc_init();
     gpio_init();
@@ -1149,21 +1167,37 @@ int main(void)
 //          UploadNow = false;
 //        }
 
-        if(lwrite_qspi == true)
+        if(lwrite_qspi == true) // BUTTON 0 is PRESSED
         {
-        
-        #ifdef DEBUG
-          //for(int i = 0; i < 255; i++) // 256 pages fit in 1kB (if 4 bytes per page)
-          //{
-            
-             // measureSensor(0);  //debug
+          
+          #ifdef DEBUG_QSPI
+          for(int i = 0; i < (1024*14); i++) // 1024 pages fit in 4kB (if 4 bytes per page)
+          {                                  // *14 intentionally not filling last (15th) sector to prevent erasing in rewrite prep           // measureSensor(0);  //debug  
+              CurrentPage.sensorValue = rand();
               write_qspi_page();   //debug
-              CurrentPage.countMin += 1;
-              //CurrentPage.sensorValue = rand();
-          //}
-         #else
-           write_qspi_page();
-         #endif
+              CurrentPage.countMin ++;
+          }
+          uint16_t StressCountMin = 0; 
+          bsi_config.qspi_currentSector = 1;
+          for(uint16_t i = 1; i < 15; i++)
+          {
+              read_qspi_sector(i);
+              for(uint16_t j = 0; j < 1024; j++)
+              {
+                  StressCountMin++;
+                  if(ReadSector.Page[j].countMin != (j+((i-1)*1024))){
+                      StressTest_FAILED = true;
+                      break;
+                  }
+              }
+          }
+          //end of test cleanup
+          bsi_config.lastKnownAddr = 4096;
+          bsi_config.qspi_currentSector = 1;
+          #endif
+       /* #else
+          write_qspi_page();
+          #endif
 
           // write_qspi_header();
           // write_qspi(qspiAddress); // *** TO BE DISCUSSED ***
@@ -1171,21 +1205,25 @@ int main(void)
             //lread_qspi = true;  //debug
           #else
           #endif
-          
-        }
-        if(lread_qspi == true)
+          */
+        }//END OF if(lwrite_qspi == true)
+
+
+        if(lread_qspi == true) // BUTTON 3 is PRESSED
         {
-          #ifdef DEBUG
-            read_qspi_sector(1);
+          #ifdef DEBUG_QSPI
+            read_qspi_sector(bsi_config.qspi_currentSector-1);
           #else
           #endif
             
           //read_qspi_page(4096);
           //read_qspi_header();
         }
+
         if(lerase_sector == true)
         {
-            erase_qspi_sector(1);            
+          //nrf_drv_qspi_chip_erase();
+          //erase_qspi_sector(1);            
         }
 
         if(pushData == true)

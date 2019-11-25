@@ -1,4 +1,4 @@
-#define SECTOR_SIZE 4096 //4kB
+//#define SECTOR_SIZE 4096 //4kB //already defined in .h?
 
 #include "nrf_drv_qspi.h"
 #include "bsi_qspi.h"
@@ -19,51 +19,67 @@
 // *********************************************************************************************
 //                            S o m e    T e r m i n o l o g y
 // *********************************************************************************************
-// a "memory page" is 1Byte (each address represents this minimum value)
-// however, our "QSPI PAGE" is the size of each sensor reading data set (much larger than 1 byte)
-// a memory sector is 4kB
+// a "memory page" (for our chip) is 1 Byte (each address represents this minimum value)
+// ...however, our "QSPI PAGE" is the size of each sensor reading data set "QSPI_PAGE_" (4 Bytes)
+// a memory sector is 4kB (this is the minimum amount of data we can delete)
 // a memory block is 64kB (thus there are 16 sectors per block!)
 
+
+// *********************************************************************************************
+//                   D e c l a r a t i o n s / I n i t i a l i z a t i o n s
+// *********************************************************************************************
 // Below is a "look-up table" used to find start address for sector block 1
 const uint32_t SectorB1[] = {0,4096,8192,12288,16384,20480,24576,28672,32768,36864,40960,45056,49152,53248,57344,61440,65536};
-static uint8_t currentSector;  //sector 1 starts at address 4096 
 
+
+// *** DEPRECATED VARIABLES THAT MAYBE WE SHOULD COMMENT OUT ***
 uint16_t pressCount = 0;
-
+//static volatile uint32_t LastKnownAddr = 4096; //start at beginning of 1st sector (do not use sector 0)
+//static uint8_t currentSector;  //sector 1 starts at address 4096
+// ************************************************************* 
 bool lwrite_qspi = false;
 bool lread_qspi = false;
 bool lerase_sector = false;
 bool m_finished = false; // used in the QSPI event
 
-//static volatile uint32_t LastKnownAddr = 4096; //start at beginning of 1st sector (do not use sector 0)
-
-BSI_Header Header = { // Entire first sector is reserved for header (prevent erasing)
-    .BSI_Name = {'T','E','S','T','\0'},
-    .StartTime = {20,19,11,4,19,9,0}, //   YY/YY/MM/DD/HH/MM/SS;
+// Entire first sector is reserved for header (prevent erasing)
+// Temp header to be used to change header in sector zero...
+// ... populate Header then call "qspi_write_header()"
+BSI_Header Header = { 
+    .BSI_Name = {'N','O','N','A','M','E','\0'},
+    .StartTime = {20,19,11,24,18,51,33}, //   YY/YY/MM/DD/HH/MM/SS;
     };
 
 // Empty header to read TestHeader back out of memory
 BSI_Header ReadHeader = {
     };
 
+// The temporary struct to inject with data before calling "write_qspi_page()"
 QSPI_Page CurrentPage = {
     .countMin = 0, //minutes since Header StartTime[] (last Local Listener connection)
     //.sensorCh = 1, //which sensor the following value is from (1=An1, 2=An2, or 9 = Pulse)
     .sensorValue = 420, //What reading did sensor take? (10b ADC or pulse)
-    //.dataSpace = 0xaa
     };
 
-QSPI_Page ReadPage = { // Only used for checking an single, specific sensor reading
+// Only used for checking an single, specific sensor reading
+QSPI_Page ReadPage = { 
     };
 
+// The temporary struct filled when calling "read_qspi_sector(uint8_t Sector)"
 QSPI_Sector ReadSector = {
     .Page = {0},  // set every page to all zeros (clear array)
     //.xTransmitted = false,
     };
 
+// The temporary general packet populated with a sector when calling "qspi_prepare_packet(uint8_t Sector)"
 Ad_gPacket gPacket = {
     .imSendingYouData = {'#','#','#'},
     };
+
+
+// *********************************************************************************************
+//                                    F u n c t i o n s
+// *********************************************************************************************
 
 //Event called when the QSPI completes an action
 void qspi_handler(nrf_drv_qspi_evt_t event, void * p_context)
@@ -102,8 +118,8 @@ void configure_memory()
     err_code = nrf_drv_qspi_cinstr_xfer(&cinstr_cfg, &temporary, NULL);
     APP_ERROR_CHECK(err_code);
 
-    //landon added code past here
-    currentSector = (bsi_config.lastKnownAddr/SECTOR_SIZE); // Which sector are we in after waking up?
+    // Landon added code past here in configure_memory()
+    //currentSector = (bsi_config.qspi_currentSector); // Which sector are we in after waking up?
 }
 
 
@@ -161,19 +177,18 @@ void write_qspi_page()
           bsi_config.configChanged = true;
           
           // if we have reached a new sector...
-          if(bsi_config.lastKnownAddr > (currentSector*SECTOR_SIZE))
+          if((bsi_config.lastKnownAddr) >= (SectorB1[bsi_config.qspi_currentSector+1]))
           {
-            if(currentSector == 16)
+            if(bsi_config.qspi_currentSector == 15)
             {
-               currentSector = 1; //needs to erase sectors :(
+               bsi_config.qspi_currentSector = 1; //needs to erase sectors :(
+               bsi_config.lastKnownAddr = 4096;   // = SectorB1[bsi_config.qspi_currentSector];
             }
             else
             {
-               currentSector++;
+               bsi_config.qspi_currentSector+=1;
             }
-
-            erase_qspi_sector(currentSector); //erase this sector so we can reuse it
-            bsi_config.lastKnownAddr = SectorB1[currentSector];
+            erase_qspi_sector(bsi_config.qspi_currentSector); //erase this sector so we can reuse it
           }//end of if new sector
                    
         }//end if(err_code == NRF_SUCCESS)

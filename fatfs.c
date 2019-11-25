@@ -185,14 +185,14 @@ void fatfs_write(BSI_Data_t * BSI_Value)
     fatfs_write_buffer.length = strlen(fatfs_write_buffer.data);  
     
     //NRF_LOG_INFO("Writing to file " FILE_NAME "...");
-    #ifdef DEBUG
+    #ifdef DEMO_WRITE
     printf("Writing to file TEST...");
     #endif
     ff_result = f_open(&file, BSI_Attribute.BSI_Name, FA_READ | FA_WRITE | FA_OPEN_APPEND);
     if (ff_result != FR_OK)
     {
       //NRF_LOG_INFO("Unable to open or create file: " FILE_NAME ".");
-      #ifdef DEBUG
+      #ifdef DEMO_WRITE
       printf("Unable to open or create file: TEST.");
       #endif
       
@@ -202,14 +202,14 @@ void fatfs_write(BSI_Data_t * BSI_Value)
     if (ff_result != FR_OK)
     {
       //NRF_LOG_INFO("Write failed\r\n.");
-      #ifdef DEBUG
+      #ifdef DEMO_WRITE
       printf("Write failed\r\n.");
       #endif
     }
    else
    {
      //NRF_LOG_INFO("%d bytes written.", bytes_written);
-      #ifdef DEBUG
+      #ifdef DEMO_WRITE
       printf("%d bytes written.", bytes_written);
       #endif
       fatfs_write_buffer.length = 0;
@@ -242,7 +242,7 @@ void fatfs_init()
     if (disk_state)
     {
         //NRF_LOG_INFO("Disk initialization failed.");
-        #ifdef DEBUG
+        #ifdef DEMO_WRITE
         printf("Disk initialization failed.");
         #endif
         return;
@@ -257,7 +257,7 @@ void fatfs_init()
     if (ff_result)
     {
         //NRF_LOG_INFO("Mount failed.");
-        #ifdef DEBUG
+        #ifdef DEMO_WRITE
         printf("Mount failed.");
         #endif
         return;
@@ -268,7 +268,7 @@ void fatfs_init()
     if (ff_result)
     {
         //NRF_LOG_INFO("Directory listing failed!");
-        #ifdef DEBUG
+        #ifdef DEMO_WRITE
         printf("Directory listing failed!");
         #endif
         return;
@@ -280,7 +280,7 @@ void fatfs_init()
         if (ff_result != FR_OK)
         {
             //NRF_LOG_INFO("Directory read failed.");
-            #ifdef DEBUG
+            #ifdef DEMO_WRITE
             printf("Directory read failed.");
             #endif
             return;

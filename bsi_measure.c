@@ -60,7 +60,7 @@ void pulse_alarm_check()
     #endif
     {
       //shut off alarm
-      #ifdef DEBUG
+      #ifdef DEMO_WRITE
       printf("Whew We Safe\n");
       #endif
       pulseAlarmOn = false;
@@ -75,7 +75,7 @@ void pulse_alarm_check()
     #endif
     {
       //enter alarm mode
-      #ifdef DEBUG
+      #ifdef DEMO_WRITE
       printf("AAAHHHHH ALARM!!!\n");
       #endif
       pulseAlarmOn = true;

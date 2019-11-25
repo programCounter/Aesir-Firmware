@@ -1204,8 +1204,8 @@ int main(void)
           //end of test cleanup
           bsi_config.lastKnownAddr = 4096;
           bsi_config.qspi_currentSector = 1;
-          #endif
-       /* #else
+
+          #else
           write_qspi_page();
           #endif
 
@@ -1215,7 +1215,6 @@ int main(void)
             //lread_qspi = true;  //debug
           #else
           #endif
-          */
         }//END OF if(lwrite_qspi == true)
 
 

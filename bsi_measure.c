@@ -24,9 +24,14 @@
 #define VREG_PWR NRF_GPIO_PIN_MAP(1,15) 
 #define ANLG_SENSOR1_PWR NRF_GPIO_PIN_MAP(0,12) 
 #define ANLG_SENSOR2_PWR NRF_GPIO_PIN_MAP(0,11) 
-#define PULSE_SENSOR_INP NRF_GPIO_PIN_MAP(1,04) 
+#define PULSE_SENSOR_INP NRF_GPIO_PIN_MAP(1,02) 
 
 #define pulseInterval 60 //needs to be set up in config, need to talk to will about changing characteristics
+
+#ifdef DEBUG
+#define ALARM_RATE_ON 30
+#define ALARM_RATE_OFF 10
+#endif
 
 static nrf_saadc_value_t m_buffer[BUFFER_SIZE];
 uint32_t ticksPulse;
@@ -44,20 +49,36 @@ void saadc_callback(nrf_drv_saadc_evt_t const * p_event)
     }
 }
 
-void pulse_alarm_check(bool alarmOn)
+void pulse_alarm_check()
 {
-  if(alarmOn)
+  if(pulseAlarmOn)
   {
-    if((pulseInterval/(ticksPulse - bsi_config.pulseTime)) > bsi_config.sensor1_config.deltaMeasAlarmOff)
+    #ifdef DEBUG
+    if((pulseInterval/(ticksPulse - bsi_config.pulseTime)) < ALARM_RATE_OFF)
+    #else
+    if((pulseInterval/(ticksPulse - bsi_config.pulseTime)) < bsi_config.sensor1_config.deltaMeasAlarmOff)
+    #endif
     {
       //shut off alarm
+      #ifdef DEBUG
+      printf("Whew We Safe\n");
+      #endif
+      pulseAlarmOn = false;
     }
   }
   else
   {
+    #ifdef DEBUG
+    if((pulseInterval/(ticksPulse - bsi_config.pulseTime)) > ALARM_RATE_ON)
+    #else
     if((pulseInterval/(ticksPulse - bsi_config.pulseTime)) > bsi_config.sensor1_config.deltaMeasAlarmOn)
+    #endif
     {
       //enter alarm mode
+      #ifdef DEBUG
+      printf("AAAHHHHH ALARM!!!\n");
+      #endif
+      pulseAlarmOn = true;
     }
   }
 }
@@ -65,11 +86,9 @@ void pulse_alarm_check(bool alarmOn)
 void pulse_evt_handler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
 {
     bsi_config.pulseNum++;
-    pulse_alarm_check(pulseAlarmOn);
+    pulse_alarm_check();
     bsi_config.pulseTime = ticksPulse;
     bsi_config.configChanged = true;
-    // What happens when we get a pulse?
-    //nrf_drv_gpiote_out_toggle(PIN_OUT);
 }
 
 void gpio_init(void)
@@ -80,10 +99,21 @@ void gpio_init(void)
   nrf_gpio_cfg_output(ANLG_SENSOR2_PWR);
   
   //Pulse sensor config
-  nrf_drv_gpiote_in_config_t pulse_config = GPIOTE_CONFIG_IN_SENSE_TOGGLE(true);
-  pulse_config.pull = NRF_GPIO_PIN_PULLUP;
+  ret_code_t err_code;
 
-  nrf_drv_gpiote_in_init(PULSE_SENSOR_INP, &pulse_config, pulse_evt_handler); 
+  err_code = nrf_drv_gpiote_init();
+  APP_ERROR_CHECK(err_code);
+
+ // nrf_drv_gpiote_out_config_t out_config = GPIOTE_CONFIG_OUT_SIMPLE(false);
+
+    //err_code = nrf_drv_gpiote_out_init(PIN_OUT, &out_config);
+    //APP_ERROR_CHECK(err_code);
+
+  nrf_drv_gpiote_in_config_t pulse_config = GPIOTE_CONFIG_IN_SENSE_LOTOHI(true);
+  pulse_config.pull = NRF_GPIO_PIN_NOPULL;
+
+  err_code = nrf_drv_gpiote_in_init(PULSE_SENSOR_INP, &pulse_config, pulse_evt_handler); 
+  APP_ERROR_CHECK(err_code);
   nrf_drv_gpiote_in_event_enable(PULSE_SENSOR_INP, true);
 }
 

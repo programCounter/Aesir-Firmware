@@ -212,7 +212,7 @@ static volatile uint8_t m_advert_data[1650]; // 256 bytes on air at one time, ma
 static uint32_t NumFlashAddrs = 16777215; // the device is configured in 24bit addressing mode so 2^24 adresses are possible
 
 #ifdef DEBUG
-#define MINUTE_TIMER_TICK APP_TIMER_TICKS(10000) // 1 second, debuggin time mudda fuxa
+#define MINUTE_TIMER_TICK APP_TIMER_TICKS(1000) // 1 second, debuggin time mudda fuxa
 #else
 #define MINUTE_TIMER_TICK APP_TIMER_TICKS(60000) //1 min, lowest resolution of time we will think about.
 #endif
@@ -489,18 +489,26 @@ static void minute_timer_timeout_handler(void * p_context)
     ticksTUpload=0;
   }
 
+  #ifdef DEBUG
+  if(true)
+  #else
   if(bsi_config.sensor1_config.sensorEnabled == true) // IF the sensors not enabled dont even increment the count
+  #endif
   {
     ticksPulse++;
     if(!(ticksPulse % pulseInterval)) //if the current time is not a multiple of the interval
     {
       pulseWriteNow = true;
     }
+    if(pulseAlarmOn)
+    {
+    pulse_alarm_check();
+    }
   }
 
 
   #ifdef DEBUG
-  if(true) //for debugging only, will ensure sensor 1 data is received
+  if(false) //for debugging only, will ensure sensor 1 data is received
   #else
   if(bsi_config.sensor2_config.sensorEnabled == true) // IF the sensors not enabled dont even increment the count
   #endif
@@ -518,7 +526,7 @@ static void minute_timer_timeout_handler(void * p_context)
   }
 
   #ifdef DEBUG
-  if(true) //for debugging only, will ensure sensor 1 data is received
+  if(false) //for debugging only, will ensure sensor 1 data is received
   #else
   if(bsi_config.sensor3_config.sensorEnabled == true) // IF the sensors not enabled dont even increment the count
   #endif
@@ -1038,6 +1046,8 @@ int main(void)
     // Initialize.
     log_init();
     timers_init();
+    saadc_init();
+    gpio_init();
     buttons_leds_init(&erase_bonds);
     power_management_init();
     ble_stack_init();
@@ -1075,8 +1085,7 @@ int main(void)
       retCode = read_fds(fds_BSI_File,fds_BSI_Key, &bsi_config);
     } //
     
-    saadc_init();
-    gpio_init();
+
 //    nrf_drv_qspi_erase(NRF_QSPI_ERASE_LEN_64KB, 0);
 //    WAIT_FOR_PERIPH();
     

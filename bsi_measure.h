@@ -7,6 +7,6 @@ extern bool pulseWriteNow;
 void saadc_callback(nrf_drv_saadc_evt_t const * p_event);
 void saadc_init(void);
 void gpio_init(void);
-void pulse_alarm_check(bool alarmOn);
+void pulse_alarm_check();
 nrf_saadc_value_t measureSensor(uint8_t channel);
 

@@ -46,7 +46,18 @@
   <Trace enabled="Yes"/>
  </TraceWindow>
  <Watch1>
-  <Watches active="1" update="Never"/>
+  <Watches active="1" update="Twice a Second">
+   <Watchpoint expression="ticksTUpload" name="ticksTUpload" radix="10" linenumber="468" filename="../../../main.c"/>
+   <Watchpoint expression="ticksS2" name="ticksS2" radix="10" linenumber="489" filename="../../../main.c"/>
+   <Watchpoint expression="ticksS3" name="ticksS3" radix="10" linenumber="509" filename="../../../main.c"/>
+   <Watchpoint expression="S3MeasureNow" name="S3MeasureNow" radix="-1" linenumber="514" filename="../../../main.c"/>
+   <Watchpoint expression="S2MeasureNow" name="S2MeasureNow" radix="10" linenumber="496" filename="../../../main.c"/>
+   <Watchpoint expression="bsi_config" name="bsi_config" radix="16" linenumber="1163" filename="../../../main.c"/>
+   <Watchpoint expression="gPacket" name="gPacket" radix="-1" linenumber="1178" filename="../../../main.c"/>
+   <Watchpoint expression=" bsi_config.lastKnownAddr" name=" bsi_config.lastKnownAddr" radix="10" linenumber="1055" filename="../../../main.c"/>
+   <Watchpoint expression="lerase_sector" name="lerase_sector" radix="16" linenumber="202" filename="../../../bsi_qspi.c"/>
+   <Watchpoint expression="currentSector" name="currentSector" radix="10" linenumber="172" filename="../../../bsi_qspi.c"/>
+  </Watches>
  </Watch1>
  <Watch2>
   <Watches active="0" update="Never"/>
@@ -58,14 +69,19 @@
   <Watches active="0" update="Never"/>
  </Watch4>
  <Files>
-  <SessionOpenFile windowGroup="DockEditLeft" x="33" y="140" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../BLE_CUS.c" selected="1" top="194" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="32" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../BLE_CUS.h" selected="0" top="6" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="0" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../bsi_config.c" selected="0" top="264" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="3" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../bsi_config.h" selected="0" top="12" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="1012" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../main.c" selected="0" top="995" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="7664" useTextEdit="1" useBinaryEdit="0" left="0" path="../config/sdk_config.h" selected="0" top="7644" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="973" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../../../../components/ble/peer_manager/peer_manager.c" selected="0" top="973" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="99" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../../../../components/libraries/util/app_error_weak.c" selected="0" top="82" codecName=""/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="34" y="788" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../main.c" selected="1" top="766" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="2" y="260" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../BLE_CUS.c" selected="0" top="222" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="33" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../BLE_CUS.h" selected="0" top="0" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="303" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../bsi_config.c" selected="0" top="282" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="12" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../bsi_config.h" selected="0" top="18" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="7664" useTextEdit="1" useBinaryEdit="0" left="0" path="../config/sdk_config.h" selected="0" top="7639" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="1009" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../../../../components/ble/peer_manager/peer_manager.c" selected="0" top="980" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="99" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../../../../components/libraries/util/app_error_weak.c" selected="0" top="12" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="50" y="267" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../bsi_qspi.c" selected="0" top="245" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="0" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../bsi_qspi.h" selected="0" top="3" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="99" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../bsi_uart.c" selected="0" top="90" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="26" y="122" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../bsi_measure.c" selected="0" top="84" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="71" y="5" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../bsi_measure.h" selected="0" top="0" codecName="Default"/>
  </Files>
- <ARMCrossStudioWindow activeProject="ble_app_template_pca10056_s140" fileDialogDefaultFilter="*.c" autoConnectTarget="J-Link" buildConfiguration="Debug" sessionSettings="" debugSearchFileMap="" fileDialogInitialDirectory="" debugSearchPath="" autoConnectCapabilities="3711"/>
+ <ARMCrossStudioWindow activeProject="ble_app_template_pca10056_s140" fileDialogDefaultFilter="*.asm;*.s;*.inc" autoConnectTarget="J-Link" buildConfiguration="Debug" sessionSettings="" debugSearchFileMap="C:/dev/nRF5_SDK_15.3.0/modules/nrfx/mdk/ses_startup_nrf52840.s&#xa;&#xa;C:/dev/nRF5_SDK_15.3.0/modules/nrfx/mdk/ses_startup_nrf_common.s&#xa;&#xa;C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 4.18/source/thumb_crt0.s&#xa;" fileDialogInitialDirectory="" debugSearchPath="" autoConnectCapabilities="3711"/>
 </session>

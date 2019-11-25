@@ -258,7 +258,7 @@ void on_write(ble_cus_t * p_cus, ble_evt_t const * p_ble_evt)
        // The delay between turning the sensor on and taking a reading from the ADC
        bsi_config.sensor3_config.pwrOnDelay = p_evt_write->data[0];
        break;
-     case CUSTOM_CHAR_UUID_SENS_DATA:
+//     case CUSTOM_CHAR_UUID_SENS_DATA:
        //bsi_config.uploadSize = p_evt_write->data[0];
        break;
     }

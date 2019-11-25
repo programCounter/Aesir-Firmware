@@ -86,7 +86,7 @@ void saadc_init(void)
     //APP_ERROR_CHECK(err_code);
 }
 
-nrf_saadc_value_t measureSensor(uint8_t channel)
+nrf_saadc_value_t measureSensor(uint8_t channel, uint32_t *currentMins)
 {
   nrf_saadc_value_t p_ADC_Result;
   switch(channel)
@@ -120,6 +120,6 @@ nrf_saadc_value_t measureSensor(uint8_t channel)
   //CurrentPage.sensorValue = p_ADC_Result;
   //CurrentPage.sensorValue = CurrentPage.sensorValue | channel;
   CurrentPage.sensorValue = (p_ADC_Result << 4) | channel;
-  
+  CurrentPage.countMin = &currentMins;
   return p_ADC_Result;
 }

@@ -31,7 +31,7 @@ This code is based on the following nordic tutorial
 #define CUSTOM_CHAR_UUID_BSI_NAME         0x1413 // Byte array that holds the BSI Name
 #define CUSTOM_CHAR_UUID_PON_DLY_S2       0x1414 // Holds the power on delay configuration. this is in mS. ie 100 = 100ms
 #define CUSTOM_CHAR_UUID_PON_DLY_S3       0x1415 // Holds the power on delay configuration. this is in mS. ie 100 = 100ms
-#define CUSTOM_CHAR_UUID_SENS_DATA        0x1416 // The Sensor Data for debugging
+//#define CUSTOM_CHAR_UUID_SENS_DATA        0x1416 // The Sensor Data for debugging
 /**@brief   Macro for defining a ble_cus instance.
  *
  * @param   _name   Name of the instance.

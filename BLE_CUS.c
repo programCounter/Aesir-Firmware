@@ -236,7 +236,7 @@ void on_write(ble_cus_t * p_cus, ble_evt_t const * p_ble_evt)
        bsi_config.sensor3_config.deltaMeasAlarmOff = p_evt_write->data[0];
        break;
      case CUSTOM_CHAR_UUID_UPLD_SZE:
-       // What size of data are we going to upload. in kb, 5 = 5kbyte
+       // The size what size of data are we going to upload. in bytes, 1024 = 1KB
        bsi_config.uploadSize = p_evt_write->data[0];
        break;
      case CUSTOM_CHAR_UUID_SENS_CNFG:

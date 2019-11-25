@@ -178,7 +178,7 @@ static bool factoryReset;
 bool StressTest_FAILED = false;
 #endif
 
-#ifdef DEBUG_QSPI // Button-press-factory-reset
+#ifdef DEBUG // Button-press-factory-reset
 static bool factoryReset = true;
 #else
 static bool factoryReset = false;
@@ -1077,7 +1077,7 @@ int main(void)
     //LB: Moving towards code that can be reset with a button
     if(factoryReset) 
     {
-      //nrf_drv_qspi_chip_erase(); //erase the QSPI flash
+      erase_qspi_sector(1);
       bsi_config.configChanged = true; //set flash bsi_config to defaults
       factoryReset = false;
     }
@@ -1239,8 +1239,10 @@ int main(void)
           if(bleConnected = true) //If we dont have a connection, dont send data.
           {
 
-            
-            qspi_prepare_packet(0);
+
+            advertising_start(erase_bonds);
+            qspi_prepare_packet(bsi_config.qspi_currentSector);
+
 
             //gPacket.Header
             //gPacket.Sector

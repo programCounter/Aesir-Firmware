@@ -480,7 +480,11 @@ static void minute_timer_timeout_handler(void * p_context)
     ticksTUpload=0;
   }
 
+  #ifdef DEBUG
+
+  #else
   if(bsi_config.sensor1_config.sensorEnabled == true) // IF the sensors not enabled dont even increment the count
+  #endif
   {
     ticksPulse++;
     if(!(ticksPulse % pulseInterval)) //if the current time is not a multiple of the interval
@@ -1030,6 +1034,8 @@ int main(void)
     // Initialize.
     log_init();
     timers_init();
+    saadc_init();
+    gpio_init();
     buttons_leds_init(&erase_bonds);
     power_management_init();
     ble_stack_init();
@@ -1057,8 +1063,7 @@ int main(void)
     configure_memory();
     m_finished = false;
     
-    saadc_init();
-    gpio_init();
+
 //    nrf_drv_qspi_erase(NRF_QSPI_ERASE_LEN_64KB, 0);
 //    WAIT_FOR_PERIPH();
     

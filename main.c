@@ -203,7 +203,7 @@ static volatile uint8_t m_advert_data[1650]; // 256 bytes on air at one time, ma
 static uint32_t NumFlashAddrs = 16777215; // the device is configured in 24bit addressing mode so 2^24 adresses are possible
 
 #ifdef DEBUG
-#define MINUTE_TIMER_TICK APP_TIMER_TICKS(10000) // 1 second, debuggin time mudda fuxa
+#define MINUTE_TIMER_TICK APP_TIMER_TICKS(1000) // 1 second, debuggin time mudda fuxa
 #else
 #define MINUTE_TIMER_TICK APP_TIMER_TICKS(60000) //1 min, lowest resolution of time we will think about.
 #endif
@@ -481,7 +481,7 @@ static void minute_timer_timeout_handler(void * p_context)
   }
 
   #ifdef DEBUG
-
+  if(true)
   #else
   if(bsi_config.sensor1_config.sensorEnabled == true) // IF the sensors not enabled dont even increment the count
   #endif
@@ -491,11 +491,15 @@ static void minute_timer_timeout_handler(void * p_context)
     {
       pulseWriteNow = true;
     }
+    if(pulseAlarmOn)
+    {
+    pulse_alarm_check();
+    }
   }
 
 
   #ifdef DEBUG
-  if(true) //for debugging only, will ensure sensor 1 data is received
+  if(false) //for debugging only, will ensure sensor 1 data is received
   #else
   if(bsi_config.sensor2_config.sensorEnabled == true) // IF the sensors not enabled dont even increment the count
   #endif
@@ -513,7 +517,7 @@ static void minute_timer_timeout_handler(void * p_context)
   }
 
   #ifdef DEBUG
-  if(true) //for debugging only, will ensure sensor 1 data is received
+  if(false) //for debugging only, will ensure sensor 1 data is received
   #else
   if(bsi_config.sensor3_config.sensorEnabled == true) // IF the sensors not enabled dont even increment the count
   #endif

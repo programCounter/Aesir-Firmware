@@ -28,6 +28,11 @@
 
 #define pulseInterval 60 //needs to be set up in config, need to talk to will about changing characteristics
 
+#ifdef DEBUG
+#define ALARM_RATE_ON 30
+#define ALARM_RATE_OFF 10
+#endif
+
 static nrf_saadc_value_t m_buffer[BUFFER_SIZE];
 uint32_t ticksPulse;
 bool pulseAlarmOn;
@@ -44,20 +49,36 @@ void saadc_callback(nrf_drv_saadc_evt_t const * p_event)
     }
 }
 
-void pulse_alarm_check(bool alarmOn)
+void pulse_alarm_check()
 {
-  if(alarmOn)
+  if(pulseAlarmOn)
   {
-    if((pulseInterval/(ticksPulse - bsi_config.pulseTime)) > bsi_config.sensor1_config.deltaMeasAlarmOff)
+    #ifdef DEBUG
+    if((pulseInterval/(ticksPulse - bsi_config.pulseTime)) < ALARM_RATE_OFF)
+    #else
+    if((pulseInterval/(ticksPulse - bsi_config.pulseTime)) < bsi_config.sensor1_config.deltaMeasAlarmOff)
+    #endif
     {
       //shut off alarm
+      #ifdef DEBUG
+      printf("Whew We Safe\n");
+      #endif
+      pulseAlarmOn = false;
     }
   }
   else
   {
+    #ifdef DEBUG
+    if((pulseInterval/(ticksPulse - bsi_config.pulseTime)) > ALARM_RATE_ON)
+    #else
     if((pulseInterval/(ticksPulse - bsi_config.pulseTime)) > bsi_config.sensor1_config.deltaMeasAlarmOn)
+    #endif
     {
       //enter alarm mode
+      #ifdef DEBUG
+      printf("AAAHHHHH ALARM!!!\n");
+      #endif
+      pulseAlarmOn = true;
     }
   }
 }
@@ -65,11 +86,9 @@ void pulse_alarm_check(bool alarmOn)
 void pulse_evt_handler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
 {
     bsi_config.pulseNum++;
-    pulse_alarm_check(pulseAlarmOn);
+    pulse_alarm_check();
     bsi_config.pulseTime = ticksPulse;
     bsi_config.configChanged = true;
-    // What happens when we get a pulse?
-    //nrf_drv_gpiote_out_toggle(PIN_OUT);
 }
 
 void gpio_init(void)

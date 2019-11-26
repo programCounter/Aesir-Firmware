@@ -134,7 +134,7 @@ void uart_data_send(uint8_t * p_data, uint16_t dLen, uint16_t m_conn_handle)
     uint32_t       firstAddr;
     uint32_t       lastAddr;
     uint32_t       *pointAddr = p_data;
-    uint8_t        dateLen = 244;
+    uint16_t        dateLen = 243;
     uint16_t nLen = BLE_NUS_MAX_DATA_LEN;
     uint8_t chunk_array[244];
     //uint16_t someLen = BLE_NUS_MAX_DATA_LEN;

@@ -123,7 +123,7 @@
 //#define DEBUG_QSPI 
 /******************************************************************************************************************/
 
-#define DEVICE_NAME                     "AEsir"                       /**< Name of device. Will be included in the advertising data. */
+#define DEVICE_NAME                     "AEsir9"                       /**< Name of device. Will be included in the advertising data. */
 #define MANUFACTURER_NAME               "RioT Wireless"                   /**< Manufacturer. Will be passed to Device Information Service. */
 #define APP_ADV_INTERVAL                300                                     /**< The advertising interval (in units of 0.625 ms. This value corresponds to 187.5 ms). */
 
@@ -517,7 +517,7 @@ static void minute_timer_timeout_handler(void * p_context)
   {
     ticksS2++;
     #ifdef DEBUG
-    if(ticksS2 >= 15) //measure sensor at 15 seconds
+    if(ticksS2 >= 3) //measure sensor at 15 seconds
     #else
     if(ticksS2 >= bsi_config.sensor2_config.measInterval)
     #endif
@@ -535,7 +535,7 @@ static void minute_timer_timeout_handler(void * p_context)
   {
     ticksS3++;
     #ifdef DEBUG
-    if(ticksS3 >= 15) //measure sensor at 15 seconds
+    if(ticksS3 >= 3) //measure sensor at 15 seconds
     #else
     if(ticksS3 >= bsi_config.sensor2_config.measInterval)
     #endif
@@ -1231,8 +1231,11 @@ int main(void)
           //nrf_drv_qspi_chip_erase();
           //erase_qspi_sector(1);            
         }
+        
+        //read_qspi_header();
 
-        if(bsi_config.lastKnownAddr > 512)
+        //if(bsi_config.lastKnownAddr >= (bsi_config.uploadSize+(4096*bsi_config.qspi_currentSector)))
+        if(bsi_config.lastKnownAddr >= (75+(4096*bsi_config.qspi_currentSector)))
         {
           advertising_start(erase_bonds);
           //Start a CODED PHY Advertisement. We are going to need two types of advertising. Coded and un-coded.
@@ -1249,7 +1252,7 @@ int main(void)
             uint32_t sOf = sizeof(gPacket);
   //          uint32_t sOf = sizeof(uint32_t);
   //          uart_data_send(&sOf,sOf,m_conn_handle);
-            //uart_data_send(&gPacket,sOf,m_conn_handle);
+            uart_data_send(&gPacket,sOf,m_conn_handle);
             pushData = false;
            // erase_qspi_sector(bsi_config.qspi_currentSector);
             //bsi_config.lastKnownAddr =0;

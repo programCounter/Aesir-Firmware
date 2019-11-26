@@ -134,23 +134,23 @@ void uart_data_send(uint8_t * p_data, uint16_t dLen, uint16_t m_conn_handle)
     uint32_t       firstAddr;
     uint32_t       lastAddr;
     uint32_t       *pointAddr = p_data;
-
+    uint8_t        dateLen = 244;
     uint16_t nLen = BLE_NUS_MAX_DATA_LEN;
-    uint8_t chunk_array[nLen];
+    uint8_t chunk_array[244];
     //uint16_t someLen = BLE_NUS_MAX_DATA_LEN;
  
     if(dLen>243)
     {
-      for(int xx = 0; xx<dLen; xx = xx + nLen)
-      {
-        pointAddr = pointAddr + xx;
+//      for(int xx = 0; xx<dLen; xx = xx + nLen)
+//      {
+        //pointAddr = pointAddr + xx;
         //memcpy(chunk_array,(p_data + xx),BLE_NUS_MAX_DATA_LEN);
-        memcpy(chunk_array,pointAddr,(nLen));
+        memcpy(chunk_array,pointAddr,(dateLen));
         //err_code = ble_nus_data_send(&m_nus, chunk_array, &nLen, m_conn_handle);
         do
         {
             //uint16_t length = (uint16_t)index;
-            err_code = ble_nus_data_send(&m_nus, chunk_array, &nLen, m_conn_handle);
+            err_code = ble_nus_data_send(&m_nus, chunk_array, &dateLen, m_conn_handle);
             if ((err_code != NRF_ERROR_INVALID_STATE) &&
                 (err_code != NRF_ERROR_RESOURCES) &&
                 (err_code != NRF_ERROR_NOT_FOUND))
@@ -158,7 +158,7 @@ void uart_data_send(uint8_t * p_data, uint16_t dLen, uint16_t m_conn_handle)
                 APP_ERROR_CHECK(err_code);
             }
         } while (err_code == NRF_ERROR_RESOURCES);
-      }
+//      }
     }
     else
     {

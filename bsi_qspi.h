@@ -1,5 +1,6 @@
 #define SECTOR_SIZE 4096 //4kB
 #include "nrf_drv_qspi.h"
+#include <time.h>
 
 
 // *** DEPRECATED VARIABLES THAT MAYBE WE SHOULD COMMENT OUT ***
@@ -12,15 +13,17 @@ extern bool m_finished; // used in the QSPI event
 extern bool lwrite_qspi;
 extern bool lread_qspi;
 extern bool lerase_sector;
+//volatile time_t RawTime;
 
 // "In the C programming language, static is used with global variables and functions to set their scope to the containing file."
 //static volatile uint32_t LastKnownAddr; // Attempt to track the most recent written memory block
 
 typedef struct BSI_Header {
       char BSI_Name[16];
-      uint8_t StartTime[8]; //7 bytes (5+ 2byte year) YYYY/MM/DD/HH/MM/SS
+      uint8_t StartTime[7]; //6 bytes (5+ 2byte year) YYYY/MM/DD/HH/MM
 }BSI_Header;
 
+extern BSI_Header Header;
 
 typedef struct QSPI_Page_ 
 { // each QSPI_Page is 4 bytes (but a true page, for our flash chip, is 1 byte)
@@ -66,3 +69,4 @@ void read_qspi_page(uint32_t Address);
 void read_qspi_sector(uint8_t Sector);
 
 void qspi_prepare_packet(uint8_t Sector);
+void qspi_update_time();

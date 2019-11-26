@@ -78,7 +78,8 @@ static char const * fds_evt_str[] =
 //};
 
 BSI_Config bsi_config = {
-    .BSI_Name ={84,69,83,84}, //PLS ADD A STRING LIBRARY :)
+
+    .BSI_Name = {'N','O','N','A','M','E','\0'},
     .configChanged  = false,
 //  .sensor1_config = s1_config,
 //  .sensor2_config = s2_config,

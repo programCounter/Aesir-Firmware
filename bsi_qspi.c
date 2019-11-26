@@ -5,6 +5,7 @@
 #include "bsp_btn_ble.h"
 #include <string.h>
 #include "bsi_config.h"
+#include <time.h>
 
 #define QSPI_STD_CMD_WRSR   0x01
 #define QSPI_STD_CMD_RSTEN  0x66
@@ -41,13 +42,15 @@ bool lwrite_qspi = false;
 bool lread_qspi = false;
 bool lerase_sector = false;
 bool m_finished = false; // used in the QSPI event
+volatile time_t RawTime = 1574731926;
+struct tm *info;
 
 // Entire first sector is reserved for header (prevent erasing)
 // Temp header to be used to change header in sector zero...
 // ... populate Header then call "qspi_write_header()"
 BSI_Header Header = { 
-    .BSI_Name = {'N','O','N','A','M','E','\0'},
-    .StartTime = {20,19,11,24,18,51,33}, //   YY/YY/MM/DD/HH/MM/SS;
+    .BSI_Name = {},
+    .StartTime = {}, //   YY/YY/MM/DD/HH/MM
     };
 
 // Empty header to read TestHeader back out of memory
@@ -334,4 +337,19 @@ void qspi_prepare_packet(uint8_t Sector)
       }
       bsi_config.configChanged = true;
       erase_qspi_sector(bsi_config.qspi_currentSector); //erase this sector so we can reuse it
+      //qspi_update_time(); // Update the current START TIME in the header to current time
+}
+
+void qspi_update_time()
+{
+      RawTime = (bsi_config.UTC_Minutes*60);
+      info = gmtime(&RawTime);
+      printf("UTC Time : %2d:%02d\n", (info->tm_hour)%24, info->tm_min);
+      // updating the time for the first time
+           
+      //     mktime(&RawTime);
+      // bsi_config.UTC_Minutes change into a time struct?
+      // maybe that time struct can put some of its parts into Header.StartTime ?
+      // then we can update the header
+      // 
 }

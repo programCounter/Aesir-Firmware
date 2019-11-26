@@ -137,7 +137,7 @@ void configure_memory()
 // ...but one thing at a time...
 void write_qspi_header()
 {
-          ret_code_t err_code;
+          /*ret_code_t err_code;
 
           nrf_drv_qspi_erase(NRF_QSPI_ERASE_LEN_4KB, 0); //Erase 4kB from &0 (erase sector 0)
           WAIT_FOR_PERIPH();
@@ -152,7 +152,7 @@ void write_qspi_header()
           if(err_code == NRF_SUCCESS) { //If write was success...
             //bsp_board_led_on(3);// If header update was success... do something?
           }
-
+          */
           lwrite_qspi = false; 
 }
 
@@ -258,11 +258,11 @@ void read_qspi_header(){
 
     ret_code_t err_code;
     memset(&ReadHeader, 0, sizeof(ReadHeader)); //Clear the read header first
+    memcpy(ReadHeader.BSI_Name, bsi_config.BSI_Name, sizeof(bsi_config.BSI_Name)); //Clear the read header first
+    //err_code = nrf_drv_qspi_read(&ReadHeader, sizeof(ReadHeader), 0); //Header is always kept at &0
+    //APP_ERROR_CHECK(err_code);
+    //WAIT_FOR_PERIPH();
 
-    err_code = nrf_drv_qspi_read(&ReadHeader, sizeof(ReadHeader), 0); //Header is always kept at &0
-
-    APP_ERROR_CHECK(err_code);
-    WAIT_FOR_PERIPH();
     lread_qspi = false;
 }
 

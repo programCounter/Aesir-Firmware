@@ -19,6 +19,7 @@ typedef struct BSISensorConfig {
 
 typedef struct BSIConfig {
     char BSI_Name[16];
+    uint32_t UTC_Minutes;
     bool configChanged;
     BSI_Sensor_Config sensor1_config;
     BSI_Sensor_Config sensor2_config;

@@ -119,15 +119,15 @@
     } while (0)
 
 /************************DEBUG DEFINITIONS**************************************************************************/
-#define DEBUG
+#define DEBUG_GENERAL
 //#define DEBUG_QSPI 
 /******************************************************************************************************************/
 
-#define DEVICE_NAME                     "AEsir2"                       /**< Name of device. Will be included in the advertising data. */
-#define MANUFACTURER_NAME               "RioT Wireless"                   /**< Manufacturer. Will be passed to Device Information Service. */
+#define DEVICE_NAME                     "Aesir69"                              /**< Name of device. Will be included in the advertising data. */
+#define MANUFACTURER_NAME               "RioT Wireless"                         /**< Manufacturer. Will be passed to Device Information Service. */
 #define APP_ADV_INTERVAL                300                                     /**< The advertising interval (in units of 0.625 ms. This value corresponds to 187.5 ms). */
 
-#define APP_ADV_DURATION                0                                   /**< The advertising duration (180 seconds) in units of 10 milliseconds. */
+#define APP_ADV_DURATION                0                                       /**< The advertising duration (180 seconds) in units of 10 milliseconds. */
 //#define APP_ADV_DURATION                180                                   /**< The advertising duration (180 seconds) in units of 10 milliseconds. */
 #define APP_BLE_OBSERVER_PRIO           3                                       /**< Application's BLE observer priority. You shouldn't need to modify this value. */
 #define APP_BLE_CONN_CFG_TAG            1                                       /**< A tag identifying the SoftDevice BLE configuration. */
@@ -173,12 +173,12 @@ static bool pushData;
 static bool bleConnected;
 static bool factoryReset;
 
-#ifdef DEBUG
+#ifdef DEBUG_GENERAL
 //uint32_t qspiAddress = 0; //ONLY FOR DEBUG
 bool StressTest_FAILED = false;
 #endif
 
-#ifdef DEBUG // Button-press-factory-reset
+#ifdef DEBUG_GENERAL // Button-press-factory-reset
 static bool factoryReset = true;
 #else
 static bool factoryReset = false;
@@ -1031,9 +1031,9 @@ void sensor_value_characteristic_update(ble_cus_t * p_cus, int16_t data)
     gatts_value.p_value = &data;
 
         // Update database.
-    sd_ble_gatts_value_set(BLE_CONN_HANDLE_INVALID,
-                                          p_cus->custom_value_handles.value_handle,
-                                          &gatts_value);
+    //sd_ble_gatts_value_set(BLE_CONN_HANDLE_INVALID,
+    //                                      p_cus->custom_value_handles.value_handle,
+    //                                      &gatts_value);
 }
 
 /**@brief Function for application main entry.*/
@@ -1052,11 +1052,10 @@ int main(void)
     buttons_leds_init(&erase_bonds);
     power_management_init();
     ble_stack_init();
-    gap_params_init();
-    gatt_init();
     retCode = init_fds();
     APP_ERROR_CHECK(retCode);
-
+    gap_params_init();
+    gatt_init();
     services_init(); //Initialises the basic services and calls ble_cus_init which inits the custom service and charateristics for configuring the BSI
     nServices_init(); //Initialises the NUS(for UART) and the qued write module
 
@@ -1073,18 +1072,7 @@ int main(void)
     configure_memory();
     m_finished = false;
 
-    //LB: Moving towards code that can be reset with a button
-    if(factoryReset) 
-    {
-      erase_qspi_sector(1);
-      bsi_config.configChanged = true; //set flash bsi_config to defaults
-      factoryReset = false;
-    }
-    else
-    {
-      //If we have a configuration already we should load it into the characteristics.
-      retCode = read_fds(fds_BSI_File,fds_BSI_Key, &bsi_config);
-    } //
+
     
 
 //    nrf_drv_qspi_erase(NRF_QSPI_ERASE_LEN_64KB, 0);
@@ -1100,7 +1088,22 @@ int main(void)
     //NRF_LOG_INFO("Template example started.");
     application_timers_start();
     uart_init();
-    
+
+    //LB: Moving towards code that can be reset with a button
+    if(factoryReset) 
+    {
+      erase_qspi_sector(1);
+      write_qspi_header();
+      //qspi_update_time();
+      bsi_config.configChanged = true; //set flash bsi_config to defaults
+      factoryReset = false;
+    }
+    else
+    {
+      //If we have a configuration already we should load it into the characteristics.
+      retCode = read_fds(fds_BSI_File,fds_BSI_Key, &bsi_config);
+    } //
+
     advertising_start(erase_bonds);
     
     //somejunkvar = true;
@@ -1128,7 +1131,6 @@ int main(void)
         #endif
         {
           #ifdef DEBUG
-            sensor_value_characteristic_update(&m_cus,measureSensor(0)); //debug
             measureSensor(0);
             lwrite_qspi = true;
           #else
@@ -1146,7 +1148,6 @@ int main(void)
         #endif
         {
           #ifdef DEBUG
-            sensor_value_characteristic_update(&m_cus,measureSensor(1)); //debug
             measureSensor(1);
             lwrite_qspi = true;
           #else

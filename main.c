@@ -1095,7 +1095,8 @@ int main(void)
     if(factoryReset) 
     {
       erase_qspi_sector(1);
-      write_qspi_header();
+      //write_qspi_header();
+      //read_qspi_header();
       //qspi_update_time();
       bsi_config.configChanged = true; //set flash bsi_config to defaults
       factoryReset = false;

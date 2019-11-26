@@ -127,6 +127,8 @@
 #define DEVICE_NAME                     "Aesir69"                              /**< Name of device. Will be included in the advertising data. */
 #define MANUFACTURER_NAME               "RioT Wireless"                         /**< Manufacturer. Will be passed to Device Information Service. */
 =======
+#define DEVICE_NAME                     "AEsir9"                       /**< Name of device. Will be included in the advertising data. */
+#define MANUFACTURER_NAME               "RioT Wireless"                   /**< Manufacturer. Will be passed to Device Information Service. */
 >>>>>>> 471e1dc873533a47cf0aae5d9498f886d6fc773c
 #define APP_ADV_INTERVAL                300                                     /**< The advertising interval (in units of 0.625 ms. This value corresponds to 187.5 ms). */
 
@@ -482,16 +484,17 @@ static void minute_timer_timeout_handler(void * p_context)
   //pushData = true;
   
   ticksTUpload++;//Increment our minutes since last upload.
-  #ifdef DEBUG
-  if(ticksTUpload >= 60) //every minute
-  #else
-  if(ticksTUpload >= bsi_config.uploadInterval)
-  #endif
-  {
-    // It is now time to initiate our upload
-    UploadNow = true;
-    ticksTUpload=0;
-  }
+  //  #ifdef DEBUG
+  //  if(ticksTUpload >= 60) //every minute
+  //  #else
+  //  if(ticksTUpload >= bsi_config.uploadInterval)
+  //  #endif
+  //  {
+  //    // It is now time to initiate our upload
+  //    UploadNow = true;
+  //    ticksTUpload=0;
+
+  //  }
 
   #ifdef DEBUG
   if(true)
@@ -512,14 +515,14 @@ static void minute_timer_timeout_handler(void * p_context)
 
 
   #ifdef DEBUG
-  if(false) //for debugging only, will ensure sensor 1 data is received
+  if(true) //for debugging only, will ensure sensor 1 data is received
   #else
   if(bsi_config.sensor2_config.sensorEnabled == true) // IF the sensors not enabled dont even increment the count
   #endif
   {
     ticksS2++;
     #ifdef DEBUG
-    if(ticksS2 >= 15) //measure sensor at 15 seconds
+    if(ticksS2 >= 3) //measure sensor at 15 seconds
     #else
     if(ticksS2 >= bsi_config.sensor2_config.measInterval)
     #endif
@@ -530,14 +533,14 @@ static void minute_timer_timeout_handler(void * p_context)
   }
 
   #ifdef DEBUG
-  if(false) //for debugging only, will ensure sensor 1 data is received
+  if(true) //for debugging only, will ensure sensor 1 data is received
   #else
   if(bsi_config.sensor3_config.sensorEnabled == true) // IF the sensors not enabled dont even increment the count
   #endif
   {
     ticksS3++;
     #ifdef DEBUG
-    if(ticksS3 >= 15) //measure sensor at 15 seconds
+    if(ticksS3 >= 3) //measure sensor at 15 seconds
     #else
     if(ticksS3 >= bsi_config.sensor2_config.measInterval)
     #endif
@@ -1234,16 +1237,21 @@ int main(void)
           //nrf_drv_qspi_chip_erase();
           //erase_qspi_sector(1);            
         }
+        
+        //read_qspi_header();
 
-        if(pushData == true)
+        //if(bsi_config.lastKnownAddr >= (bsi_config.uploadSize+(4096*bsi_config.qspi_currentSector)))
+        if(bsi_config.lastKnownAddr >= (75+(4096*bsi_config.qspi_currentSector)))
         {
-
+          advertising_start(erase_bonds);
           //Start a CODED PHY Advertisement. We are going to need two types of advertising. Coded and un-coded.
           if(bleConnected = true) //If we dont have a connection, dont send data.
           {
 
+
             advertising_start(erase_bonds);
             qspi_prepare_packet(bsi_config.qspi_currentSector);
+
 
             //gPacket.Header
             //gPacket.Sector
@@ -1252,7 +1260,9 @@ int main(void)
   //          uart_data_send(&sOf,sOf,m_conn_handle);
             uart_data_send(&gPacket,sOf,m_conn_handle);
             pushData = false;
-            
+           // erase_qspi_sector(bsi_config.qspi_currentSector);
+            //bsi_config.lastKnownAddr =0;
+
             //Data is all done, break the connection...
 
 

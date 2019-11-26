@@ -78,12 +78,14 @@ static char const * fds_evt_str[] =
 //};
 
 BSI_Config bsi_config = {
+<<<<<<< HEAD
     .BSI_Name = {'N','O','N','A','M','E','\0'},
+=======
+>>>>>>> 471e1dc873533a47cf0aae5d9498f886d6fc773c
     .configChanged  = false,
 //  .sensor1_config = s1_config,
 //  .sensor2_config = s2_config,
 //  .sensor3_config = s3_config,
-    .uploadSize     = 1024,
     .uploadInterval = 1,
     .lastKnownAddr  = 4096,  //LB: Start writing data at the start of sector 1
     .qspi_currentSector = 1, //LB: Same as above :)

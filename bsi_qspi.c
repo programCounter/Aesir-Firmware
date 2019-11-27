@@ -127,12 +127,7 @@ void configure_memory()
     //currentSector = (bsi_config.qspi_currentSector); // Which sector are we in after waking up?
 }
 
-
-// All Code seen below is for reading and writing from QSPI,
-// flag was? set in button event, method called in main
-
-
-
+#ifdef DEBUG_QSPI //The header is no longer in the QSPI
 // ***********************************************************************************
 // used to ERASE the old header and UPDATE with new header!
 // I need to add another function for just updating start time (or just do it manually?)...
@@ -157,6 +152,7 @@ void write_qspi_header()
           */
           lwrite_qspi = false; 
 }
+#endif
 
 
 // ***********************************************************************************
@@ -222,6 +218,7 @@ void erase_qspi_sector(uint8_t Sector)
       lerase_sector = false;      
 }
 
+#ifdef DEBUG_QSPI
 // ***********************************************************************************
 // becoming "legacy" or deprecated
 // Used to write anything sizeof(m_buffer_tx) to a specific address
@@ -236,8 +233,9 @@ void write_qspi(uint32_t Address)
       memset(&m_buffer_tx, 0, sizeof(m_buffer_tx)); //clean out tx buffer AFTER tx'ing 
       lwrite_qspi = false; 
 }
+#endif
 
-
+#ifdef DEBUG_QSPI
 // ***********************************************************************************
 // becoming "legacy" or deprecated
 // Used to read anything sizeof(m_buffer_rx) from a specific address
@@ -252,10 +250,11 @@ void read_qspi(uint32_t Address)
     WAIT_FOR_PERIPH();
     lread_qspi = false;
 }
+#endif
 
 
 // ***********************************************************************************
-// used ONLY to read the header (sector 0) from the QSPI
+// used ONLY to read the header from the FDS (used to be on QSPI, now it is not)
 void read_qspi_header(){
     //uint8_t testTimeArray[] = {20,19,11,26,16,22};
     //ret_code_t err_code;
@@ -277,7 +276,7 @@ void read_qspi_header(){
     lread_qspi = false;
 }
 
-
+#ifdef DEBUG_QSPI
 // ***********************************************************************************
 // used to read out a page (see page struct) from any specified address
 // be cautious, passing an address that is not the start of a page will result in overlap
@@ -302,14 +301,15 @@ void read_qspi_page(uint32_t Address){
     }
 
     lread_qspi = false;
-}
+} 
+#endif
 
 
 // ***********************************************************************************
 // Used to read an entire sector (4kB) of the QSPI using addresses in the sector table.
 // This will populate the struct ReadSector (which is less than 4kB) with all Pages...
 // ...read in the specified sector
-// You can select sector 1-15 (but should not 0, which is where header is stored)
+// You can select sector 0-15 
 // *** This fxn should be used for populating the advertisement ***
 void read_qspi_sector(uint8_t Sector){
     
@@ -326,7 +326,7 @@ void read_qspi_sector(uint8_t Sector){
 
 // ***********************************************************************************
 // This will automatically populate the extern gPacket (general packet) with the current
-//    header and the specified sector of data from QSPI. Good luck?
+// header (from FDS) and the specified sector of data from QSPI. Good luck?
 void qspi_prepare_packet(uint8_t Sector)
 {
       uint16_t data_length_calc = 0;
@@ -352,21 +352,28 @@ void qspi_prepare_packet(uint8_t Sector)
       //gPacket.datalength = sizeof(gPacket);
 
       // Because we sent data (hopefully), we should start writing at the next sector
-      if(bsi_config.qspi_currentSector == 15)
+      // Determine if we should move to the next sector or roll back to start and erase
+      if(bsi_config.qspi_currentSector == 15) //Sector 15 is last in block 1
       {
-         bsi_config.qspi_currentSector = 0; //needs to erase sectors :(
-         bsi_config.lastKnownAddr = 0;   // = SectorB1[bsi_config.qspi_currentSector];
+         bsi_config.qspi_currentSector = 0; // Set sector back to 0
+         bsi_config.lastKnownAddr = 0;  // set next write address to start of sector 0
       }
       else
       {
-         bsi_config.qspi_currentSector+=1;
-         bsi_config.lastKnownAddr = SectorB1[bsi_config.qspi_currentSector];
+         bsi_config.qspi_currentSector+=1; //increment to next sector 
+         bsi_config.lastKnownAddr = SectorB1[bsi_config.qspi_currentSector]; //set next write address to start of next sector
       }
-      bsi_config.configChanged = true;
+      bsi_config.configChanged = true; //update the fds
       erase_qspi_sector(bsi_config.qspi_currentSector); //erase this sector so we can reuse it
       
 }
 
+
+/************************************************************************************ 
+** Update the stored "StartTime" in bsi_conifg FDS (which is in minutes)
+** Called when generating a packet (meaning new start time for next packet)
+** Or called when connecting to Android App and characteristics are updated 
+*/
 void qspi_update_time()
 {
       RawTime = (bsi_config.UTC_Minutes + ticksTUpload); //*60);//+MinCount?
@@ -376,11 +383,4 @@ void qspi_update_time()
       #ifdef DEMO_WRITE
       printf("GMT Time : %2d:%02d\n", (info->tm_hour)%24, info->tm_min);
       #endif
-      // updating the time for the first time
-           
-      //     mktime(&RawTime);
-      // bsi_config.UTC_Minutes change into a time struct?
-      // maybe that time struct can put some of its parts into Header.StartTime ?
-      // then we can update the header
-      // 
 }

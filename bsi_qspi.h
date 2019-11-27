@@ -7,7 +7,7 @@
 static volatile uint8_t m_buffer_tx[16];
 static volatile uint8_t m_buffer_rx[16];
 extern uint16_t pressCount;
-//static uint8_t currentSector;
+//static uint8_t currentSector; //now this is in the FDS
 // *************************************************************
 extern bool m_finished; // used in the QSPI event
 extern bool lwrite_qspi;
@@ -20,7 +20,7 @@ extern bool lerase_sector;
 
 typedef struct BSI_Header {
       char BSI_Name[16];
-      uint8_t StartTime[6]; //6 bytes (5+ 2byte year) YYYY/MM/DD/HH/MM
+      uint8_t StartTime[6]; //6 bytes (4 + 2byte year) YYYY/MM/DD/HH/MM
 }BSI_Header;
 
 extern BSI_Header Header;

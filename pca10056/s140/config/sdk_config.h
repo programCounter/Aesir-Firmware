@@ -49,7 +49,7 @@
 
 /************************DEMO DEFINITIONS**************************************************************************/
 #define DEMO_WRITE
-//#define DEBUG_GENERAL
+#define DEBUG_GENERAL //if defined: on restart default values (not FDS) will be loaded
 //#define DEBUG_QSPI 
 #define DEMO_SENSORS
 #define analogInterval 3

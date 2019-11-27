@@ -139,8 +139,8 @@ void uart_data_send(uint8_t * p_data, uint16_t dLen, uint16_t m_conn_handle)
  
     if(dLen>243)
     {
-      //for(int xx = 0; xx<dLen; xx = xx + dateLen)
-      //{
+//      for(int xx = 0; xx<dLen; xx = xx + dateLen)
+//      {
         //memcpy(chunk_array,(p_data + xx),dateLen);
         memcpy(chunk_array,p_data,dateLen);
         //err_code = ble_nus_data_send(&m_nus, chunk_array, &nLen, m_conn_handle);

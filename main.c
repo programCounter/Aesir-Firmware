@@ -166,7 +166,6 @@ static uint16_t m_conn_handle = BLE_CONN_HANDLE_INVALID;                        
 
 static uint32_t ticksS2;
 static uint32_t ticksS3;
-static uint32_t ticksTUpload; // nUmber of ticks to be compared against upload interval
 static bool S2MeasureNow;
 static bool S3MeasureNow;
 static bool UploadNow;
@@ -500,9 +499,10 @@ static void minute_timer_timeout_handler(void * p_context)
   #endif
   {
     ticksPulse++;
-    if(!(ticksPulse % pulseInterval)) //if the current time is not a multiple of the interval
+    if(ticksPulse >= pulseInterval) //pulse interval is defines in sdk config
     {
       pulseWriteNow = true;
+      ticksPulse = 0;
     }
     if(pulseAlarmOn)
     {
@@ -519,7 +519,7 @@ static void minute_timer_timeout_handler(void * p_context)
   {
     ticksS2++;
     #ifdef DEBUG
-    if(ticksS2 >= 3) //measure sensor at 15 seconds
+    if(ticksS2 >= analogInterval) //analogInterval defined in sdk config
     #else
     if(ticksS2 >= bsi_config.sensor2_config.measInterval)
     #endif
@@ -537,7 +537,7 @@ static void minute_timer_timeout_handler(void * p_context)
   {
     ticksS3++;
     #ifdef DEBUG
-    if(ticksS3 >= 3) //measure sensor at 15 seconds
+    if(ticksS3 >= analogInterval) //analogInterval defined in sdk config
     #else
     if(ticksS3 >= bsi_config.sensor2_config.measInterval)
     #endif

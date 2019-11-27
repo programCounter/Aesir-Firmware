@@ -45,6 +45,7 @@ bool lerase_sector = false;
 bool m_finished = false; // used in the QSPI event
 volatile time_t RawTime = 1574731926;
 struct tm *info;
+uint32_t ticksTUpload;
 
 // Entire first sector is reserved for header (prevent erasing)
 // Temp header to be used to change header in sector zero...
@@ -328,12 +329,27 @@ void read_qspi_sector(uint8_t Sector){
 //    header and the specified sector of data from QSPI. Good luck?
 void qspi_prepare_packet(uint8_t Sector)
 {
+      uint16_t data_length_calc = 0;
+      #ifdef DEMO_SENSORS
+      data_length_calc += (ticksTUpload/pulseInterval);
+      data_length_calc += (ticksTUpload/analogInterval);
+      data_length_calc += (ticksTUpload/analogInterval);
+      #else
+      if(bsi_config.sensor1_config.sensorEnabled == true)
+      {data_length_calc += (ticksTUpload/pulseInterval);}
+      if(bsi_config.sensor2_config.sensorEnabled == true)
+      {data_length_calc += (ticksTUpload/bsi_config.sensor2_config.measInterval);}
+      if(bsi_config.sensor3_config.sensorEnabled == true)
+      {data_length_calc += (ticksTUpload/bsi_config.sensor3_config.measInterval);}
+      #endif
+      gPacket.datalength = data_length_calc * 4;
+      
       qspi_update_time(); // Update the current START TIME in the header to current time
       read_qspi_header();
       gPacket.Header = ReadHeader;
       read_qspi_sector(Sector);
       gPacket.Sector = ReadSector;
-      gPacket.datalength = sizeof(gPacket);
+      //gPacket.datalength = sizeof(gPacket);
 
       // Because we sent data (hopefully), we should start writing at the next sector
       if(bsi_config.qspi_currentSector == 15)
@@ -353,9 +369,9 @@ void qspi_prepare_packet(uint8_t Sector)
 
 void qspi_update_time()
 {
-      RawTime = (bsi_config.UTC_Minutes + ticksPulse); //*60);//+MinCount?
+      RawTime = (bsi_config.UTC_Minutes + ticksTUpload); //*60);//+MinCount?
       bsi_config.UTC_Minutes = RawTime;
-      ticksPulse = 0;
+      ticksTUpload = 0;
       info = gmtime(&RawTime);
       #ifdef DEMO_WRITE
       printf("GMT Time : %2d:%02d\n", (info->tm_hour)%24, info->tm_min);

@@ -51,6 +51,9 @@
 #define DEMO_WRITE
 //#define DEBUG_GENERAL
 //#define DEBUG_QSPI 
+#define DEMO_SENSORS
+#define analogInterval 3
+#define pulseInterval 60
 
 /******************************************************************************************************************/
 

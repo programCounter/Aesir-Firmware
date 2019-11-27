@@ -26,8 +26,6 @@
 #define ANLG_SENSOR2_PWR NRF_GPIO_PIN_MAP(0,11) 
 #define PULSE_SENSOR_INP NRF_GPIO_PIN_MAP(1,02) 
 
-#define pulseInterval 60 //needs to be set up in config, need to talk to will about changing characteristics
-
 #ifdef DEBUG
 #define ALARM_RATE_ON 30
 #define ALARM_RATE_OFF 10

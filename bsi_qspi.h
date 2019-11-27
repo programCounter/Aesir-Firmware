@@ -49,7 +49,7 @@ typedef struct Advertisement_General_Packet {
 }Ad_gPacket;
 
 extern Ad_gPacket gPacket; //General packet used for sending header + a sector of data 
-
+extern uint32_t ticksTUpload; // nUmber of ticks to be compared against upload interval
 
 //************************************************************
 //        F U N C T I O N      P R O T O T Y P E S 

@@ -87,8 +87,8 @@ BSI_Config bsi_config = {
 //  .sensor3_config = s3_config,
     .uploadSize     = 512,
     .uploadInterval = 1,
-    .lastKnownAddr  = 4096,  //LB: Start writing data at the start of sector 1
-    .qspi_currentSector = 1, //LB: Same as above :)
+    .lastKnownAddr  = 0,  //LB: Start writing data at the start of sector 0
+    .qspi_currentSector = 0, //LB: Same as above :)
 };
 
 //Create FDS record for Sensor1

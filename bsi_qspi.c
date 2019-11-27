@@ -185,8 +185,8 @@ void write_qspi_page()
           {
             if(bsi_config.qspi_currentSector == 15)
             {
-               bsi_config.qspi_currentSector = 1; //needs to erase sectors :(
-               bsi_config.lastKnownAddr = 4096;   // = SectorB1[bsi_config.qspi_currentSector];
+               bsi_config.qspi_currentSector = 0; //needs to erase sectors :(
+               bsi_config.lastKnownAddr = 0;   // = SectorB1[bsi_config.qspi_currentSector];
             }
             else
             {
@@ -338,8 +338,8 @@ void qspi_prepare_packet(uint8_t Sector)
       // Because we sent data (hopefully), we should start writing at the next sector
       if(bsi_config.qspi_currentSector == 15)
       {
-         bsi_config.qspi_currentSector = 1; //needs to erase sectors :(
-         bsi_config.lastKnownAddr = 4096;   // = SectorB1[bsi_config.qspi_currentSector];
+         bsi_config.qspi_currentSector = 0; //needs to erase sectors :(
+         bsi_config.lastKnownAddr = 0;   // = SectorB1[bsi_config.qspi_currentSector];
       }
       else
       {

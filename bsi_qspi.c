@@ -262,7 +262,12 @@ void read_qspi_header(){
     //err_code = nrf_drv_qspi_read(&ReadHeader, sizeof(ReadHeader), 0); //Header is always kept at &0
     //APP_ERROR_CHECK(err_code);
     //WAIT_FOR_PERIPH();
-
+    ReadHeader.StartTime[0] = 20; // Can't wait to see the Y21K people freak about this
+    ReadHeader.StartTime[1] = (info->tm_year)%100; //6 bytes (5+ 2byte year) YY/YY/MM/DD/HH/MM
+    ReadHeader.StartTime[2] = (info->tm_mon)+1;
+    ReadHeader.StartTime[3] = (info->tm_mday); //mday is day of the month (ie Dec 31st)
+    ReadHeader.StartTime[4] = (info->tm_hour); //24 hour format
+    ReadHeader.StartTime[5] = (info->tm_min);
     lread_qspi = false;
 }
 
@@ -318,6 +323,7 @@ void read_qspi_sector(uint8_t Sector){
 //    header and the specified sector of data from QSPI. Good luck?
 void qspi_prepare_packet(uint8_t Sector)
 {
+      qspi_update_time(); // Update the current START TIME in the header to current time
       read_qspi_header();
       gPacket.Header = ReadHeader;
       read_qspi_sector(Sector);
@@ -337,14 +343,17 @@ void qspi_prepare_packet(uint8_t Sector)
       }
       bsi_config.configChanged = true;
       erase_qspi_sector(bsi_config.qspi_currentSector); //erase this sector so we can reuse it
-      //qspi_update_time(); // Update the current START TIME in the header to current time
+      
 }
 
 void qspi_update_time()
 {
-      RawTime = (bsi_config.UTC_Minutes*60);
+      RawTime = (bsi_config.UTC_Minutes+bsi_config.pulseTime); //*60);//+MinCount?
+      bsi_config.UTC_Minutes = RawTime;
+      bsi_config.pulseTime = 0;
       info = gmtime(&RawTime);
       printf("UTC Time : %2d:%02d\n", (info->tm_hour)%24, info->tm_min);
+
       // updating the time for the first time
            
       //     mktime(&RawTime);

@@ -6,6 +6,7 @@
 #include <string.h>
 #include "bsi_config.h"
 #include <time.h>
+#include "bsi_measure.h"
 
 #define QSPI_STD_CMD_WRSR   0x01
 #define QSPI_STD_CMD_RSTEN  0x66
@@ -255,11 +256,11 @@ void read_qspi(uint32_t Address)
 // ***********************************************************************************
 // used ONLY to read the header (sector 0) from the QSPI
 void read_qspi_header(){
-    uint8_t testTimeArray[] = {20,19,11,26,16,22};
+    //uint8_t testTimeArray[] = {20,19,11,26,16,22};
     //ret_code_t err_code;
     memset(&ReadHeader, 0, sizeof(ReadHeader)); //Clear the read header first
     //strcpy(ReadHeader.BSI_Name, "BSITEST");
-    memcpy(ReadHeader.StartTime, testTimeArray, 6);
+    //memcpy(ReadHeader.StartTime, testTimeArray, 6);
     memcpy(ReadHeader.BSI_Name, bsi_config.BSI_Name, strlen(bsi_config.BSI_Name));
     //memcpy(ReadHeader.StartTime, bsi_config., sizeof(bsi_config.BSI_Name));
 
@@ -352,9 +353,9 @@ void qspi_prepare_packet(uint8_t Sector)
 
 void qspi_update_time()
 {
-      RawTime = (bsi_config.UTC_Minutes+bsi_config.pulseTime); //*60);//+MinCount?
+      RawTime = (bsi_config.UTC_Minutes + ticksPulse); //*60);//+MinCount?
       bsi_config.UTC_Minutes = RawTime;
-      bsi_config.pulseTime = 0;
+      ticksPulse = 0;
       info = gmtime(&RawTime);
       printf("UTC Time : %2d:%02d\n", (info->tm_hour)%24, info->tm_min);
 

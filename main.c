@@ -480,7 +480,6 @@ static void minute_timer_timeout_handler(void * p_context)
   //pushData = true;
   
   ticksTUpload++;//Increment our minutes since last upload.
-  bsi_config.pulseTime++;
   //bsi_config.configChanged = true;
   //  #ifdef DEBUG
   //  if(ticksTUpload >= 60) //every minute

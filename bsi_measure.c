@@ -182,7 +182,7 @@ nrf_saadc_value_t measureSensor(uint8_t channel)
   //CurrentPage.sensorCh = channel;
   //CurrentPage.sensorValue = p_ADC_Result;
   //CurrentPage.sensorValue = CurrentPage.sensorValue | channel;
+  CurrentPage.countMin = ticksPulse;
   CurrentPage.sensorValue = (p_ADC_Result << 4) | channel;
-  
   return p_ADC_Result;
 }

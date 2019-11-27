@@ -145,11 +145,10 @@ void uart_data_send(uint8_t * p_data, uint16_t dLen, uint16_t m_conn_handle)
 //      {
         //pointAddr = pointAddr + xx;
         //memcpy(chunk_array,(p_data + xx),BLE_NUS_MAX_DATA_LEN);
-        memcpy(chunk_array,pointAddr,(dateLen));
+        memcpy(chunk_array,pointAddr,dateLen);
         //err_code = ble_nus_data_send(&m_nus, chunk_array, &nLen, m_conn_handle);
         do
         {
-            //uint16_t length = (uint16_t)index;
             err_code = ble_nus_data_send(&m_nus, chunk_array, &dateLen, m_conn_handle);
             if ((err_code != NRF_ERROR_INVALID_STATE) &&
                 (err_code != NRF_ERROR_RESOURCES) &&

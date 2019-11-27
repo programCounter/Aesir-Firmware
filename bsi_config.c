@@ -80,7 +80,7 @@ static char const * fds_evt_str[] =
 BSI_Config bsi_config = {
 
     .BSI_Name = {'N','O','N','A','M','E','\0'},
-    .UTC_Minutes = 1574832651,
+    .UTC_Minutes = 1574833551,
     .configChanged  = false,
 //  .sensor1_config = s1_config,
 //  .sensor2_config = s2_config,

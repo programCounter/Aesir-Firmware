@@ -357,7 +357,7 @@ void qspi_update_time()
       bsi_config.UTC_Minutes = RawTime;
       ticksPulse = 0;
       info = gmtime(&RawTime);
-      printf("UTC Time : %2d:%02d\n", (info->tm_hour)%24, info->tm_min);
+      printf("GMT Time : %2d:%02d\n", (info->tm_hour)%24, info->tm_min);
 
       // updating the time for the first time
            

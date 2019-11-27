@@ -133,19 +133,16 @@ void uart_data_send(uint8_t * p_data, uint16_t dLen, uint16_t m_conn_handle)
     uint32_t       err_code;
     uint32_t       firstAddr;
     uint32_t       lastAddr;
-    uint32_t       *pointAddr = p_data;
-    uint16_t        dateLen = 243;
-    uint16_t nLen = BLE_NUS_MAX_DATA_LEN;
-    uint8_t chunk_array[244];
+    uint16_t       dateLen = BLE_NUS_MAX_DATA_LEN;
+    uint8_t chunk_array[BLE_NUS_MAX_DATA_LEN];
     //uint16_t someLen = BLE_NUS_MAX_DATA_LEN;
  
     if(dLen>243)
     {
-//      for(int xx = 0; xx<dLen; xx = xx + nLen)
-//      {
-        //pointAddr = pointAddr + xx;
-        //memcpy(chunk_array,(p_data + xx),BLE_NUS_MAX_DATA_LEN);
-        memcpy(chunk_array,pointAddr,dateLen);
+      //for(int xx = 0; xx<dLen; xx = xx + dateLen)
+      //{
+        //memcpy(chunk_array,(p_data + xx),dateLen);
+        memcpy(chunk_array,p_data,dateLen);
         //err_code = ble_nus_data_send(&m_nus, chunk_array, &nLen, m_conn_handle);
         do
         {

@@ -255,10 +255,14 @@ void read_qspi(uint32_t Address)
 // ***********************************************************************************
 // used ONLY to read the header (sector 0) from the QSPI
 void read_qspi_header(){
-
-    ret_code_t err_code;
+    uint8_t testTimeArray[] = {20,19,11,26,16,22};
+    //ret_code_t err_code;
     memset(&ReadHeader, 0, sizeof(ReadHeader)); //Clear the read header first
-    memcpy(ReadHeader.BSI_Name, bsi_config.BSI_Name, sizeof(bsi_config.BSI_Name)); //Clear the read header first
+    //strcpy(ReadHeader.BSI_Name, "BSITEST");
+    memcpy(ReadHeader.StartTime, testTimeArray, 6);
+    memcpy(ReadHeader.BSI_Name, bsi_config.BSI_Name, strlen(bsi_config.BSI_Name));
+    //memcpy(ReadHeader.StartTime, bsi_config., sizeof(bsi_config.BSI_Name));
+
     //err_code = nrf_drv_qspi_read(&ReadHeader, sizeof(ReadHeader), 0); //Header is always kept at &0
     //APP_ERROR_CHECK(err_code);
     //WAIT_FOR_PERIPH();

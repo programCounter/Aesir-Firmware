@@ -376,8 +376,8 @@ void qspi_prepare_packet(uint8_t Sector)
 */
 void qspi_update_time()
 {
-      RawTime = (bsi_config.UTC_Minutes + ticksTUpload); //*60);//+MinCount?
-      bsi_config.UTC_Minutes = RawTime;
+      RawTime = (bsi_config.UTC_Minutes + ticksTUpload); //*60);// Raw time has to be in seconds
+      bsi_config.UTC_Minutes = RawTime; // /60) //When we are done fiddling with this we gotta put it back in minutes
       ticksTUpload = 0;
       info = gmtime(&RawTime);
       #ifdef DEMO_WRITE

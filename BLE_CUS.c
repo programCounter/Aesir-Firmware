@@ -13,6 +13,7 @@ This code is based on the following nordic tutorial
 #include "boards.h"
 #include "nrf_log.h"
 #include "bsi_config.h"
+#include "bsi_qspi.h"
 
 /**@brief Function for initializing the Custom Service.
  *
@@ -73,7 +74,7 @@ uint32_t ble_cus_init(ble_cus_t * p_cus, const ble_cus_init_t * p_cus_init)
     //custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_UPLD_INTV,"Upload Interval");
     custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_PON_DLY_S2,"Power On Delay S2",&bsi_config.sensor2_config.pwrOnDelay);
     custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_PON_DLY_S3,"Power On Delay S3",&bsi_config.sensor3_config.pwrOnDelay);
-    //custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_SENS_DATA,"Sensor 1 Data");
+    custom_value_char_add(p_cus, p_cus_init,CUSTOM_CHAR_UUID_UTC_TIME,"UTC Time in Minutes",&bsi_config.UTC_Minutes);
     return 0;
 }
 
@@ -92,7 +93,8 @@ static uint32_t custom_value_char_add(ble_cus_t * p_cus, const ble_cus_init_t * 
     ble_gatts_attr_t    attr_char_value;
     ble_uuid_t          ble_uuid;
     ble_gatts_attr_md_t attr_md;
-    char p_Val[16] = {0};//The longest value we have is BSI Name at 16 chars
+    char p_Val[64] = {0};//The longest value we have is BSI Name at 16 chars
+
     memset(&char_md, 0, sizeof(char_md));
 
     char_md.char_props.read         = 1;
@@ -141,12 +143,21 @@ static uint32_t custom_value_char_add(ble_cus_t * p_cus, const ble_cus_init_t * 
      attr_char_value.init_len  = 16;
      attr_char_value.max_len   = 16;
     }
+    else if (ble_uuid.uuid == CUSTOM_CHAR_UUID_UTC_TIME)
+    {
+     memcpy(&p_Val,p_defVal,32);
+     attr_char_value.init_len  = 32;
+     attr_char_value.max_len   = 32;
+    }
     else 
     { 
       memcpy(&p_Val,p_defVal,2);
       attr_char_value.init_len  = sizeof(uint16_t);
       attr_char_value.max_len   = sizeof(uint16_t);
     }
+
+
+
 
     attr_char_value.p_value   = &p_Val;
     
@@ -192,8 +203,13 @@ void on_write(ble_cus_t * p_cus, ble_evt_t const * p_ble_evt)
     switch(p_evt_write->uuid.uuid)
      {
      case CUSTOM_CHAR_UUID_BSI_NAME:
+       // Clear then Set FLASH name to new rx'd NAME
        memset(&bsi_config.BSI_Name, 0, sizeof(bsi_config.BSI_Name));
-       memcpy(&bsi_config.BSI_Name,&p_evt_write->data,p_evt_write->len);
+       memcpy(&bsi_config.BSI_Name, &p_evt_write->data, p_evt_write->len);
+       // Clear then Set HEADER name to new rx'd NAME
+       memset(&Header.BSI_Name, 0, sizeof(Header.BSI_Name));
+       memcpy(&Header.BSI_Name, &p_evt_write->data, p_evt_write->len);
+       //write_qspi_header();
        break;
      case CUSTOM_CHAR_UUID_S2_MEAS_INTV:     
        // The time in minutes between each measurment.
@@ -236,16 +252,16 @@ void on_write(ble_cus_t * p_cus, ble_evt_t const * p_ble_evt)
        bsi_config.sensor3_config.deltaMeasAlarmOff = p_evt_write->data[0];
        break;
      case CUSTOM_CHAR_UUID_UPLD_SZE:
-       // What size of data are we going to upload. in kb, 5 = 5kbyte
+       // The size what size of data are we going to upload. in bytes, 1024 = 1KB
        bsi_config.uploadSize = p_evt_write->data[0];
        break;
      case CUSTOM_CHAR_UUID_SENS_CNFG:
        // The sensors attached to the device. PULSE,ANLG,ANLG. 1 = connected, 0 = disconnected. ie 110.
        init_sensors(p_evt_write->data[0]);
        break;
-//     case CUSTOM_CHAR_UUID_SENS_ADDRS:
-//       // The Addresses of the attached sensors (uint-16, uint-16, uint-16). 
-//       break;
+     //case CUSTOM_CHAR_UUID_SENS_ADDRS:
+     // The Addresses of the attached sensors (uint-16, uint-16, uint-16). 
+     // break;
      case CUSTOM_CHAR_UUID_UPLD_INTV:
        // The interval that the BSI uploads the data.
        bsi_config.uploadInterval = p_evt_write->data[0];
@@ -258,8 +274,13 @@ void on_write(ble_cus_t * p_cus, ble_evt_t const * p_ble_evt)
        // The delay between turning the sensor on and taking a reading from the ADC
        bsi_config.sensor3_config.pwrOnDelay = p_evt_write->data[0];
        break;
-//     case CUSTOM_CHAR_UUID_SENS_DATA:
-       //bsi_config.uploadSize = p_evt_write->data[0];
+     //case CUSTOM_CHAR_UUID_SENS_DATA:
+     //bsi_config.uploadSize = p_evt_write->data[0];
+     //  break;
+     case CUSTOM_CHAR_UUID_UTC_TIME:
+       memset(&bsi_config.UTC_Minutes, 0, sizeof(bsi_config.UTC_Minutes));
+       memcpy(&bsi_config.UTC_Minutes, &p_evt_write->data, p_evt_write->len);
+       qspi_update_time();
        break;
     }
     //We are going to want to switch on the uuid of the written event

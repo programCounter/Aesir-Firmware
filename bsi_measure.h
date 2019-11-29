@@ -1,7 +1,12 @@
 #include "nrf_drv_saadc.h"
 
+extern uint32_t ticksPulse;
+extern bool pulseAlarmOn;
+extern bool pulseWriteNow;
+
 void saadc_callback(nrf_drv_saadc_evt_t const * p_event);
 void saadc_init(void);
 void gpio_init(void);
-nrf_saadc_value_t measureSensor(uint8_t channel, uint32_t * currentMins);
+void pulse_alarm_check();
+nrf_saadc_value_t measureSensor(uint8_t channel);
 

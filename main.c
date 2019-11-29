@@ -119,14 +119,16 @@
     } while (0)
 
 /************************DEBUG DEFINITIONS**************************************************************************/
-#define DEBUG 
-/*******************************************************************************************************************/
-#define DEVICE_NAME                     "AEsir"                       /**< Name of device. Will be included in the advertising data. */
-#define MANUFACTURER_NAME               "RioT Wireless"                   /**< Manufacturer. Will be passed to Device Information Service. */
+// see defines in sdk_config
+/******************************************************************************************************************/
+
+
+#define DEVICE_NAME                     "AEsir"                                /**< Name of device. Will be included in the advertising data. */
+#define MANUFACTURER_NAME               "RioT Wireless"                         /**< Manufacturer. Will be passed to Device Information Service. */
 #define APP_ADV_INTERVAL                300                                     /**< The advertising interval (in units of 0.625 ms. This value corresponds to 187.5 ms). */
 
-#define APP_ADV_DURATION                0                                   /**< The advertising duration (180 seconds) in units of 10 milliseconds. */
-//#define APP_ADV_DURATION                180                                   /**< The advertising duration (180 seconds) in units of 10 milliseconds. */
+#define APP_ADV_DURATION                500                                       /**< The advertising duration (5 seconds) in units of 10 milliseconds. */
+//#define APP_ADV_DURATION                18000                                   /**< The advertising duration (180 seconds) in units of 10 milliseconds. */
 #define APP_BLE_OBSERVER_PRIO           3                                       /**< Application's BLE observer priority. You shouldn't need to modify this value. */
 #define APP_BLE_CONN_CFG_TAG            1                                       /**< A tag identifying the SoftDevice BLE configuration. */
 
@@ -148,7 +150,7 @@
 #define SEC_PARAM_MIN_KEY_SIZE          7                                       /**< Minimum encryption key size. */
 #define SEC_PARAM_MAX_KEY_SIZE          16                                      /**< Maximum encryption key size. */
 
-
+#define pulseInterval 60 //needs to be set up in config, need to talk to will about changing characteristics
 
 #define DEAD_BEEF                       0xDEADBEEF                              /**< Value used as error code on stack dump, can be used to identify stack location on stack unwind. */
 
@@ -163,13 +165,24 @@ static uint16_t m_conn_handle = BLE_CONN_HANDLE_INVALID;                        
 
 static uint32_t ticksS2;
 static uint32_t ticksS3;
-static uint32_t ticksTUpload; // nUmber of ticks to be compared against upload interval
 static bool S2MeasureNow;
 static bool S3MeasureNow;
 static bool UploadNow;
 static bool pushData;
 static bool bleConnected;
-uint32_t qspiAddress = 0; //ONLY FOR DEBUG
+static bool factoryReset;
+static bool advertisingStarted;
+static bool pendingUpload;
+#ifdef DEBUG_GENERAL
+//uint32_t qspiAddress = 0; //ONLY FOR DEBUG
+bool StressTest_FAILED = false;
+#endif
+
+#ifdef DEBUG_GENERAL // Button-press-factory-reset
+static bool factoryReset = true;
+#else
+static bool factoryReset = false;
+#endif
 
 uint32_t p_reset_reason; //holds a register(RESETREAS) indicating the reason the device was reset
 // https://infocenter.nordicsemi.com/index.jsp?topic=%2Fcom.nordic.infocenter.nrf52832.ps.v1.1%2Fpower.html
@@ -195,18 +208,21 @@ static ble_uuid_t m_adv_uuids[] =                                               
     RAM_SIZE=0x3ddf0      -> 0xDDE0
 */
 
-//static volatile uint8_t m_advert_data[1650]; // 256 bytes on air at one time, max 1650 byte in total chained advert.
+static volatile uint8_t m_advert_data[1650]; // 256 bytes on air at one time, max 1650 byte in total chained advert.
 
 static uint32_t NumFlashAddrs = 16777215; // the device is configured in 24bit addressing mode so 2^24 adresses are possible
 
 #ifdef DEBUG
 #define MINUTE_TIMER_TICK APP_TIMER_TICKS(1000) // 1 second, debuggin time mudda fuxa
+#define ADVERT_RETRY_TIMER_TICK APP_TIMER_TICKS(5000)
 #else
 #define MINUTE_TIMER_TICK APP_TIMER_TICKS(60000) //1 min, lowest resolution of time we will think about.
+#define ADVERT_RETRY_TIMER_TICK APP_TIMER_TICKS(5000)
 #endif
 //#define SENSOR_MEASURE_TICK APP_TIMER_TICKS(3600000) //1 hour. default measurement time for analog sensors
 
-APP_TIMER_DEF(m_minute_timer_id);                                  
+APP_TIMER_DEF(m_minute_timer_id);      
+APP_TIMER_DEF(m_advert_timer_id);                            
 //APP_TIMER_DEF(m_measure_timer1_id);  
 //APP_TIMER_DEF(m_measure_timer2_id);  
 
@@ -456,6 +472,11 @@ static void conn_params_init(void)
     APP_ERROR_CHECK(err_code);
 }
 
+static void Advet_timeout_handler(void * p_context)
+{
+   advertisingStarted = false; //we make this true and the pending upload flag is true we should restart our timer
+}
+
 static void minute_timer_timeout_handler(void * p_context)
 {
   //What happens every minute?
@@ -466,54 +487,71 @@ static void minute_timer_timeout_handler(void * p_context)
   //pushData = true;
   
   ticksTUpload++;//Increment our minutes since last upload.
-//  #ifdef DEBUG
-//  if(ticksTUpload >= 60) //every minute
-//  #else
-//  if(ticksTUpload >= bsi_config.uploadInterval)
-//  #endif
-//  {
-//    // It is now time to initiate our upload
-//    UploadNow = true;
-//    ticksTUpload=0;
-//  }
+  //bsi_config.configChanged = true;
+  //  #ifdef DEBUG
+  //  if(ticksTUpload >= 60) //every minute
+  //  #else
+  //  if(ticksTUpload >= bsi_config.uploadInterval)
+  //  #endif
+  //  {
+  //    // It is now time to initiate our upload
+  //    UploadNow = true;
+  //    ticksTUpload=0;
 
+  //  }
 
-  if((lwrite_qspi|lread_qspi|lerase_sector)==false)
+  #ifdef DEBUG
+  if(true)
+  #else
+  if(bsi_config.sensor1_config.sensorEnabled == true) // IF the sensors not enabled dont even increment the count
+  #endif
   {
-    #ifdef DEBUG
-    if(true) //for debugging only, will ensure sensor 1 data is received
-    #else
-    if(bsi_config.sensor2_config.sensorEnabled == true) // IF the sensors not enabled dont even increment the count
-    #endif
+    ticksPulse++;
+    if(ticksPulse >= pulseInterval) //pulse interval is defines in sdk config
     {
-      ticksS2++;
-      #ifdef DEBUG
-      if(ticksS2 >= 5) //measure sensor at 15 seconds
-      #else
-      if(ticksS2 >= bsi_config.sensor2_config.measInterval)
-      #endif
-      {
-        S2MeasureNow = true;
-        ticksS2 = 0;
-      }
+      pulseWriteNow = true;
+      ticksPulse = 0;
     }
+    if(pulseAlarmOn)
+    {
+    pulse_alarm_check();
+    }
+  }
 
+
+  #ifdef DEBUG
+  if(true) //for debugging only, will ensure sensor 1 data is received
+  #else
+  if(bsi_config.sensor2_config.sensorEnabled == true) // IF the sensors not enabled dont even increment the count
+  #endif
+  {
+    ticksS2++;
     #ifdef DEBUG
-    if(true) //for debugging only, will ensure sensor 1 data is received
+    if(ticksS2 >= analogInterval) //analogInterval defined in sdk config
     #else
-    if(bsi_config.sensor3_config.sensorEnabled == true) // IF the sensors not enabled dont even increment the count
+    if(ticksS2 >= bsi_config.sensor2_config.measInterval)
     #endif
     {
-      ticksS3++;
-      #ifdef DEBUG
-      if(ticksS3 >= 5) //measure sensor at 15 seconds
-      #else
-      if(ticksS3 >= bsi_config.sensor2_config.measInterval)
-      #endif
-      {
-        S3MeasureNow = true;
-        ticksS3 = 0;
-      }
+      S2MeasureNow = true;
+      ticksS2 = 0;
+    }
+  }
+
+  #ifdef DEBUG
+  if(true) //for debugging only, will ensure sensor 1 data is received
+  #else
+  if(bsi_config.sensor3_config.sensorEnabled == true) // IF the sensors not enabled dont even increment the count
+  #endif
+  {
+    ticksS3++;
+    #ifdef DEBUG
+    if(ticksS3 >= analogInterval) //analogInterval defined in sdk config
+    #else
+    if(ticksS3 >= bsi_config.sensor2_config.measInterval)
+    #endif
+    {
+      S3MeasureNow = true;
+      ticksS3 = 0;
     }
   }
 }
@@ -542,8 +580,14 @@ static void timers_init(void)
     err_code = app_timer_create(&m_minute_timer_id,
                                 APP_TIMER_MODE_REPEATED,
                                 minute_timer_timeout_handler);
+                              
     APP_ERROR_CHECK(err_code);
 
+    err_code = app_timer_create(&m_advert_timer_id,
+                                APP_TIMER_MODE_SINGLE_SHOT,
+                                Advet_timeout_handler);
+                              
+    APP_ERROR_CHECK(err_code);
 }
 
 
@@ -563,6 +607,12 @@ static void application_timers_start(void)
 
 }
 
+static void advert_restart_timer_start(void)
+{
+    ret_code_t err_code;//Start the 10 second wait before we retry advertising for connection.
+    err_code = app_timer_start(m_advert_timer_id, ADVERT_RETRY_TIMER_TICK, NULL);
+    APP_ERROR_CHECK(err_code);
+}
 
 /**@brief Function for putting the chip into sleep mode.
  *
@@ -639,6 +689,8 @@ static void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context)
 
             on_disconnect(p_cus, p_ble_evt); //from BLE_CUS.c
             bleConnected = false;
+             err_code = bsp_indication_set(BSP_INDICATE_IDLE);
+             APP_ERROR_CHECK(err_code);
             break;
 
         case BLE_GAP_EVT_CONNECTED:
@@ -651,8 +703,15 @@ static void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context)
 
             on_connect(p_cus, p_ble_evt);//from BLE_CUS.c
             bleConnected = true;
+            advertisingStarted = false;
             break;
-
+        case BLE_GAP_EVT_TIMEOUT:
+            if(pendingUpload==true)
+            {
+              advert_restart_timer_start();//If we time out but still have a pending upload, wait a few seconds and try re-advertising for a connection.
+            }
+             
+            break;
         case BLE_GAP_EVT_PHY_UPDATE_REQUEST:
         {
             NRF_LOG_DEBUG("PHY update request.");
@@ -671,6 +730,8 @@ static void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context)
             err_code = sd_ble_gap_disconnect(p_ble_evt->evt.gattc_evt.conn_handle,
                                              BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
             APP_ERROR_CHECK(err_code);
+             err_code = bsp_indication_set(BSP_INDICATE_IDLE);
+             APP_ERROR_CHECK(err_code);
             break;
 
         case BLE_GATTS_EVT_TIMEOUT:
@@ -779,10 +840,7 @@ static void bsp_event_handler(bsp_event_t event)
     switch (event)
     {
         case BSP_EVENT_KEY_0:
-            //LB: Just going to use this for QSPI debug...
-            // Will write header to Sector 0 ( needs to be moved to first time initialization though)
-            // Parameters of header are pre-defined for now in struct BSI_Header Header;
-            lwrite_qspi = true;            
+            //doesn't work
             break;
 
         case BSP_EVENT_KEY_1:
@@ -799,13 +857,15 @@ static void bsp_event_handler(bsp_event_t event)
             break;
  
         case BSP_EVENT_KEY_2:
-            //Write to qspi
-            //lwrite_qspi = true;
+            #ifdef DEBUG_QSPI
+            lwrite_qspi = true;
+            #endif
             break;
        
         case BSP_EVENT_KEY_3:
-            //LB: Just going to use this for QSPI debug...
+            #ifdef DEBUG_QSPI
             lread_qspi = true;
+            #endif
             break;
         
         case BSP_EVENT_SLEEP:
@@ -843,31 +903,43 @@ static void bsp_event_handler(bsp_event_t event)
 
 
 /**@brief Function for initializing the Advertising functionality.*/
-ble_advertising_init_t advInit;
-static void advertising_init(void)
+static void advertising_init(bool codedPHY)
 {
     ret_code_t             err_code;
-    
-    memset(&advInit, 0, sizeof(advInit));
+    ble_advertising_init_t init;
 
-    advInit.advdata.name_type                = BLE_ADVDATA_FULL_NAME;
-    advInit.advdata.include_appearance       = true;
-    advInit.advdata.flags                    = BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE;
-    advInit.advdata.uuids_complete.uuid_cnt  = sizeof(m_adv_uuids) / sizeof(m_adv_uuids[0]);
-    advInit.advdata.uuids_complete.p_uuids   = m_adv_uuids;
+    memset(&init, 0, sizeof(init));
 
-    advInit.config.ble_adv_fast_enabled      = true;
-    advInit.config.ble_adv_fast_interval     = APP_ADV_INTERVAL;
-    advInit.config.ble_adv_fast_timeout      = APP_ADV_DURATION;
-    advInit.config.ble_adv_extended_enabled  = false;
-    
+    init.advdata.name_type                = BLE_ADVDATA_FULL_NAME;
+    init.advdata.include_appearance       = true;
+//    init.advdata.flags                    = BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE;
+    init.advdata.flags              = BLE_GAP_ADV_FLAGS_LE_ONLY_LIMITED_DISC_MODE;
+
+    init.advdata.uuids_complete.uuid_cnt  = sizeof(m_adv_uuids) / sizeof(m_adv_uuids[0]);
+    init.advdata.uuids_complete.p_uuids   = m_adv_uuids;
+
+    init.config.ble_adv_fast_enabled      = true;
+    init.config.ble_adv_fast_interval     = APP_ADV_INTERVAL;
+    init.config.ble_adv_fast_timeout      = APP_ADV_DURATION;
+    //init.config.ble_adv_extended_enabled  = false;
+//    if(codedPHY==true)
+//    {
+      init.config.ble_adv_primary_phy = BLE_GAP_PHY_CODED;
+      init.config.ble_adv_secondary_phy = BLE_GAP_PHY_CODED;
+//    }
+//    else
+//    {
+//      init.config.ble_adv_primary_phy = BLE_GAP_PHY_1MBPS;
+//      init.config.ble_adv_secondary_phy = BLE_GAP_PHY_1MBPS;
+//    }
+    init.config.ble_adv_extended_enabled = true;
 
     //init.config.
-    advInit.evt_handler = on_adv_evt;
+    init.evt_handler = on_adv_evt;
 
-    err_code = ble_advertising_init(&m_advertising, &advInit);
+    err_code = ble_advertising_init(&m_advertising, &init);
     APP_ERROR_CHECK(err_code);
-    
+
     ble_advertising_conn_cfg_tag_set(&m_advertising, APP_BLE_CONN_CFG_TAG);
 }
 
@@ -924,7 +996,7 @@ static void idle_state_handle(void)
 /**@brief Function for starting advertising.*/
 static void advertising_start(bool erase_bonds)
 {
-    uint16_t whatPHY;
+    
     if (erase_bonds == true)
     {
         delete_bonds();
@@ -932,42 +1004,31 @@ static void advertising_start(bool erase_bonds)
     }
     else
     {
-        if((Vbat_reset&p_reset_reason)==true)// if the result of the bitwise AND is > 0, should mean we woke from power being power-cycled
-        {
-            whatPHY  = BLE_GAP_PHY_AUTO;
-        }
-        else
-        {
-            whatPHY  = BLE_GAP_PHY_CODED;
-        }
+
         
         ret_code_t err_code = ble_advertising_start(&m_advertising, BLE_ADV_MODE_FAST);
-        m_advertising.adv_modes_config.ble_adv_primary_phy = whatPHY;
-        m_advertising.adv_modes_config.ble_adv_secondary_phy = whatPHY;
 
-        //err_code = sd_ble_gap_phy_update(m_conn_handle, &phys);
-        ble_advertising_modes_config_set(&m_advertising,&advInit);
-        APP_ERROR_CHECK(err_code);
      }
+     advertisingStarted = true;
 }
 
-/**@brief Struct that contains pointers to the encoded advertising data. */
-static uint8_t              m_adv_handle = BLE_GAP_ADV_SET_HANDLE_NOT_SET; /**< Advertising handle used to identify an advertising set. */
-static uint8_t              m_enc_advdata[BLE_GAP_ADV_SET_DATA_SIZE_MAX];  /**< Buffer for storing an encoded advertising set. */
-static ble_gap_adv_data_t m_adv_data =
-{
-    .adv_data =
-    {
-        .p_data = m_enc_advdata,
-        .len    = BLE_GAP_ADV_SET_DATA_SIZE_MAX 
-    },
-    .scan_rsp_data =
-    {
-        .p_data = NULL,
-        .len    = 0
-
-    }
-};
+///**@brief Struct that contains pointers to the encoded advertising data. */
+//static uint8_t              m_adv_handle = BLE_GAP_ADV_SET_HANDLE_NOT_SET; /**< Advertising handle used to identify an advertising set. */
+//static uint8_t              m_enc_advdata[BLE_GAP_ADV_SET_DATA_SIZE_MAX];  /**< Buffer for storing an encoded advertising set. */
+//static ble_gap_adv_data_t m_adv_data =
+//{
+//    .adv_data =
+//    {
+//        .p_data = m_enc_advdata,
+//        .len    = BLE_GAP_ADV_SET_DATA_SIZE_MAX 
+//    },
+//    .scan_rsp_data =
+//    {
+//        .p_data = NULL,
+//        .len    = 0
+//
+//    }
+//};
 
 //void update_advert(void) //depricated, now using UART
 //{
@@ -990,7 +1051,7 @@ static ble_gap_adv_data_t m_adv_data =
 //    APP_ERROR_CHECK(err_code);
 //}
 
-//function for updating chracteristic value
+//function for updating characteristic value
 void sensor_value_characteristic_update(ble_cus_t * p_cus, int16_t data)
 {
     //little endian converter::::::: -> swapped = (num>>8) | (num<<8);
@@ -1004,9 +1065,9 @@ void sensor_value_characteristic_update(ble_cus_t * p_cus, int16_t data)
     gatts_value.p_value = &data;
 
         // Update database.
-    sd_ble_gatts_value_set(BLE_CONN_HANDLE_INVALID,
-                                          p_cus->custom_value_handles.value_handle,
-                                          &gatts_value);
+    //sd_ble_gatts_value_set(BLE_CONN_HANDLE_INVALID,
+    //                                      p_cus->custom_value_handles.value_handle,
+    //                                      &gatts_value);
 }
 
 /**@brief Function for application main entry.*/
@@ -1016,28 +1077,27 @@ int main(void)
     uint32_t responce;
     bool erase_bonds;
     nrf_drv_qspi_config_t config = NRF_DRV_QSPI_DEFAULT_CONFIG;
-    
+    advertisingStarted = false;
+
     // Initialize.
     log_init();
     timers_init();
+    saadc_init();
+    gpio_init();
     buttons_leds_init(&erase_bonds);
     power_management_init();
     ble_stack_init();
-    gap_params_init();
-    gatt_init();
-    
-    //If we have a configuration already we should load it into the characteristics.
     retCode = init_fds();
     APP_ERROR_CHECK(retCode);
-    retCode = read_fds(fds_BSI_File,fds_BSI_Key, &bsi_config);
-
+    gap_params_init();
+    gatt_init();
     services_init(); //Initialises the basic services and calls ble_cus_init which inits the custom service and charateristics for configuring the BSI
     nServices_init(); //Initialises the NUS(for UART) and the qued write module
 
-    //uint32_t sd_power_reset_reason_get(uint32_t *p_reset_reason);
-    responce = sd_power_reset_reason_get(&p_reset_reason);
+    // uint32_t sd_power_reset_reason_get(uint32_t *p_reset_reason)
+    //responce = sd_power_reset_reason_get(&p_reset_reason);
 
-    advertising_init();
+    advertising_init(false);
     
     conn_params_init();
     peer_manager_init();
@@ -1046,13 +1106,13 @@ int main(void)
 
     configure_memory();
     m_finished = false;
+
+
     
-    saadc_init();
-    gpio_init();
-    nrf_drv_qspi_erase(NRF_QSPI_ERASE_LEN_ALL, 0);
-    WAIT_FOR_PERIPH();
-    bsi_config.lastKnownAddr = 0;
-    bsi_config.configChanged = true;
+
+//    nrf_drv_qspi_erase(NRF_QSPI_ERASE_LEN_64KB, 0);
+//    WAIT_FOR_PERIPH();
+    
 //    retCode = init_fds();
 //    APP_ERROR_CHECK(retCode);
 //    retCode = read_fds(fds_BSI_File,fds_BSI_Key, &bsi_config);
@@ -1063,16 +1123,28 @@ int main(void)
     //NRF_LOG_INFO("Template example started.");
     application_timers_start();
     uart_init();
-    
-    advertising_start(erase_bonds);
+
+    //LB: Moving towards code that can be reset with a button
+    if(factoryReset) 
+    {
+      erase_qspi_sector(1);
+      //write_qspi_header();
+      //read_qspi_header();
+      qspi_update_time();
+      bsi_config.configChanged = true; //set flash bsi_config to defaults
+      factoryReset = false;
+    }
+    else
+    {
+      //If we have a configuration already we should load it into the characteristics.
+      retCode = read_fds(fds_BSI_File,fds_BSI_Key, &bsi_config);
+    } //
+
+    //advertising_start(erase_bonds);
     
     //somejunkvar = true;
     //ble_bas_battery_level_update(&m_bas, 5, BLE_CONN_HANDLE_ALL);
     // Enter main loop.
-    #ifdef DEBUG
-    lerase_sector = true;  //debug
-    #else
-    #endif
     for (;;)
     {
         if(bsi_config.configChanged == true)
@@ -1082,6 +1154,12 @@ int main(void)
 
           bsi_config.configChanged = false; // Written the config, set this back to false...
         }
+        if(pulseWriteNow == true)
+        {
+            measureSensor(2);
+            lwrite_qspi = true;
+          pulseWriteNow = false;
+        }
         #ifdef DEBUG
         if(S2MeasureNow == true)
         #else
@@ -1089,8 +1167,7 @@ int main(void)
         #endif
         {
           #ifdef DEBUG
-            //sensor_value_characteristic_update(&m_cus,measureSensor(0)); //debug
-            measureSensor(0,&ticksTUpload);
+            measureSensor(0);
             lwrite_qspi = true;
           #else
           measureSensor(0);
@@ -1107,8 +1184,7 @@ int main(void)
         #endif
         {
           #ifdef DEBUG
-            //sensor_value_characteristic_update(&m_cus,measureSensor(1)); //debug
-            measureSensor(1,&ticksTUpload);
+            measureSensor(1);
             lwrite_qspi = true;
           #else
           measureSensor(1);
@@ -1117,23 +1193,54 @@ int main(void)
           // Time to take a measurement on Analog S3
           S3MeasureNow = false;
         }
+//        else if(UploadNow == true)
+//        {
+//          //There may be an issue with how the advert api plays with the code the update advert,
+//          //based on what I read we should dodge the issues by only changing the config when the advertising is stopped.
+//          //we need the data from the flash
+//          
+//          // read_qspi(qspiAddress); // *** TO BE DISCUSSED ***
+//          //read_qspi_page(4096 + sizeof(CurrentPage));
+//          read_qspi_sector(1);
+//          //we need to put that data into our advert
+//          //update_advert();
+//          //Advertising should be stopped
+//          //advertising_start(erase_bonds);
+//          //The advertisment should then time out and stop.
+//          UploadNow = false;
+//        }
 
-
-        if(lwrite_qspi == true)
+        if(lwrite_qspi == true) // BUTTON 0 is PRESSED
         {
-        
-        #ifdef DEBUG
-          //for(int i = 0; i < 255; i++) // 256 pages fit in 1kB (if 4 bytes per page)
-          //{
-            
-             // measureSensor(0);  //debug
+          
+          #ifdef DEBUG_QSPI
+          for(int i = 0; i < (1024*14); i++) // 1024 pages fit in 4kB (if 4 bytes per page)
+          {                                  // *14 intentionally not filling last (15th) sector to prevent erasing in rewrite prep           // measureSensor(0);  //debug  
+              CurrentPage.sensorValue = rand();
               write_qspi_page();   //debug
-              CurrentPage.countMin += 1;
-              //CurrentPage.sensorValue = rand();
-          //}
-         #else
-           write_qspi_page();
-         #endif
+              CurrentPage.countMin ++;
+          }
+          uint16_t StressCountMin = 0; 
+          bsi_config.qspi_currentSector = 1;
+          for(uint16_t i = 1; i < 15; i++)
+          {
+              read_qspi_sector(i);
+              for(uint16_t j = 0; j < 1024; j++)
+              {
+                  StressCountMin++;
+                  if(ReadSector.Page[j].countMin != (j+((i-1)*1024))){
+                      StressTest_FAILED = true;
+                      break;
+                  }
+              }
+          }
+          //end of test cleanup
+          bsi_config.lastKnownAddr = 4096;
+          bsi_config.qspi_currentSector = 1;
+
+          #else
+          write_qspi_page();
+          #endif
 
           // write_qspi_header();
           // write_qspi(qspiAddress); // *** TO BE DISCUSSED ***
@@ -1141,34 +1248,47 @@ int main(void)
             //lread_qspi = true;  //debug
           #else
           #endif
-          
-        }
-        if(lread_qspi == true)
+        }//END OF if(lwrite_qspi == true)
+
+
+        if(lread_qspi == true) // BUTTON 3 is PRESSED
         {
-          #ifdef DEBUG
-            read_qspi_sector(1);
+          #ifdef DEBUG_QSPI
+            read_qspi_sector(bsi_config.qspi_currentSector-1);
           #else
           #endif
             
           //read_qspi_page(4096);
           //read_qspi_header();
         }
+
         if(lerase_sector == true)
         {
-            erase_qspi_sector(1);
-            lerase_sector = false;
+          //nrf_drv_qspi_chip_erase();
+          //erase_qspi_sector(1);            
         }
+        
+        //read_qspi_header();
 
-        //if(pushData == true)
-        if(bsi_config.lastKnownAddr >= 500)
+        //if(bsi_config.lastKnownAddr >= (bsi_config.uploadSize+(4096*bsi_config.qspi_currentSector)))
+        if(bsi_config.lastKnownAddr >= (75+(4096*bsi_config.qspi_currentSector)))
         {
-          
-          //Start a CODED PHY Advertisement. We are going to need two types of advertising. Coded and un-coded.
-          advertising_start(erase_bonds);
-
-          if(bleConnected = true) //dont try and send data till we have a connection.
+          pendingUpload = true;
+        }
+        
+         if(pendingUpload == true)
+        {
+          if(advertisingStarted==false)
           {
-            qspi_prepare_packet(0);
+            //Start a CODED PHY Advertisement. We are going to need two types of advertising. Coded and un-coded.
+            advertising_init(true);
+            advertising_start(erase_bonds);
+          }
+          
+          if(bleConnected == true) //If we dont have a connection, dont send data.
+          {
+
+            qspi_prepare_packet(bsi_config.qspi_currentSector);
 
             //gPacket.Header
             //gPacket.Sector
@@ -1176,11 +1296,12 @@ int main(void)
   //          uint32_t sOf = sizeof(uint32_t);
   //          uart_data_send(&sOf,sOf,m_conn_handle);
             uart_data_send(&gPacket,sOf,m_conn_handle);
-            pushData = false;
-            lerase_sector = true;
-            bsi_config.lastKnownAddr = 0;
-            //Data is all done, break the connection...
+            //pushData = false;
+           // erase_qspi_sector(bsi_config.qspi_currentSector);
+            //bsi_config.lastKnownAddr =0;
 
+            //Data is all done, break the connection...// Connection break is done by the Loli
+            pendingUpload = false;
 
           }
         }

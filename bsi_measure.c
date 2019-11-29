@@ -13,6 +13,7 @@
 
 #include "bsi_measure.h"
 #include "bsi_qspi.h"
+#include "BLE_CUS.h"
 #include "nrf_gpio.h"
 #include "nrf_drv_gpiote.h"
 #include "nrf_delay.h"
@@ -23,9 +24,17 @@
 #define VREG_PWR NRF_GPIO_PIN_MAP(1,15) 
 #define ANLG_SENSOR1_PWR NRF_GPIO_PIN_MAP(0,12) 
 #define ANLG_SENSOR2_PWR NRF_GPIO_PIN_MAP(0,11) 
-#define PULSE_SENSOR_INP NRF_GPIO_PIN_MAP(1,04) 
+#define PULSE_SENSOR_INP NRF_GPIO_PIN_MAP(1,02) 
+
+#ifdef DEBUG
+#define ALARM_RATE_ON 30
+#define ALARM_RATE_OFF 10
+#endif
 
 static nrf_saadc_value_t m_buffer[BUFFER_SIZE];
+uint32_t ticksPulse;
+bool pulseAlarmOn;
+bool pulseWriteNow;
 
 void saadc_callback(nrf_drv_saadc_evt_t const * p_event)
 {
@@ -38,10 +47,46 @@ void saadc_callback(nrf_drv_saadc_evt_t const * p_event)
     }
 }
 
+void pulse_alarm_check()
+{
+  if(pulseAlarmOn)
+  {
+    #ifdef DEBUG
+    if((pulseInterval/(ticksPulse - bsi_config.pulseTime)) < ALARM_RATE_OFF)
+    #else
+    if((pulseInterval/(ticksPulse - bsi_config.pulseTime)) < bsi_config.sensor1_config.deltaMeasAlarmOff)
+    #endif
+    {
+      //shut off alarm
+      #ifdef DEMO_WRITE
+      printf("Whew We Safe\n");
+      #endif
+      pulseAlarmOn = false;
+    }
+  }
+  else
+  {
+    #ifdef DEBUG
+    if((pulseInterval/(ticksPulse - bsi_config.pulseTime)) > ALARM_RATE_ON)
+    #else
+    if((pulseInterval/(ticksPulse - bsi_config.pulseTime)) > bsi_config.sensor1_config.deltaMeasAlarmOn)
+    #endif
+    {
+      //enter alarm mode
+      #ifdef DEMO_WRITE
+      printf("AAAHHHHH ALARM!!!\n");
+      #endif
+      pulseAlarmOn = true;
+    }
+  }
+}
+
 void pulse_evt_handler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
 {
-    // What happens when we get a pulse?
-    //nrf_drv_gpiote_out_toggle(PIN_OUT);
+    bsi_config.pulseNum++;
+    pulse_alarm_check();
+    bsi_config.pulseTime = ticksPulse;
+    bsi_config.configChanged = true;
 }
 
 void gpio_init(void)
@@ -52,10 +97,21 @@ void gpio_init(void)
   nrf_gpio_cfg_output(ANLG_SENSOR2_PWR);
   
   //Pulse sensor config
-  nrf_drv_gpiote_in_config_t pulse_config = GPIOTE_CONFIG_IN_SENSE_TOGGLE(true);
-  pulse_config.pull = NRF_GPIO_PIN_PULLUP;
+  ret_code_t err_code;
 
-  nrf_drv_gpiote_in_init(PULSE_SENSOR_INP, &pulse_config, pulse_evt_handler); 
+  err_code = nrf_drv_gpiote_init();
+  APP_ERROR_CHECK(err_code);
+
+ // nrf_drv_gpiote_out_config_t out_config = GPIOTE_CONFIG_OUT_SIMPLE(false);
+
+    //err_code = nrf_drv_gpiote_out_init(PIN_OUT, &out_config);
+    //APP_ERROR_CHECK(err_code);
+
+  nrf_drv_gpiote_in_config_t pulse_config = GPIOTE_CONFIG_IN_SENSE_LOTOHI(true);
+  pulse_config.pull = NRF_GPIO_PIN_NOPULL;
+
+  err_code = nrf_drv_gpiote_in_init(PULSE_SENSOR_INP, &pulse_config, pulse_evt_handler); 
+  APP_ERROR_CHECK(err_code);
   nrf_drv_gpiote_in_event_enable(PULSE_SENSOR_INP, true);
 }
 
@@ -86,7 +142,7 @@ void saadc_init(void)
     //APP_ERROR_CHECK(err_code);
 }
 
-nrf_saadc_value_t measureSensor(uint8_t channel, uint32_t *currentMins)
+nrf_saadc_value_t measureSensor(uint8_t channel)
 {
   nrf_saadc_value_t p_ADC_Result;
   switch(channel)
@@ -109,6 +165,11 @@ nrf_saadc_value_t measureSensor(uint8_t channel, uint32_t *currentMins)
       nrf_gpio_pin_write(ANLG_SENSOR2_PWR,0); //Sensor power off
       nrf_gpio_pin_write(VREG_PWR,0); //Power Regulator Off
       break;
+     case 2:
+      //pulse sensor data upload
+      p_ADC_Result = bsi_config.pulseNum;
+      bsi_config.pulseNum = 0;
+      break;
     case 6:
       //Check the battery level.
       nrfx_saadc_sample_convert(channel,&p_ADC_Result);// This returns a single value from the specified ADC channel. THIS FUNCTION IS BLOCKING!
@@ -119,7 +180,7 @@ nrf_saadc_value_t measureSensor(uint8_t channel, uint32_t *currentMins)
   //CurrentPage.sensorCh = channel;
   //CurrentPage.sensorValue = p_ADC_Result;
   //CurrentPage.sensorValue = CurrentPage.sensorValue | channel;
+  CurrentPage.countMin = ticksPulse;
   CurrentPage.sensorValue = (p_ADC_Result << 4) | channel;
-  CurrentPage.countMin = &currentMins;
   return p_ADC_Result;
 }

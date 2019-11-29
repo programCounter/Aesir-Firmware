@@ -78,14 +78,17 @@ static char const * fds_evt_str[] =
 //};
 
 BSI_Config bsi_config = {
-//  BSI_Name = //PLS ADD A STRING LIBRARY :)
+
+    .BSI_Name = {'N','O','N','A','M','E','\0'},
+    .UTC_Minutes = 1574833551,
     .configChanged  = false,
 //  .sensor1_config = s1_config,
 //  .sensor2_config = s2_config,
 //  .sensor3_config = s3_config,
-    .uploadSize     = 9,
-    .uploadInterval = 0,
-    .lastKnownAddr  = 4096, //LB: Start writing data at the start of sector 1
+    .uploadSize     = 512,
+    .uploadInterval = 1,
+    .lastKnownAddr  = 0,  //LB: Start writing data at the start of sector 0
+    .qspi_currentSector = 0, //LB: Same as above :)
 };
 
 //Create FDS record for Sensor1

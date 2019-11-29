@@ -47,6 +47,15 @@
 #include "app_config.h"
 #endif
 
+/************************DEMO DEFINITIONS**************************************************************************/
+#define DEMO_WRITE
+#define DEBUG_GENERAL //if defined: on restart default values (not FDS) will be loaded
+//#define DEBUG_QSPI 
+#define DEMO_SENSORS
+#define analogInterval 3
+#define pulseInterval 60
+
+/******************************************************************************************************************/
 
 // </e>
 

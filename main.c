@@ -123,12 +123,12 @@
 /******************************************************************************************************************/
 
 
-#define DEVICE_NAME                     "AEsir9"                                /**< Name of device. Will be included in the advertising data. */
+#define DEVICE_NAME                     "AEsir"                                /**< Name of device. Will be included in the advertising data. */
 #define MANUFACTURER_NAME               "RioT Wireless"                         /**< Manufacturer. Will be passed to Device Information Service. */
 #define APP_ADV_INTERVAL                300                                     /**< The advertising interval (in units of 0.625 ms. This value corresponds to 187.5 ms). */
 
-#define APP_ADV_DURATION                0                                       /**< The advertising duration (180 seconds) in units of 10 milliseconds. */
-//#define APP_ADV_DURATION                180                                   /**< The advertising duration (180 seconds) in units of 10 milliseconds. */
+#define APP_ADV_DURATION                500                                       /**< The advertising duration (5 seconds) in units of 10 milliseconds. */
+//#define APP_ADV_DURATION                18000                                   /**< The advertising duration (180 seconds) in units of 10 milliseconds. */
 #define APP_BLE_OBSERVER_PRIO           3                                       /**< Application's BLE observer priority. You shouldn't need to modify this value. */
 #define APP_BLE_CONN_CFG_TAG            1                                       /**< A tag identifying the SoftDevice BLE configuration. */
 
@@ -171,7 +171,8 @@ static bool UploadNow;
 static bool pushData;
 static bool bleConnected;
 static bool factoryReset;
-
+static bool advertisingStarted;
+static bool pendingUpload;
 #ifdef DEBUG_GENERAL
 //uint32_t qspiAddress = 0; //ONLY FOR DEBUG
 bool StressTest_FAILED = false;
@@ -213,12 +214,15 @@ static uint32_t NumFlashAddrs = 16777215; // the device is configured in 24bit a
 
 #ifdef DEBUG
 #define MINUTE_TIMER_TICK APP_TIMER_TICKS(1000) // 1 second, debuggin time mudda fuxa
+#define ADVERT_RETRY_TIMER_TICK APP_TIMER_TICKS(5000)
 #else
 #define MINUTE_TIMER_TICK APP_TIMER_TICKS(60000) //1 min, lowest resolution of time we will think about.
+#define ADVERT_RETRY_TIMER_TICK APP_TIMER_TICKS(5000)
 #endif
 //#define SENSOR_MEASURE_TICK APP_TIMER_TICKS(3600000) //1 hour. default measurement time for analog sensors
 
-APP_TIMER_DEF(m_minute_timer_id);                                  
+APP_TIMER_DEF(m_minute_timer_id);      
+APP_TIMER_DEF(m_advert_timer_id);                            
 //APP_TIMER_DEF(m_measure_timer1_id);  
 //APP_TIMER_DEF(m_measure_timer2_id);  
 
@@ -468,6 +472,11 @@ static void conn_params_init(void)
     APP_ERROR_CHECK(err_code);
 }
 
+static void Advet_timeout_handler(void * p_context)
+{
+   advertisingStarted = false; //we make this true and the pending upload flag is true we should restart our timer
+}
+
 static void minute_timer_timeout_handler(void * p_context)
 {
   //What happens every minute?
@@ -571,8 +580,14 @@ static void timers_init(void)
     err_code = app_timer_create(&m_minute_timer_id,
                                 APP_TIMER_MODE_REPEATED,
                                 minute_timer_timeout_handler);
+                              
     APP_ERROR_CHECK(err_code);
 
+    err_code = app_timer_create(&m_advert_timer_id,
+                                APP_TIMER_MODE_SINGLE_SHOT,
+                                Advet_timeout_handler);
+                              
+    APP_ERROR_CHECK(err_code);
 }
 
 
@@ -592,6 +607,12 @@ static void application_timers_start(void)
 
 }
 
+static void advert_restart_timer_start(void)
+{
+    ret_code_t err_code;//Start the 10 second wait before we retry advertising for connection.
+    err_code = app_timer_start(m_advert_timer_id, ADVERT_RETRY_TIMER_TICK, NULL);
+    APP_ERROR_CHECK(err_code);
+}
 
 /**@brief Function for putting the chip into sleep mode.
  *
@@ -668,6 +689,8 @@ static void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context)
 
             on_disconnect(p_cus, p_ble_evt); //from BLE_CUS.c
             bleConnected = false;
+             err_code = bsp_indication_set(BSP_INDICATE_IDLE);
+             APP_ERROR_CHECK(err_code);
             break;
 
         case BLE_GAP_EVT_CONNECTED:
@@ -680,8 +703,15 @@ static void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context)
 
             on_connect(p_cus, p_ble_evt);//from BLE_CUS.c
             bleConnected = true;
+            advertisingStarted = false;
             break;
-
+        case BLE_GAP_EVT_TIMEOUT:
+            if(pendingUpload==true)
+            {
+              advert_restart_timer_start();//If we time out but still have a pending upload, wait a few seconds and try re-advertising for a connection.
+            }
+             
+            break;
         case BLE_GAP_EVT_PHY_UPDATE_REQUEST:
         {
             NRF_LOG_DEBUG("PHY update request.");
@@ -700,6 +730,8 @@ static void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context)
             err_code = sd_ble_gap_disconnect(p_ble_evt->evt.gattc_evt.conn_handle,
                                              BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
             APP_ERROR_CHECK(err_code);
+             err_code = bsp_indication_set(BSP_INDICATE_IDLE);
+             APP_ERROR_CHECK(err_code);
             break;
 
         case BLE_GATTS_EVT_TIMEOUT:
@@ -871,7 +903,7 @@ static void bsp_event_handler(bsp_event_t event)
 
 
 /**@brief Function for initializing the Advertising functionality.*/
-static void advertising_init(void)
+static void advertising_init(bool codedPHY)
 {
     ret_code_t             err_code;
     ble_advertising_init_t init;
@@ -880,15 +912,27 @@ static void advertising_init(void)
 
     init.advdata.name_type                = BLE_ADVDATA_FULL_NAME;
     init.advdata.include_appearance       = true;
-    init.advdata.flags                    = BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE;
+//    init.advdata.flags                    = BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE;
+    init.advdata.flags              = BLE_GAP_ADV_FLAGS_LE_ONLY_LIMITED_DISC_MODE;
+
     init.advdata.uuids_complete.uuid_cnt  = sizeof(m_adv_uuids) / sizeof(m_adv_uuids[0]);
     init.advdata.uuids_complete.p_uuids   = m_adv_uuids;
 
     init.config.ble_adv_fast_enabled      = true;
     init.config.ble_adv_fast_interval     = APP_ADV_INTERVAL;
     init.config.ble_adv_fast_timeout      = APP_ADV_DURATION;
-    init.config.ble_adv_extended_enabled  = false;
-    
+    //init.config.ble_adv_extended_enabled  = false;
+//    if(codedPHY==true)
+//    {
+      init.config.ble_adv_primary_phy = BLE_GAP_PHY_CODED;
+      init.config.ble_adv_secondary_phy = BLE_GAP_PHY_CODED;
+//    }
+//    else
+//    {
+//      init.config.ble_adv_primary_phy = BLE_GAP_PHY_1MBPS;
+//      init.config.ble_adv_secondary_phy = BLE_GAP_PHY_1MBPS;
+//    }
+    init.config.ble_adv_extended_enabled = true;
 
     //init.config.
     init.evt_handler = on_adv_evt;
@@ -952,7 +996,7 @@ static void idle_state_handle(void)
 /**@brief Function for starting advertising.*/
 static void advertising_start(bool erase_bonds)
 {
-    uint16_t whatPHY;
+    
     if (erase_bonds == true)
     {
         delete_bonds();
@@ -960,43 +1004,31 @@ static void advertising_start(bool erase_bonds)
     }
     else
     {
-        if((Vbat_reset&p_reset_reason)==true)// if the result of the bitwise AND is > 0, should mean we woke from power being power-cycled
-        {
-            whatPHY  = BLE_GAP_PHY_1MBPS;
-        }
-        else
-        {
-            whatPHY  = BLE_GAP_PHY_CODED;
-        }
+
         
         ret_code_t err_code = ble_advertising_start(&m_advertising, BLE_ADV_MODE_FAST);
-        ble_gap_phys_t const phys =
-        {
-          .rx_phys  = whatPHY,
-          .tx_phys  = whatPHY, 
-        };
-//        err_code = sd_ble_gap_phy_update(m_conn_handle, &phys);
-//        APP_ERROR_CHECK(err_code);
+
      }
+     advertisingStarted = true;
 }
 
-/**@brief Struct that contains pointers to the encoded advertising data. */
-static uint8_t              m_adv_handle = BLE_GAP_ADV_SET_HANDLE_NOT_SET; /**< Advertising handle used to identify an advertising set. */
-static uint8_t              m_enc_advdata[BLE_GAP_ADV_SET_DATA_SIZE_MAX];  /**< Buffer for storing an encoded advertising set. */
-static ble_gap_adv_data_t m_adv_data =
-{
-    .adv_data =
-    {
-        .p_data = m_enc_advdata,
-        .len    = BLE_GAP_ADV_SET_DATA_SIZE_MAX 
-    },
-    .scan_rsp_data =
-    {
-        .p_data = NULL,
-        .len    = 0
-
-    }
-};
+///**@brief Struct that contains pointers to the encoded advertising data. */
+//static uint8_t              m_adv_handle = BLE_GAP_ADV_SET_HANDLE_NOT_SET; /**< Advertising handle used to identify an advertising set. */
+//static uint8_t              m_enc_advdata[BLE_GAP_ADV_SET_DATA_SIZE_MAX];  /**< Buffer for storing an encoded advertising set. */
+//static ble_gap_adv_data_t m_adv_data =
+//{
+//    .adv_data =
+//    {
+//        .p_data = m_enc_advdata,
+//        .len    = BLE_GAP_ADV_SET_DATA_SIZE_MAX 
+//    },
+//    .scan_rsp_data =
+//    {
+//        .p_data = NULL,
+//        .len    = 0
+//
+//    }
+//};
 
 //void update_advert(void) //depricated, now using UART
 //{
@@ -1045,7 +1077,8 @@ int main(void)
     uint32_t responce;
     bool erase_bonds;
     nrf_drv_qspi_config_t config = NRF_DRV_QSPI_DEFAULT_CONFIG;
-    
+    advertisingStarted = false;
+
     // Initialize.
     log_init();
     timers_init();
@@ -1064,7 +1097,7 @@ int main(void)
     // uint32_t sd_power_reset_reason_get(uint32_t *p_reset_reason)
     //responce = sd_power_reset_reason_get(&p_reset_reason);
 
-    advertising_init();
+    advertising_init(false);
     
     conn_params_init();
     peer_manager_init();
@@ -1107,7 +1140,7 @@ int main(void)
       retCode = read_fds(fds_BSI_File,fds_BSI_Key, &bsi_config);
     } //
 
-    advertising_start(erase_bonds);
+    //advertising_start(erase_bonds);
     
     //somejunkvar = true;
     //ble_bas_battery_level_update(&m_bas, 5, BLE_CONN_HANDLE_ALL);
@@ -1240,15 +1273,22 @@ int main(void)
         //if(bsi_config.lastKnownAddr >= (bsi_config.uploadSize+(4096*bsi_config.qspi_currentSector)))
         if(bsi_config.lastKnownAddr >= (75+(4096*bsi_config.qspi_currentSector)))
         {
-          advertising_start(erase_bonds);
-          //Start a CODED PHY Advertisement. We are going to need two types of advertising. Coded and un-coded.
-          if(bleConnected = true) //If we dont have a connection, dont send data.
+          pendingUpload = true;
+        }
+        
+         if(pendingUpload == true)
+        {
+          if(advertisingStarted==false)
+          {
+            //Start a CODED PHY Advertisement. We are going to need two types of advertising. Coded and un-coded.
+            advertising_init(true);
+            advertising_start(erase_bonds);
+          }
+          
+          if(bleConnected == true) //If we dont have a connection, dont send data.
           {
 
-
-            advertising_start(erase_bonds);
             qspi_prepare_packet(bsi_config.qspi_currentSector);
-
 
             //gPacket.Header
             //gPacket.Sector
@@ -1256,12 +1296,12 @@ int main(void)
   //          uint32_t sOf = sizeof(uint32_t);
   //          uart_data_send(&sOf,sOf,m_conn_handle);
             uart_data_send(&gPacket,sOf,m_conn_handle);
-            pushData = false;
+            //pushData = false;
            // erase_qspi_sector(bsi_config.qspi_currentSector);
             //bsi_config.lastKnownAddr =0;
 
-            //Data is all done, break the connection...
-
+            //Data is all done, break the connection...// Connection break is done by the Loli
+            pendingUpload = false;
 
           }
         }

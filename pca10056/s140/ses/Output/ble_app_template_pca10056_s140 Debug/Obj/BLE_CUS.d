@@ -81,4 +81,10 @@ Output/ble_app_template_pca10056_s140\ Debug/Obj/BLE_CUS.o: \
  ../../../../../../components/libraries/log/nrf_log_types.h \
  ../../../../../../components/libraries/log/nrf_log_types.h \
  E:\dev\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\examples\ble_peripheral\Aesir-Firmware\bsi_config.h \
- ../../../../../../components/libraries/fds/fds.h
+ ../../../../../../components/libraries/fds/fds.h \
+ E:\dev\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\examples\ble_peripheral\Aesir-Firmware\bsi_qspi.h \
+ ../../../../../../integration/nrfx/legacy/nrf_drv_qspi.h \
+ ../../../../../../modules/nrfx/drivers/include/nrfx_qspi.h \
+ ../../../../../../modules/nrfx/hal/nrf_qspi.h \
+ E:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.22/include/time.h \
+ E:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.22/include/sys/time.h

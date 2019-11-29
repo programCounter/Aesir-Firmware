@@ -689,6 +689,7 @@ static void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context)
 
             on_disconnect(p_cus, p_ble_evt); //from BLE_CUS.c
             bleConnected = false;
+            advertisingStarted = false;
              err_code = bsp_indication_set(BSP_INDICATE_IDLE);
              APP_ERROR_CHECK(err_code);
             break;
@@ -921,18 +922,19 @@ static void advertising_init(bool codedPHY)
     init.config.ble_adv_fast_enabled      = true;
     init.config.ble_adv_fast_interval     = APP_ADV_INTERVAL;
     init.config.ble_adv_fast_timeout      = APP_ADV_DURATION;
-    //init.config.ble_adv_extended_enabled  = false;
-//    if(codedPHY==true)
-//    {
+    if(codedPHY==true)
+    {
       init.config.ble_adv_primary_phy = BLE_GAP_PHY_CODED;
       init.config.ble_adv_secondary_phy = BLE_GAP_PHY_CODED;
-//    }
-//    else
-//    {
-//      init.config.ble_adv_primary_phy = BLE_GAP_PHY_1MBPS;
-//      init.config.ble_adv_secondary_phy = BLE_GAP_PHY_1MBPS;
-//    }
-    init.config.ble_adv_extended_enabled = true;
+      init.config.ble_adv_extended_enabled = true;
+    }
+    else
+    {
+      init.config.ble_adv_primary_phy = BLE_GAP_PHY_1MBPS;
+      init.config.ble_adv_secondary_phy = BLE_GAP_PHY_1MBPS;
+      init.config.ble_adv_extended_enabled  = false;
+    }
+
 
     //init.config.
     init.evt_handler = on_adv_evt;
@@ -1281,7 +1283,7 @@ int main(void)
           if(advertisingStarted==false)
           {
             //Start a CODED PHY Advertisement. We are going to need two types of advertising. Coded and un-coded.
-            advertising_init(true);
+            advertising_init(false);
             advertising_start(erase_bonds);
           }
           

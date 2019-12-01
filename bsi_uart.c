@@ -149,9 +149,10 @@ void uart_data_send(uint8_t * p_data, uint16_t dLen, uint16_t m_conn_handle)
             err_code = ble_nus_data_send(&m_nus, chunk_array, &dateLen, m_conn_handle);
             if ((err_code != NRF_ERROR_INVALID_STATE) &&
                 (err_code != NRF_ERROR_RESOURCES) &&
-                (err_code != NRF_ERROR_NOT_FOUND))
+                (err_code != NRF_ERROR_NOT_FOUND) &&
+                (err_code != BLE_ERROR_GATTS_SYS_ATTR_MISSING))
             {
-                APP_ERROR_CHECK(err_code);
+                //APP_ERROR_CHECK(err_code);
             }
         } while (err_code == NRF_ERROR_RESOURCES);
 //      }

@@ -682,6 +682,11 @@ static void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context)
             }
            on_write(p_cus, p_ble_evt);
            break;
+        
+        case BLE_GATTS_EVT_SYS_ATTR_MISSING:
+            err_code = sd_ble_gatts_sys_attr_set(m_conn_handle, NULL, 0, 0);
+            APP_ERROR_CHECK(err_code);
+            break;
 
         case BLE_GAP_EVT_DISCONNECTED:
             NRF_LOG_INFO("Disconnected.");
@@ -914,7 +919,7 @@ static void advertising_init(bool codedPHY)
     init.advdata.name_type                = BLE_ADVDATA_FULL_NAME;
     init.advdata.include_appearance       = true;
 //    init.advdata.flags                    = BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE;
-    init.advdata.flags              = BLE_GAP_ADV_FLAGS_LE_ONLY_LIMITED_DISC_MODE;
+    init.advdata.flags                    = BLE_GAP_ADV_FLAGS_LE_ONLY_LIMITED_DISC_MODE;
 
     init.advdata.uuids_complete.uuid_cnt  = sizeof(m_adv_uuids) / sizeof(m_adv_uuids[0]);
     init.advdata.uuids_complete.p_uuids   = m_adv_uuids;
@@ -924,14 +929,14 @@ static void advertising_init(bool codedPHY)
     init.config.ble_adv_fast_timeout      = APP_ADV_DURATION;
     if(codedPHY==true)
     {
-      init.config.ble_adv_primary_phy = BLE_GAP_PHY_CODED;
-      init.config.ble_adv_secondary_phy = BLE_GAP_PHY_CODED;
-      init.config.ble_adv_extended_enabled = true;
+      init.config.ble_adv_primary_phy       = BLE_GAP_PHY_CODED;
+      init.config.ble_adv_secondary_phy     = BLE_GAP_PHY_CODED;
+      init.config.ble_adv_extended_enabled  = true;
     }
     else
     {
-      init.config.ble_adv_primary_phy = BLE_GAP_PHY_1MBPS;
-      init.config.ble_adv_secondary_phy = BLE_GAP_PHY_1MBPS;
+      init.config.ble_adv_primary_phy       = BLE_GAP_PHY_1MBPS;
+      init.config.ble_adv_secondary_phy     = BLE_GAP_PHY_1MBPS;
       init.config.ble_adv_extended_enabled  = false;
     }
 
@@ -1006,10 +1011,7 @@ static void advertising_start(bool erase_bonds)
     }
     else
     {
-
-        
         ret_code_t err_code = ble_advertising_start(&m_advertising, BLE_ADV_MODE_FAST);
-
      }
      advertisingStarted = true;
 }
@@ -1099,7 +1101,7 @@ int main(void)
     // uint32_t sd_power_reset_reason_get(uint32_t *p_reset_reason)
     //responce = sd_power_reset_reason_get(&p_reset_reason);
 
-    advertising_init(false);
+    advertising_init(true);
     
     conn_params_init();
     peer_manager_init();
@@ -1283,7 +1285,7 @@ int main(void)
           if(advertisingStarted==false)
           {
             //Start a CODED PHY Advertisement. We are going to need two types of advertising. Coded and un-coded.
-            advertising_init(false);
+            advertising_init(true);
             advertising_start(erase_bonds);
           }
           

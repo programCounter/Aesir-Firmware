@@ -1,6 +1,9 @@
 #include "bsi_config.h"
 #include <string.h>
 
+
+static bool fds_event_fired = false;
+
 //Flash data storage. FDS
 
 /* Array to map FDS return values to strings. */
@@ -174,24 +177,37 @@ ret_code_t write_fds(uint16_t sensorFile, uint16_t sensorKey)
       .data.length_words = (sizeof(bsi_config) + 3) / sizeof(uint32_t),
   };
 
-  //Check if the file exists in the flash
-  retCode = fds_record_find(sensorFile, sensorKey, &descript, &token);
-  
-  //switch on the retCode, are we updating or making a new file?
-  switch(retCode)
+
+  while(retCode!=NRF_SUCCESS)//We want to loop in case any of these return FDS_ERR_NO_SPACE_IN_QUEUES, we can wait till the FDS evt fires then re-try.
   {
+    //Check if the file exists in the flash
+    retCode = fds_record_find(sensorFile, sensorKey, &descript, &token);
+    fds_event_fired=false;
+    //switch on the retCode, are we updating or making a new file?
+    switch(retCode)
+    {
 
-    case FDS_SUCCESS:
-      //The file exists, we can update it.
-      retCode = fds_record_update(&descript, &FDS_BSI_record);
-      break;
+      case FDS_SUCCESS:
+        //The file exists, we can update it.
 
-    case FDS_ERR_NOT_FOUND:
-      //The file DOES NOT exists, we can need to make it.
-      retCode = fds_record_write(&descript, &FDS_BSI_record);
-      break;
+          retCode = fds_record_update(&descript, &FDS_BSI_record);
+
+        break;
+
+      case FDS_ERR_NOT_FOUND:
+        //The file DOES NOT exists, we can need to make it.
+        retCode = fds_record_write(&descript, &FDS_BSI_record);
+        break;
+    }
+    //IF we get an error
+    if(retCode == FDS_ERR_NO_SPACE_IN_QUEUES)//wait till an FDS event fires and loop back around.
+    {
+      while(fds_event_fired==false) 
+      {
+        sd_app_evt_wait();//Sleep till next event. This line requires a soft device to be present.
+      }
+    }
   }
-
   retCode = fds_gc();
   /* Wait for fds to initialize. */
   //(void) sd_app_evt_wait();//Sleep till next event. This line requires a soft device to be present.
@@ -276,6 +292,7 @@ bool update_BSI_Config(void)
 
 void fds_evt_handler(fds_evt_t const * p_evt)
 {
+    fds_event_fired = true;
     switch (p_evt->id)
     {
         case FDS_EVT_INIT:

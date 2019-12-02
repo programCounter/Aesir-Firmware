@@ -1154,8 +1154,6 @@ int main(void)
         if(bsi_config.configChanged == true)
         {
           retCode = write_fds(fds_BSI_File,fds_BSI_Key);
-          APP_ERROR_CHECK(retCode);
-
           bsi_config.configChanged = false; // Written the config, set this back to false...
         }
         if(pulseWriteNow == true)

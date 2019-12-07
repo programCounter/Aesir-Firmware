@@ -213,7 +213,8 @@ static uint32_t NumFlashAddrs = 16777215; // the device is configured in 24bit a
 
 #ifdef DEBUG
 #define MINUTE_TIMER_TICK APP_TIMER_TICKS(1000) // 1 second, debuggin time mudda fuxa
-
+uint16_t advertRetry = 0;
+#define advRetryMax  5
 //Generate a random number between a max and min so that no two devices have the same timeout.
 #define randTimeMax  10000
 #define randTimeMin  5000
@@ -221,13 +222,15 @@ static uint32_t NumFlashAddrs = 16777215; // the device is configured in 24bit a
 #define ADVERT_RETRY_TIMER_TICK APP_TIMER_TICKS(randTime)
 #else
 #define MINUTE_TIMER_TICK APP_TIMER_TICKS(60000) //1 min, lowest resolution of time we will think about.
+uint16_t advertRetry = 0;
+#define advRetryMax  10
 //Generate a random number between a max and min so that no two devices have the same timeout.
 #define randTimeMax  10000
 #define randTimeMin  5000
 #define randTime  (rand() % (randTimeMax + 1 - randTimeMin) + randTimeMin)
 #define ADVERT_RETRY_TIMER_TICK APP_TIMER_TICKS(randTime)
 #endif
-//#define SENSOR_MEASURE_TICK APP_TIMER_TICKS(3600000) //1 hour. default measurement time for analog sensors
+
 
 APP_TIMER_DEF(m_minute_timer_id);      
 APP_TIMER_DEF(m_advert_timer_id);                            
@@ -706,6 +709,7 @@ static void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context)
             on_connect(p_cus, p_ble_evt);//from BLE_CUS.c
             bleConnected = true;
             advertisingStarted = false;
+            advertRetry = 0;
             break;
       
         case BLE_GAP_EVT_TIMEOUT:
@@ -716,8 +720,9 @@ static void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context)
            //If the advertisement timesout, turn the LED off...
             err_code = bsp_indication_set(BSP_INDICATE_IDLE);
             //If we still have a pending upload, then start the re-try timer which will start advertisement when it expires.
-            if(pendingUpload==true)
-            {
+            if(pendingUpload==true && advertRetry < advRetryMax)
+            { 
+              advertRetry ++;
               advert_restart_timer_start();//If we time out but still have a pending upload, wait a few seconds and try re-advertising for a connection.
             }
              
@@ -1277,9 +1282,11 @@ int main(void)
         //read_qspi_header();
 
         //if(bsi_config.lastKnownAddr >= (bsi_config.uploadSize+(4096*bsi_config.qspi_currentSector)))
-        if(bsi_config.lastKnownAddr >= (75+(4096*bsi_config.qspi_currentSector)))
+        if(bsi_config.lastKnownAddr >= (200+(4096*bsi_config.qspi_currentSector)))
         {
           pendingUpload = true;
+          qspi_increment_sector();// want to increment the secto everytime we exceed the upload amount, not just when we actually send data.
+          advertRetry = 0;// if we get another batch of data we want to re-try sending, even if retry has maxed.
         }
         
          if(pendingUpload == true)

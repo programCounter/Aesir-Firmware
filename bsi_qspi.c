@@ -353,6 +353,26 @@ void qspi_prepare_packet(uint8_t Sector)
 
       // Because we sent data (hopefully), we should start writing at the next sector
       // Determine if we should move to the next sector or roll back to start and erase
+//      if(bsi_config.qspi_currentSector == 15) //Sector 15 is last in block 1
+//      {
+//         bsi_config.qspi_currentSector = 0; // Set sector back to 0
+//         bsi_config.lastKnownAddr = 0;  // set next write address to start of sector 0
+//      }
+//      else
+//      {
+//         bsi_config.qspi_currentSector+=1; //increment to next sector 
+//         bsi_config.lastKnownAddr = SectorB1[bsi_config.qspi_currentSector]; //set next write address to start of next sector
+//      }
+      //qspi_increment_sector(); // if we don't send the data, we just write to the same sector forever... call this from main when we hit our upload thresh-hold
+      bsi_config.configChanged = true; //update the fds
+      erase_qspi_sector(bsi_config.qspi_currentSector); //erase this sector so we can reuse it
+      
+}
+
+void qspi_increment_sector(void)
+{
+      // Because we sent data (hopefully), we should start writing at the next sector
+      // Determine if we should move to the next sector or roll back to start and erase
       if(bsi_config.qspi_currentSector == 15) //Sector 15 is last in block 1
       {
          bsi_config.qspi_currentSector = 0; // Set sector back to 0
@@ -364,10 +384,7 @@ void qspi_prepare_packet(uint8_t Sector)
          bsi_config.lastKnownAddr = SectorB1[bsi_config.qspi_currentSector]; //set next write address to start of next sector
       }
       bsi_config.configChanged = true; //update the fds
-      erase_qspi_sector(bsi_config.qspi_currentSector); //erase this sector so we can reuse it
-      
 }
-
 
 /************************************************************************************ 
 ** Update the stored "StartTime" in bsi_conifg FDS (which is in minutes)

@@ -35,7 +35,6 @@ Output/ble_app_template_pca10056_s140\ Release/Obj/nrf_fstorage.o: \
  ../../../../../../components/softdevice/s140/headers/nrf52/nrf_mbr.h \
  ../../../../../../components/softdevice/s140/headers/nrf_svc.h \
  ../../../../../../components/libraries/util/sdk_macros.h \
- ../../../../../../components/libraries/strerror/nrf_strerror.h \
  ../../../../../../components/libraries/log/src/nrf_log_internal.h \
  ../../../../../../components/libraries/util/app_util.h \
  ../../../../../../components/libraries/log/nrf_log_instance.h \

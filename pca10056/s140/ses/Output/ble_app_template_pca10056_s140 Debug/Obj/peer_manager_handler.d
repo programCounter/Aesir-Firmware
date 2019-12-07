@@ -1,8 +1,8 @@
 Output/ble_app_template_pca10056_s140\ Debug/Obj/peer_manager_handler.o: \
- C:\Users\kyrel\Desktop\BL654\nRF5_SDK\nRF5_SDK_15.3.0\components\ble\peer_manager\peer_manager_handler.c \
- C:\Users\kyrel\Desktop\BL654\nRF5_SDK\nRF5_SDK_15.3.0\components\ble\peer_manager\peer_manager_handler.h \
+ E:\dev\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\components\ble\peer_manager\peer_manager_handler.c \
+ E:\dev\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\components\ble\peer_manager\peer_manager_handler.h \
  ../../../../../../components/softdevice/s140/headers/ble.h \
- C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.22/include/stdint.h \
+ E:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.22/include/stdint.h \
  ../../../../../../components/softdevice/s140/headers/nrf_svc.h \
  ../../../../../../components/softdevice/s140/headers/nrf_error.h \
  ../../../../../../components/softdevice/s140/headers/ble_err.h \
@@ -26,11 +26,11 @@ Output/ble_app_template_pca10056_s140\ Debug/Obj/peer_manager_handler.o: \
  ../../../../../../modules/nrfx/mdk/nrf52_to_nrf52840.h \
  ../../../../../../modules/nrfx/mdk/compiler_abstraction.h \
  ../../../../../../components/softdevice/s140/headers/ble_gatts.h \
- C:\Users\kyrel\Desktop\BL654\nRF5_SDK\nRF5_SDK_15.3.0\components\ble\peer_manager\peer_manager.h \
- C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.22/include/stdbool.h \
+ E:\dev\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\components\ble\peer_manager\peer_manager.h \
+ E:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.22/include/stdbool.h \
  ../../../../../../components/libraries/util/sdk_common.h \
- C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.22/include/string.h \
- C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.22/include/__crossworks.h \
+ E:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.22/include/string.h \
+ E:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.22/include/__crossworks.h \
  ../config/sdk_config.h \
  ../../../../../../components/libraries/util/nordic_common.h \
  ../../../../../../modules/nrfx/mdk/compiler_abstraction.h \
@@ -38,13 +38,13 @@ Output/ble_app_template_pca10056_s140\ Debug/Obj/peer_manager_handler.o: \
  ../../../../../../components/libraries/util/sdk_errors.h \
  ../../../../../../components/softdevice/s140/headers/nrf_error.h \
  ../../../../../../components/libraries/util/app_util.h \
- C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.22/include/stddef.h \
+ E:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.22/include/stddef.h \
  ../../../../../../components/softdevice/s140/headers/nrf52/nrf_mbr.h \
  ../../../../../../components/softdevice/s140/headers/nrf_svc.h \
  ../../../../../../components/libraries/util/sdk_macros.h \
  ../../../../../../components/libraries/util/nrf_assert.h \
  ../../../../../../components/softdevice/s140/headers/ble_gap.h \
- C:\Users\kyrel\Desktop\BL654\nRF5_SDK\nRF5_SDK_15.3.0\components\ble\peer_manager\peer_manager_types.h \
+ E:\dev\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\components\ble\peer_manager\peer_manager_types.h \
  ../../../../../../components/softdevice/s140/headers/ble_hci.h \
  ../../../../../../components/ble/common/ble_gatt_db.h \
  ../../../../../../components/softdevice/s140/headers/ble_gattc.h \
@@ -54,10 +54,10 @@ Output/ble_app_template_pca10056_s140\ Debug/Obj/peer_manager_handler.o: \
  ../../../../../../components/softdevice/s140/headers/nrf_error_soc.h \
  ../../../../../../components/softdevice/s140/headers/nrf_nvic.h \
  ../../../../../../components/libraries/util/app_error.h \
- C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.22/include/stdio.h \
+ E:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.22/include/stdio.h \
  ../../../../../../components/libraries/util/app_error_weak.h \
- C:\Users\kyrel\Desktop\BL654\nRF5_SDK\nRF5_SDK_15.3.0\components\ble\peer_manager\peer_database.h \
- C:\Users\kyrel\Desktop\BL654\nRF5_SDK\nRF5_SDK_15.3.0\components\ble\peer_manager\peer_manager_internal.h \
+ E:\dev\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\components\ble\peer_manager\peer_database.h \
+ E:\dev\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\components\ble\peer_manager\peer_manager_internal.h \
  ../../../../../../components/libraries/util/sdk_errors.h \
  ../../../../../../components/libraries/util/app_error.h \
  ../../../../../../components/ble/common/ble_conn_state.h \

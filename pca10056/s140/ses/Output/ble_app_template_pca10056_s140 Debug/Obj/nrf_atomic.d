@@ -1,11 +1,11 @@
 Output/ble_app_template_pca10056_s140\ Debug/Obj/nrf_atomic.o: \
- C:\Users\kyrel\Desktop\BL654\nRF5_SDK\nRF5_SDK_15.3.0\components\libraries\atomic\nrf_atomic.c \
- C:\Users\kyrel\Desktop\BL654\nRF5_SDK\nRF5_SDK_15.3.0\components\libraries\atomic\nrf_atomic.h \
+ E:\dev\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\components\libraries\atomic\nrf_atomic.c \
+ E:\dev\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\components\libraries\atomic\nrf_atomic.h \
  ../../../../../../components/libraries/util/sdk_common.h \
- C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.22/include/stdint.h \
- C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.22/include/stdbool.h \
- C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.22/include/string.h \
- C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.22/include/__crossworks.h \
+ E:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.22/include/stdint.h \
+ E:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.22/include/stdbool.h \
+ E:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.22/include/string.h \
+ E:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.22/include/__crossworks.h \
  ../config/sdk_config.h \
  ../../../../../../components/libraries/util/nordic_common.h \
  ../../../../../../modules/nrfx/mdk/compiler_abstraction.h \
@@ -13,7 +13,7 @@ Output/ble_app_template_pca10056_s140\ Debug/Obj/nrf_atomic.o: \
  ../../../../../../components/libraries/util/sdk_errors.h \
  ../../../../../../components/softdevice/s140/headers/nrf_error.h \
  ../../../../../../components/libraries/util/app_util.h \
- C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.22/include/stddef.h \
+ E:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.22/include/stddef.h \
  ../../../../../../modules/nrfx/mdk/nrf.h \
  ../../../../../../modules/nrfx/mdk/nrf52840.h \
  ../../../../../../components/toolchain/cmsis/include/core_cm4.h \
@@ -30,4 +30,4 @@ Output/ble_app_template_pca10056_s140\ Debug/Obj/nrf_atomic.o: \
  ../../../../../../components/softdevice/s140/headers/nrf_svc.h \
  ../../../../../../components/libraries/util/sdk_macros.h \
  ../../../../../../components/libraries/util/nrf_assert.h \
- C:\Users\kyrel\Desktop\BL654\nRF5_SDK\nRF5_SDK_15.3.0\components\libraries\atomic\nrf_atomic_internal.h
+ E:\dev\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\components\libraries\atomic\nrf_atomic_internal.h

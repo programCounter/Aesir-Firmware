@@ -127,8 +127,10 @@
 #define MANUFACTURER_NAME               "RioT Wireless"                         /**< Manufacturer. Will be passed to Device Information Service. */
 #define APP_ADV_INTERVAL                300                                     /**< The advertising interval (in units of 0.625 ms. This value corresponds to 187.5 ms). */
 
+//Tells the radio how long we want to advertise for.
 #define APP_ADV_DURATION                500                                       /**< The advertising duration (5 seconds) in units of 10 milliseconds. */
 //#define APP_ADV_DURATION                18000                                   /**< The advertising duration (180 seconds) in units of 10 milliseconds. */
+
 #define APP_BLE_OBSERVER_PRIO           3                                       /**< Application's BLE observer priority. You shouldn't need to modify this value. */
 #define APP_BLE_CONN_CFG_TAG            1                                       /**< A tag identifying the SoftDevice BLE configuration. */
 
@@ -203,10 +205,7 @@ static ble_uuid_t m_adv_uuids[] =                                               
    
 };
 
-/* When we added the custom service we had to change the ram map as shown...
-    RAM_START=0x20002210  -> 0x20002220 
-    RAM_SIZE=0x3ddf0      -> 0xDDE0
-*/
+/* When we added the custom service we had to change the ram map...*/
 
 static volatile uint8_t m_advert_data[1650]; // 256 bytes on air at one time, max 1650 byte in total chained advert.
 
@@ -214,10 +213,19 @@ static uint32_t NumFlashAddrs = 16777215; // the device is configured in 24bit a
 
 #ifdef DEBUG
 #define MINUTE_TIMER_TICK APP_TIMER_TICKS(1000) // 1 second, debuggin time mudda fuxa
-#define ADVERT_RETRY_TIMER_TICK APP_TIMER_TICKS(5000)
+
+//Generate a random number between a max and min so that no two devices have the same timeout.
+#define randTimeMax  10000
+#define randTimeMin  5000
+#define randTime  (rand() % (randTimeMax + 1 - randTimeMin) + randTimeMin)
+#define ADVERT_RETRY_TIMER_TICK APP_TIMER_TICKS(randTime)
 #else
 #define MINUTE_TIMER_TICK APP_TIMER_TICKS(60000) //1 min, lowest resolution of time we will think about.
-#define ADVERT_RETRY_TIMER_TICK APP_TIMER_TICKS(5000)
+//Generate a random number between a max and min so that no two devices have the same timeout.
+#define randTimeMax  10000
+#define randTimeMin  5000
+#define randTime  (rand() % (randTimeMax + 1 - randTimeMin) + randTimeMin)
+#define ADVERT_RETRY_TIMER_TICK APP_TIMER_TICKS(randTime)
 #endif
 //#define SENSOR_MEASURE_TICK APP_TIMER_TICKS(3600000) //1 hour. default measurement time for analog sensors
 
@@ -568,14 +576,6 @@ static void timers_init(void)
     ret_code_t err_code = app_timer_init();
     APP_ERROR_CHECK(err_code);
 
-    /* YOUR_JOB: Create any timers to be used by the application.
-                 Below is an example of how to create a timer.
-                 For every new timer needed, increase the value of the macro APP_TIMER_MAX_TIMERS by
-                 one.
-       ret_code_t err_code;
-       err_code = app_timer_create(&m_app_timer_id, APP_TIMER_MODE_REPEATED, timer_timeout_handler);
-       APP_ERROR_CHECK(err_code); */
-
     // Create timers.
     err_code = app_timer_create(&m_minute_timer_id,
                                 APP_TIMER_MODE_REPEATED,
@@ -596,10 +596,6 @@ static void timers_init(void)
  */
 static void application_timers_start(void)
 {
-    /* YOUR_JOB: Start your timers. below is an example of how to start a timer.
-       ret_code_t err_code;
-       err_code = app_timer_start(m_app_timer_id, TIMER_INTERVAL, NULL);
-       APP_ERROR_CHECK(err_code); */
 
     ret_code_t err_code;//Start the 1 minute timer, this is the timer used to trigger the updload
     err_code = app_timer_start(m_minute_timer_id, MINUTE_TIMER_TICK, NULL);
@@ -711,13 +707,21 @@ static void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context)
             bleConnected = true;
             advertisingStarted = false;
             break;
+      
         case BLE_GAP_EVT_TIMEOUT:
+            break;
+
+        case BLE_GAP_EVT_ADV_SET_TERMINATED:
+        {
+           //If the advertisement timesout, turn the LED off...
+            err_code = bsp_indication_set(BSP_INDICATE_IDLE);
+            //If we still have a pending upload, then start the re-try timer which will start advertisement when it expires.
             if(pendingUpload==true)
             {
               advert_restart_timer_start();//If we time out but still have a pending upload, wait a few seconds and try re-advertising for a connection.
             }
              
-            break;
+        }break;
         case BLE_GAP_EVT_PHY_UPDATE_REQUEST:
         {
             NRF_LOG_DEBUG("PHY update request.");
@@ -918,8 +922,8 @@ static void advertising_init(bool codedPHY)
 
     init.advdata.name_type                = BLE_ADVDATA_FULL_NAME;
     init.advdata.include_appearance       = true;
-//    init.advdata.flags                    = BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE;
-    init.advdata.flags                    = BLE_GAP_ADV_FLAGS_LE_ONLY_LIMITED_DISC_MODE;
+    init.advdata.flags                    = BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE;
+//    init.advdata.flags                    = BLE_GAP_ADV_FLAGS_LE_ONLY_LIMITED_DISC_MODE;
 
     init.advdata.uuids_complete.uuid_cnt  = sizeof(m_adv_uuids) / sizeof(m_adv_uuids[0]);
     init.advdata.uuids_complete.p_uuids   = m_adv_uuids;

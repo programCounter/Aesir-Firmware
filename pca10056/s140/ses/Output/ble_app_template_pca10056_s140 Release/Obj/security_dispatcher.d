@@ -66,7 +66,6 @@ Output/ble_app_template_pca10056_s140\ Release/Obj/security_dispatcher.o: \
  ../../../../../../components/libraries/log/nrf_log.h \
  ../../../../../../components/libraries/experimental_section_vars/nrf_section.h \
  ../../../../../../components/libraries/util/nordic_common.h \
- ../../../../../../components/libraries/strerror/nrf_strerror.h \
  ../../../../../../components/libraries/log/src/nrf_log_internal.h \
  ../../../../../../components/libraries/log/nrf_log_instance.h \
  ../../../../../../components/libraries/log/nrf_log_types.h \
@@ -74,6 +73,4 @@ Output/ble_app_template_pca10056_s140\ Release/Obj/security_dispatcher.o: \
  ../../../../../../components/libraries/log/nrf_log_ctrl.h \
  ../../../../../../components/libraries/log/src/nrf_log_ctrl_internal.h \
  ../../../../../../components/libraries/log/nrf_log_backend_interface.h \
- ../../../../../../components/libraries/memobj/nrf_memobj.h \
- E:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.22/include/stdlib.h \
- ../../../../../../components/libraries/balloc/nrf_balloc.h
+ ../../../../../../components/libraries/strerror/nrf_strerror.h

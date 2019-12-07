@@ -1,13 +1,13 @@
 Output/ble_app_template_pca10056_s140\ Debug/Obj/nrfx_atomic.o: \
- E:\dev\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\modules\nrfx\soc\nrfx_atomic.c \
- E:\dev\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\modules\nrfx\soc\nrfx_atomic.h \
+ C:\Users\kyrel\Desktop\BL654\nRF5_SDK\nRF5_SDK_15.3.0\modules\nrfx\soc\nrfx_atomic.c \
+ C:\Users\kyrel\Desktop\BL654\nRF5_SDK\nRF5_SDK_15.3.0\modules\nrfx\soc\nrfx_atomic.h \
  ../../../../../../modules/nrfx/nrfx.h \
  ../../../../../../integration/nrfx/nrfx_config.h ../config/sdk_config.h \
  ../../../../../../modules/nrfx/drivers/nrfx_common.h \
- E:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.22/include/stdint.h \
- E:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.22/include/stddef.h \
- E:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.22/include/__crossworks.h \
- E:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.22/include/stdbool.h \
+ C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.22/include/stdint.h \
+ C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.22/include/stddef.h \
+ C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.22/include/__crossworks.h \
+ C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.22/include/stdbool.h \
  ../../../../../../modules/nrfx/mdk/nrf.h \
  ../../../../../../modules/nrfx/mdk/nrf52840.h \
  ../../../../../../components/toolchain/cmsis/include/core_cm4.h \
@@ -41,7 +41,7 @@ Output/ble_app_template_pca10056_s140\ Debug/Obj/nrfx_atomic.o: \
  ../../../../../../components/softdevice/s140/headers/nrf_nvic.h \
  ../../../../../../components/libraries/util/nrf_assert.h \
  ../../../../../../components/libraries/util/app_error.h \
- E:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.22/include/stdio.h \
+ C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.22/include/stdio.h \
  ../../../../../../components/libraries/util/sdk_errors.h \
  ../../../../../../components/softdevice/s140/headers/nrf_error.h \
  ../../../../../../components/libraries/util/app_error_weak.h \
@@ -51,4 +51,4 @@ Output/ble_app_template_pca10056_s140\ Debug/Obj/nrfx_atomic.o: \
  ../../../../../../components/libraries/util/sdk_resources.h \
  ../../../../../../components/softdevice/s140/headers/nrf_sd_def.h \
  ../../../../../../modules/nrfx/drivers/nrfx_errors.h \
- E:\dev\nRF5_SDK_153\nRF5_SDK_15.3.0_59ac345\modules\nrfx\soc\nrfx_atomic_internal.h
+ C:\Users\kyrel\Desktop\BL654\nRF5_SDK\nRF5_SDK_15.3.0\modules\nrfx\soc\nrfx_atomic_internal.h

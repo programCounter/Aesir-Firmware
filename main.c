@@ -123,7 +123,7 @@
 /******************************************************************************************************************/
 
 
-#define DEVICE_NAME                     "AEsir"                                /**< Name of device. Will be included in the advertising data. */
+#define DEVICE_NAME                     "AEsirKY"                                /**< Name of device. Will be included in the advertising data. */
 #define MANUFACTURER_NAME               "RioT Wireless"                         /**< Manufacturer. Will be passed to Device Information Service. */
 #define APP_ADV_INTERVAL                300                                     /**< The advertising interval (in units of 0.625 ms. This value corresponds to 187.5 ms). */
 
@@ -132,8 +132,8 @@
 #define APP_BLE_OBSERVER_PRIO           3                                       /**< Application's BLE observer priority. You shouldn't need to modify this value. */
 #define APP_BLE_CONN_CFG_TAG            1                                       /**< A tag identifying the SoftDevice BLE configuration. */
 
-#define MIN_CONN_INTERVAL               MSEC_TO_UNITS(100, UNIT_1_25_MS)        /**< Minimum acceptable connection interval (0.1 seconds). */
-#define MAX_CONN_INTERVAL               MSEC_TO_UNITS(200, UNIT_1_25_MS)        /**< Maximum acceptable connection interval (0.2 second). */
+#define MIN_CONN_INTERVAL               MSEC_TO_UNITS(12, UNIT_1_25_MS)        /**< Minimum acceptable connection interval (0.1 seconds). */
+#define MAX_CONN_INTERVAL               MSEC_TO_UNITS(75, UNIT_1_25_MS)        /**< Maximum acceptable connection interval (0.2 second). */
 #define SLAVE_LATENCY                   0                                       /**< Slave latency. */
 #define CONN_SUP_TIMEOUT                MSEC_TO_UNITS(4000, UNIT_10_MS)         /**< Connection supervisory timeout (4 seconds). */
 
@@ -150,7 +150,7 @@
 #define SEC_PARAM_MIN_KEY_SIZE          7                                       /**< Minimum encryption key size. */
 #define SEC_PARAM_MAX_KEY_SIZE          16                                      /**< Maximum encryption key size. */
 
-#define pulseInterval 60 //needs to be set up in config, need to talk to will about changing characteristics
+//#define pulseInterval 60 //needs to be set up in config, need to talk to will about changing characteristics
 
 #define DEAD_BEEF                       0xDEADBEEF                              /**< Value used as error code on stack dump, can be used to identify stack location on stack unwind. */
 
@@ -1163,9 +1163,9 @@ int main(void)
           pulseWriteNow = false;
         }
         #ifdef DEBUG
-        if(S2MeasureNow == true)
+        else if(S2MeasureNow == true)
         #else
-        if(S2MeasureNow == true && bsi_config.sensor2_config.sensorEnabled == true)
+        else if(S2MeasureNow == true && bsi_config.sensor2_config.sensorEnabled == true)
         #endif
         {
           #ifdef DEBUG
@@ -1287,7 +1287,7 @@ int main(void)
             advertising_start(erase_bonds);
           }
           
-          if(bleConnected == true) //If we dont have a connection, dont send data.
+          if(bleConnected == true && comm_started == true) //If we dont have a connection, dont send data.
           {
 
             qspi_prepare_packet(bsi_config.qspi_currentSector);
@@ -1304,7 +1304,7 @@ int main(void)
 
             //Data is all done, break the connection...// Connection break is done by the Loli
             pendingUpload = false;
-
+            comm_started = false;
           }
         }
         idle_state_handle();

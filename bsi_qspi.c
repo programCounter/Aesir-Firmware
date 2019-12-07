@@ -349,7 +349,7 @@ void qspi_prepare_packet(uint8_t Sector)
       gPacket.Header = ReadHeader;
       read_qspi_sector(Sector);
       gPacket.Sector = ReadSector;
-      //gPacket.datalength = sizeof(gPacket);
+      gPacket.datalength += sizeof(gPacket.Header);
 
       // Because we sent data (hopefully), we should start writing at the next sector
       // Determine if we should move to the next sector or roll back to start and erase
@@ -376,8 +376,8 @@ void qspi_prepare_packet(uint8_t Sector)
 */
 void qspi_update_time()
 {
-      RawTime = (bsi_config.UTC_Minutes + ticksTUpload); //*60);// Raw time has to be in seconds
-      bsi_config.UTC_Minutes = RawTime; // /60) //When we are done fiddling with this we gotta put it back in minutes
+      RawTime = ((bsi_config.UTC_Minutes + ticksTUpload)*60);// Raw time has to be in seconds
+      bsi_config.UTC_Minutes = (RawTime/60); //When we are done fiddling with this we gotta put it back in minutes
       ticksTUpload = 0;
       info = gmtime(&RawTime);
       #ifdef DEMO_WRITE

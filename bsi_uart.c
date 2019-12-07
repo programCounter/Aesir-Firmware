@@ -42,6 +42,7 @@ BLE_NUS_DEF(m_nus, NRF_SDH_BLE_TOTAL_LINK_COUNT);                               
 NRF_BLE_QWR_DEF(m_qwr);  
 //static uint16_t   m_ble_nus_max_data_len = BLE_GATT_ATT_MTU_DEFAULT - 3;            /**< Maximum length of data (in bytes) that can be transmitted to the peer by the Nordic UART service module. */
 static uint16_t   m_ble_nus_max_data_len = NRF_SDH_BLE_GATT_MAX_MTU_SIZE - 3;            /**< Maximum length of data (in bytes) that can be transmitted to the peer by the Nordic UART service module. */
+bool comm_started = false;
 /**@brief Function for handling the data from the Nordic UART Service.
  *
  * @details This function will process the data received from the Nordic UART BLE Service and send
@@ -50,6 +51,8 @@ static uint16_t   m_ble_nus_max_data_len = NRF_SDH_BLE_GATT_MAX_MTU_SIZE - 3;   
  * @param[in] p_evt       Nordic UART Service event.
  */
 /**@snippet [Handling the data received over BLE] */
+uint8_t commstarted = 0;
+uint8_t txrdy       = 0;
 static void nus_data_handler(ble_nus_evt_t * p_evt)
 {
 
@@ -77,7 +80,20 @@ static void nus_data_handler(ble_nus_evt_t * p_evt)
             while (app_uart_put('\n') == NRF_ERROR_BUSY);
         }
     }
-
+    switch(p_evt->type)
+    {
+      case BLE_NUS_EVT_TX_RDY:
+        printf("txrdy: %d", txrdy++);
+        break;
+      case BLE_NUS_EVT_COMM_STARTED:
+      printf("commstarted: %d", commstarted++);
+      comm_started = true;
+        break;/**< Notification has been enabled. */
+      case BLE_NUS_EVT_COMM_STOPPED:
+      comm_started = false;
+      printf("commstopped");
+        break;
+    }
 }
 /**@snippet [Handling the data received over BLE] */
 
@@ -136,14 +152,8 @@ void uart_data_send(uint8_t * p_data, uint16_t dLen, uint16_t m_conn_handle)
     uint16_t       dateLen = BLE_NUS_MAX_DATA_LEN;
     uint8_t chunk_array[BLE_NUS_MAX_DATA_LEN];
     //uint16_t someLen = BLE_NUS_MAX_DATA_LEN;
- 
-    if(dLen>243)
-    {
-//      for(int xx = 0; xx<dLen; xx = xx + dateLen)
-//      {
-        //memcpy(chunk_array,(p_data + xx),dateLen);
+
         memcpy(chunk_array,p_data,dateLen);
-        //err_code = ble_nus_data_send(&m_nus, chunk_array, &nLen, m_conn_handle);
         do
         {
             err_code = ble_nus_data_send(&m_nus, chunk_array, &dateLen, m_conn_handle);
@@ -155,14 +165,6 @@ void uart_data_send(uint8_t * p_data, uint16_t dLen, uint16_t m_conn_handle)
                 APP_ERROR_CHECK(err_code);
             }
         } while (err_code == NRF_ERROR_RESOURCES);
-//      }
-    }
-    else
-    {
-        err_code = ble_nus_data_send(&m_nus, p_data, &dLen, m_conn_handle);
-        APP_ERROR_CHECK(err_code);
-
-    }
 }   
 
 

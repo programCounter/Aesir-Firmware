@@ -43,6 +43,7 @@ NRF_BLE_QWR_DEF(m_qwr);
 //static uint16_t   m_ble_nus_max_data_len = BLE_GATT_ATT_MTU_DEFAULT - 3;            /**< Maximum length of data (in bytes) that can be transmitted to the peer by the Nordic UART service module. */
 static uint16_t   m_ble_nus_max_data_len = NRF_SDH_BLE_GATT_MAX_MTU_SIZE - 3;            /**< Maximum length of data (in bytes) that can be transmitted to the peer by the Nordic UART service module. */
 bool comm_started = false;
+bool tx_rdy = false;
 /**@brief Function for handling the data from the Nordic UART Service.
  *
  * @details This function will process the data received from the Nordic UART BLE Service and send
@@ -83,15 +84,22 @@ static void nus_data_handler(ble_nus_evt_t * p_evt)
     switch(p_evt->type)
     {
       case BLE_NUS_EVT_TX_RDY:
+        tx_rdy = true;
+        #ifdef DEMO_WRITE
         printf("txrdy: %d", txrdy++);
+        #endif
         break;
       case BLE_NUS_EVT_COMM_STARTED:
+      #ifdef DEMO_WRITE
       printf("commstarted: %d", commstarted++);
+      #endif
       comm_started = true;
         break;/**< Notification has been enabled. */
       case BLE_NUS_EVT_COMM_STOPPED:
       comm_started = false;
+      #ifdef DEMO_WRITE
       printf("commstopped");
+      #endif
         break;
     }
 }

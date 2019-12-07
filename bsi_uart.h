@@ -6,3 +6,4 @@ void uart_init(void);
 
 void nServices_init(void);
 extern bool comm_started;
+extern bool tx_rdy;

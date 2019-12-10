@@ -207,8 +207,9 @@ ret_code_t write_fds(uint16_t sensorFile, uint16_t sensorKey)
         sd_app_evt_wait();//Sleep till next event. This line requires a soft device to be present.
       }
     }
+    retCode = fds_gc();
   }
-  retCode = fds_gc();
+
   /* Wait for fds to initialize. */
   //(void) sd_app_evt_wait();//Sleep till next event. This line requires a soft device to be present.
 

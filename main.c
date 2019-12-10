@@ -123,7 +123,7 @@
 /******************************************************************************************************************/
 
 
-#define DEVICE_NAME                     "AEsirKY"                                /**< Name of device. Will be included in the advertising data. */
+#define DEVICE_NAME                     "AEsirKYREL"                                /**< Name of device. Will be included in the advertising data. */
 #define MANUFACTURER_NAME               "RioT Wireless"                         /**< Manufacturer. Will be passed to Device Information Service. */
 #define APP_ADV_INTERVAL                300                                     /**< The advertising interval (in units of 0.625 ms. This value corresponds to 187.5 ms). */
 
@@ -692,6 +692,7 @@ static void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context)
             // LED indication will be changed when advertising starts.
 
             on_disconnect(p_cus, p_ble_evt); //from BLE_CUS.c
+            comm_started = false;
             bleConnected = false;
             advertisingStarted = false;
              err_code = bsp_indication_set(BSP_INDICATE_IDLE);
@@ -1282,7 +1283,7 @@ int main(void)
         //read_qspi_header();
 
         //if(bsi_config.lastKnownAddr >= (bsi_config.uploadSize+(4096*bsi_config.qspi_currentSector)))
-        if(bsi_config.lastKnownAddr >= (200+(4096*bsi_config.qspi_currentSector)))
+        if(bsi_config.lastKnownAddr >= (1024+(4096*bsi_config.qspi_currentSector)))
         {
           pendingUpload = true;
           qspi_increment_sector();// want to increment the secto everytime we exceed the upload amount, not just when we actually send data.
@@ -1305,8 +1306,8 @@ int main(void)
 
             //gPacket.Header
             //gPacket.Sector
-            uint32_t sOf = sizeof(gPacket);
-  //          uint32_t sOf = sizeof(uint32_t);
+            //uint32_t sOf = sizeof(gPacket);
+            uint32_t sOf = gPacket.datalength;
   //          uart_data_send(&sOf,sOf,m_conn_handle);
             uart_data_send(&gPacket,sOf,m_conn_handle);
             //pushData = false;

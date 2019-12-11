@@ -175,6 +175,14 @@ static bool bleConnected;
 static bool factoryReset;
 static bool advertisingStarted;
 static bool pendingUpload;
+
+//static bool alarmState = false; //moved to bsi_measure
+typedef struct Alarm_State_Packet {
+    char alrmState[3];
+    char BSIName[16];
+}Alarm_Packet;
+static Alarm_Packet alrmPacket = {};
+
 #ifdef DEBUG_GENERAL
 //uint32_t qspiAddress = 0; //ONLY FOR DEBUG
 bool StressTest_FAILED = false;
@@ -1182,8 +1190,8 @@ int main(void)
             measureSensor(0);
             lwrite_qspi = true;
           #else
-          measureSensor(0);
-          lwrite_qspi = true;
+            measureSensor(0);
+            lwrite_qspi = true;
           #endif
           
           //Time to take a measurement on Analog S2
@@ -1283,10 +1291,13 @@ int main(void)
         //read_qspi_header();
 
         //if(bsi_config.lastKnownAddr >= (bsi_config.uploadSize+(4096*bsi_config.qspi_currentSector)))
-        if(bsi_config.lastKnownAddr >= (1024+(4096*bsi_config.qspi_currentSector)))
+        if(bsi_config.lastKnownAddr >= (1024+(4096*bsi_config.qspi_currentSector)) || alarmState > 0)
         {
           pendingUpload = true;
-          qspi_increment_sector();// want to increment the secto everytime we exceed the upload amount, not just when we actually send data.
+          if(alarmState == 0)
+          {
+            qspi_increment_sector();// want to increment the secto everytime we exceed the upload amount, not just when we actually send data.
+          }
           advertRetry = 0;// if we get another batch of data we want to re-try sending, even if retry has maxed.
         }
         
@@ -1301,18 +1312,40 @@ int main(void)
           
           if(bleConnected == true && comm_started == true) //If we dont have a connection, dont send data.
           {
+            if(alarmState > 0)
+            {
+              memcpy(alrmPacket.BSIName,bsi_config.BSI_Name,16);//So the loli knows who is alarming
+              //alrmPacket.BSIName = bsi_config.BSI_Name;
+              if(alarmState == 2)
+              {
+                alrmPacket.alrmState[0] = '+';//alarm on
+                alrmPacket.alrmState[1] = '+';
+                alrmPacket.alrmState[2] = '+';
+              }
+              else
+              {
+                alrmPacket.alrmState[0] = '-';//alarm off
+                alrmPacket.alrmState[1] = '-';
+                alrmPacket.alrmState[2] = '-';
+              }
+              uint32_t sOf = sizeof(alrmPacket);
+              uart_data_send(&alrmPacket,sOf,m_conn_handle);//send the alarm packet to the loli
+              alarmState = 0;//set this false, we have notified the loli that an alarm state has changed.
+            }
+            else
+            {
+              qspi_prepare_packet(bsi_config.qspi_currentSector);
+                          //gPacket.Header
+              //gPacket.Sector
+              //uint32_t sOf = sizeof(gPacket);
+              uint32_t sOf = gPacket.datalength;
+    //          uart_data_send(&sOf,sOf,m_conn_handle);
+              uart_data_send(&gPacket,sOf,m_conn_handle);
+              //pushData = false;
+             // erase_qspi_sector(bsi_config.qspi_currentSector);
+              //bsi_config.lastKnownAddr =0;
+            }
 
-            qspi_prepare_packet(bsi_config.qspi_currentSector);
-
-            //gPacket.Header
-            //gPacket.Sector
-            //uint32_t sOf = sizeof(gPacket);
-            uint32_t sOf = gPacket.datalength;
-  //          uart_data_send(&sOf,sOf,m_conn_handle);
-            uart_data_send(&gPacket,sOf,m_conn_handle);
-            //pushData = false;
-           // erase_qspi_sector(bsi_config.qspi_currentSector);
-            //bsi_config.lastKnownAddr =0;
 
             //Data is all done, break the connection...// Connection break is done by the Loli
             pendingUpload = false;

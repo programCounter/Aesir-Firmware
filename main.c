@@ -1282,11 +1282,13 @@ int main(void)
         //read_qspi_header();
 
         //if(bsi_config.lastKnownAddr >= (bsi_config.uploadSize+(4096*bsi_config.qspi_currentSector)))
-        if(bsi_config.lastKnownAddr >= (200+(4096*bsi_config.qspi_currentSector)))
+        if(bsi_config.lastKnownAddr >= (4096+(4096*bsi_config.qspi_currentSector)))
         {
           pendingUpload = true;
           qspi_increment_sector();// want to increment the secto everytime we exceed the upload amount, not just when we actually send data.
           advertRetry = 0;// if we get another batch of data we want to re-try sending, even if retry has maxed.
+          advertisingStarted=false;
+          sd_ble_gap_adv_stop(m_conn_handle);
         }
         
          if(pendingUpload == true)

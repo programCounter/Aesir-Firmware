@@ -53,7 +53,7 @@
 //#define DEBUG_QSPI 
 #define DEMO_SENSORS
 #define analogInterval 3
-#define pulseInterval 11
+#define pulseInterval 3
 
 /******************************************************************************************************************/
 

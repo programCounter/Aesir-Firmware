@@ -52,8 +52,8 @@ bool tx_rdy = false;
  * @param[in] p_evt       Nordic UART Service event.
  */
 /**@snippet [Handling the data received over BLE] */
-uint8_t commstarted = 0;
-uint8_t txrdy       = 0;
+uint8_t commstartedcount = 0;
+uint8_t txrdycount  = 0;
 static void nus_data_handler(ble_nus_evt_t * p_evt)
 {
 
@@ -86,12 +86,12 @@ static void nus_data_handler(ble_nus_evt_t * p_evt)
       case BLE_NUS_EVT_TX_RDY:
         tx_rdy = true;
         #ifdef DEMO_WRITE
-        printf("txrdy: %d", txrdy++);
+        printf("txrdy: %d", txrdycount++);
         #endif
         break;
       case BLE_NUS_EVT_COMM_STARTED:
       #ifdef DEMO_WRITE
-      printf("commstarted: %d", commstarted++);
+      printf("commstarted: %d", commstartedcount++);
       #endif
       comm_started = true;
         break;/**< Notification has been enabled. */
@@ -150,7 +150,7 @@ void nServices_init(void)
  *          'new line' '\n' (hex 0x0A) or if the string has reached the maximum data length.
  */
 /**@snippet [Handling the data received over UART] */
-
+uint8_t chunk_array[BLE_NUS_MAX_DATA_LEN];
 void uart_data_send(uint8_t * p_data, uint16_t dLen, uint16_t m_conn_handle)
 {
     static uint8_t index = 0;
@@ -158,21 +158,41 @@ void uart_data_send(uint8_t * p_data, uint16_t dLen, uint16_t m_conn_handle)
     uint32_t       firstAddr;
     uint32_t       lastAddr;
     uint16_t       dateLen = BLE_NUS_MAX_DATA_LEN;
-    uint8_t chunk_array[BLE_NUS_MAX_DATA_LEN];
+    
+    uint16_t datasent = 0;
     //uint16_t someLen = BLE_NUS_MAX_DATA_LEN;
+    //need to set tx_rdy true for the first iteration
+    tx_rdy = true;
 
-        memcpy(chunk_array,p_data,dateLen);
-        do
-        {
-            err_code = ble_nus_data_send(&m_nus, chunk_array, &dateLen, m_conn_handle);
-            if ((err_code != NRF_ERROR_INVALID_STATE) &&
-                (err_code != NRF_ERROR_RESOURCES) &&
-                (err_code != NRF_ERROR_NOT_FOUND) &&
-                (err_code != BLE_ERROR_GATTS_SYS_ATTR_MISSING))
-            {
-                APP_ERROR_CHECK(err_code);
-            }
-        } while (err_code == NRF_ERROR_RESOURCES);
+    while(datasent < (dLen - 1) && comm_started)
+    {
+        if(tx_rdy)
+        { 
+          if((dLen - datasent) < BLE_NUS_MAX_DATA_LEN)
+          {
+              dateLen = (dLen - datasent);
+          }
+          else
+          {
+              dateLen = BLE_NUS_MAX_DATA_LEN;
+          }
+          memcpy(chunk_array,&p_data[datasent],dateLen);
+          do
+          {
+              err_code = ble_nus_data_send(&m_nus, chunk_array, &dateLen, m_conn_handle);
+              if ((err_code != NRF_ERROR_INVALID_STATE) &&
+                  (err_code != NRF_ERROR_RESOURCES) &&
+                  (err_code != NRF_ERROR_NOT_FOUND) &&
+                  (err_code != BLE_ERROR_GATTS_SYS_ATTR_MISSING))
+              {
+                  APP_ERROR_CHECK(err_code);
+              }
+          } while (err_code == NRF_ERROR_RESOURCES);
+
+          datasent += (dateLen - 1);
+          tx_rdy = false;
+        }
+     }
 }   
 
 

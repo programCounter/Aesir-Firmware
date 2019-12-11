@@ -3,6 +3,7 @@
 extern uint32_t ticksPulse;
 extern bool pulseAlarmOn;
 extern bool pulseWriteNow;
+extern char alarmState;
 
 void saadc_callback(nrf_drv_saadc_evt_t const * p_event);
 void saadc_init(void);

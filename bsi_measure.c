@@ -32,9 +32,10 @@
 #endif
 
 static nrf_saadc_value_t m_buffer[BUFFER_SIZE];
-uint32_t ticksPulse;
-bool pulseAlarmOn;
-bool pulseWriteNow;
+uint32_t ticksPulse = false;
+bool pulseAlarmOn = false;
+bool pulseWriteNow = false;
+char alarmState = 0; // 0 = off | 1 = alarm off, alarm state on | 2 = alarm on, alarm state on
 
 void saadc_callback(nrf_drv_saadc_evt_t const * p_event)
 {
@@ -59,9 +60,10 @@ void pulse_alarm_check()
     {
       //shut off alarm
       #ifdef DEMO_WRITE
-      printf("Whew We Safe\n");
+      printf("Whew We Safe\n"); // Clear the alarm on the LoLi
       #endif
       pulseAlarmOn = false;
+      alarmState = 1; //state changed, notify the loli
     }
   }
   else
@@ -74,9 +76,10 @@ void pulse_alarm_check()
     {
       //enter alarm mode
       #ifdef DEMO_WRITE
-      printf("AAAHHHHH ALARM!!!\n");
+      printf("AAAHHHHH ALARM!!!\n"); // Send the alarm to the Loli
       #endif
       pulseAlarmOn = true;
+      alarmState = 2; //state changed, notify the loli
     }
   }
 }

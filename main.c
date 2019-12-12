@@ -123,7 +123,7 @@
 /******************************************************************************************************************/
 
 
-#define DEVICE_NAME                     "AEsirKYREL"                                /**< Name of device. Will be included in the advertising data. */
+#define DEVICE_NAME                     "AEsirREL"                                /**< Name of device. Will be included in the advertising data. */
 #define MANUFACTURER_NAME               "RioT Wireless"                         /**< Manufacturer. Will be passed to Device Information Service. */
 #define APP_ADV_INTERVAL                300                                     /**< The advertising interval (in units of 0.625 ms. This value corresponds to 187.5 ms). */
 
@@ -180,6 +180,8 @@ static bool factoryReset;
 static bool advertisingStarted;
 static bool pendingUpload;
 
+uint8_t advtestcount = 0;
+
 //static bool alarmState = false; //moved to bsi_measure
 typedef struct Alarm_State_Packet {
     char alrmState[3];
@@ -193,7 +195,7 @@ bool StressTest_FAILED = false;
 #endif
 
 #ifdef DEBUG_GENERAL // Button-press-factory-reset
-static bool factoryReset = false;
+static bool factoryReset = true;
 #else
 static bool factoryReset = false;
 #endif
@@ -707,11 +709,13 @@ static void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context)
             comm_started = false;
             bleConnected = false;
             advertisingStarted = false;
-             err_code = bsp_indication_set(BSP_INDICATE_ADVERTISING);
-             APP_ERROR_CHECK(err_code);
-             #ifdef APP_DEMO
-              advertising_start(false);
-             #endif
+            err_code = bsp_indication_set(BSP_INDICATE_IDLE);
+            APP_ERROR_CHECK(err_code);
+            #ifdef APP_DEMO
+            err_code = bsp_indication_set(BSP_INDICATE_ADVERTISING);
+            APP_ERROR_CHECK(err_code);
+            advertising_start(false);
+            #endif
             break;
 
         case BLE_GAP_EVT_CONNECTED:
@@ -1169,13 +1173,12 @@ int main(void)
       //If we have a configuration already we should load it into the characteristics.
       retCode = read_fds(fds_BSI_File,fds_BSI_Key, &bsi_config);
     } //
-
     services_init(); //Initialises the basic services and calls ble_cus_init which inits the custom service and charateristics for configuring the BSI
     nServices_init(); //Initialises the NUS(for UART) and the qued write module
-
+    #ifndef DEMO_SENSORS
     advertising_init(false);
     advertising_start(erase_bonds);
-    
+    #endif
     //somejunkvar = true;
     //ble_bas_battery_level_update(&m_bas, 5, BLE_CONN_HANDLE_ALL);
     // Enter main loop.
@@ -1235,23 +1238,6 @@ int main(void)
           // Time to take a measurement on Analog S3
           S3MeasureNow = false;
         }
-//        else if(UploadNow == true)
-//        {
-//          //There may be an issue with how the advert api plays with the code the update advert,
-//          //based on what I read we should dodge the issues by only changing the config when the advertising is stopped.
-//          //we need the data from the flash
-//          
-//          // read_qspi(qspiAddress); // *** TO BE DISCUSSED ***
-//          //read_qspi_page(4096 + sizeof(CurrentPage));
-//          read_qspi_sector(1);
-//          //we need to put that data into our advert
-//          //update_advert();
-//          //Advertising should be stopped
-//          //advertising_start(erase_bonds);
-//          //The advertisment should then time out and stop.
-//          UploadNow = false;
-//        }
-
         if(lwrite_qspi == true) // BUTTON 0 is PRESSED
         {
           
@@ -1283,13 +1269,6 @@ int main(void)
           #else
           write_qspi_page();
           #endif
-
-          // write_qspi_header();
-          // write_qspi(qspiAddress); // *** TO BE DISCUSSED ***
-          #ifdef DEBUG
-            //lread_qspi = true;  //debug
-          #else
-          #endif
         }//END OF if(lwrite_qspi == true)
 
 
@@ -1314,7 +1293,7 @@ int main(void)
 
         //if(bsi_config.lastKnownAddr >= (bsi_config.uploadSize+(4096*bsi_config.qspi_currentSector)))
 
-        if(bsi_config.lastKnownAddr >= (1024+(4096*bsi_config.qspi_currentSector)) || alarmState > 0)
+        if(bsi_config.lastKnownAddr >= (200+(4096*bsi_config.qspi_currentSector)) || alarmState > 0)
         {
           pendingUpload = true;
           if(alarmState == 0)
@@ -1322,19 +1301,20 @@ int main(void)
             qspi_increment_sector();// want to increment the secto everytime we exceed the upload amount, not just when we actually send data.
           }
           advertRetry = 0;// if we get another batch of data we want to re-try sending, even if retry has maxed.
-          advertisingStarted=false;
+          //advertisingStarted=false;
           sd_ble_gap_adv_stop(m_conn_handle);
         }
         
-         if(pendingUpload == true && bleConnected == false)
+        if(pendingUpload == true)// && bleConnected == false)
         {
-          if(advertisingStarted==false)
+          if(advertisingStarted == false) //&& bleConnected == false)
           {
+            advtestcount++;
             //Start a CODED PHY Advertisement. We are going to need two types of advertising. Coded and un-coded.
             advertising_init(true);
             advertising_start(erase_bonds);
           }
-          
+        
           if(bleConnected == true && comm_started == true) //If we dont have a connection, dont send data.
           {
             if(alarmState > 0)
@@ -1375,9 +1355,10 @@ int main(void)
             //Data is all done, break the connection...// Connection break is done by the Loli
             pendingUpload = false;
             comm_started = false;
+            advtestcount = 0;
           }
         }
+    }
         idle_state_handle();
     #endif
-    }
 }

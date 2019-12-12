@@ -189,9 +189,7 @@ ret_code_t write_fds(uint16_t sensorFile, uint16_t sensorKey)
 
       case FDS_SUCCESS:
         //The file exists, we can update it.
-
-          retCode = fds_record_update(&descript, &FDS_BSI_record);
-
+        retCode = fds_record_update(&descript, &FDS_BSI_record);
         break;
 
       case FDS_ERR_NOT_FOUND:

@@ -52,6 +52,7 @@
 #define DEBUG_GENERAL //if defined: on restart default values (not FDS) will be loaded
 //#define DEBUG_QSPI 
 #define DEMO_SENSORS
+#define APP_DEMO
 #define analogInterval 3
 #define pulseInterval 3
 

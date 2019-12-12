@@ -128,7 +128,11 @@
 #define APP_ADV_INTERVAL                300                                     /**< The advertising interval (in units of 0.625 ms. This value corresponds to 187.5 ms). */
 
 //Tells the radio how long we want to advertise for.
-#define APP_ADV_DURATION                500                                       /**< The advertising duration (5 seconds) in units of 10 milliseconds. */
+#ifdef APP_DEMO
+#define APP_ADV_DURATION                0
+#else
+#define APP_ADV_DURATION                6000                                       /**< The advertising duration (5 seconds) in units of 10 milliseconds. */
+#endif 
 //#define APP_ADV_DURATION                18000                                   /**< The advertising duration (180 seconds) in units of 10 milliseconds. */
 
 #define APP_BLE_OBSERVER_PRIO           3                                       /**< Application's BLE observer priority. You shouldn't need to modify this value. */
@@ -189,7 +193,7 @@ bool StressTest_FAILED = false;
 #endif
 
 #ifdef DEBUG_GENERAL // Button-press-factory-reset
-static bool factoryReset = true;
+static bool factoryReset = false;
 #else
 static bool factoryReset = false;
 #endif
@@ -703,8 +707,11 @@ static void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context)
             comm_started = false;
             bleConnected = false;
             advertisingStarted = false;
-             err_code = bsp_indication_set(BSP_INDICATE_IDLE);
+             err_code = bsp_indication_set(BSP_INDICATE_ADVERTISING);
              APP_ERROR_CHECK(err_code);
+             #ifdef APP_DEMO
+              advertising_start(false);
+             #endif
             break;
 
         case BLE_GAP_EVT_CONNECTED:
@@ -734,6 +741,7 @@ static void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context)
               advertRetry ++;
               advert_restart_timer_start();//If we time out but still have a pending upload, wait a few seconds and try re-advertising for a connection.
             }
+            advertisingStarted = false;
              
         }break;
         case BLE_GAP_EVT_PHY_UPDATE_REQUEST:
@@ -1113,13 +1121,12 @@ int main(void)
     APP_ERROR_CHECK(retCode);
     gap_params_init();
     gatt_init();
-    services_init(); //Initialises the basic services and calls ble_cus_init which inits the custom service and charateristics for configuring the BSI
-    nServices_init(); //Initialises the NUS(for UART) and the qued write module
+
 
     // uint32_t sd_power_reset_reason_get(uint32_t *p_reset_reason)
     //responce = sd_power_reset_reason_get(&p_reset_reason);
 
-    advertising_init(true);
+   
     
     conn_params_init();
     peer_manager_init();
@@ -1155,6 +1162,7 @@ int main(void)
       qspi_update_time();
       bsi_config.configChanged = true; //set flash bsi_config to defaults
       factoryReset = false;
+      delete_config_fds();//Somtimes the FDS gets mad, cleaning it out seems to help...
     }
     else
     {
@@ -1162,13 +1170,27 @@ int main(void)
       retCode = read_fds(fds_BSI_File,fds_BSI_Key, &bsi_config);
     } //
 
-    //advertising_start(erase_bonds);
+    services_init(); //Initialises the basic services and calls ble_cus_init which inits the custom service and charateristics for configuring the BSI
+    nServices_init(); //Initialises the NUS(for UART) and the qued write module
+
+    advertising_init(false);
+    advertising_start(erase_bonds);
     
     //somejunkvar = true;
     //ble_bas_battery_level_update(&m_bas, 5, BLE_CONN_HANDLE_ALL);
     // Enter main loop.
     for (;;)
     {
+    #ifdef APP_DEMO
+
+        if(bsi_config.configChanged == true)
+        {
+          delete_config_fds();//Somtimes the FDS gets mad, cleaning it out seems to help...
+          retCode = write_fds(fds_BSI_File,fds_BSI_Key);
+          bsi_config.configChanged = false; // Written the config, set this back to false...
+        }
+        idle_state_handle();
+    #else
         if(bsi_config.configChanged == true)
         {
           retCode = write_fds(fds_BSI_File,fds_BSI_Key);
@@ -1178,7 +1200,7 @@ int main(void)
         {
             measureSensor(2);
             lwrite_qspi = true;
-          pulseWriteNow = false;
+            pulseWriteNow = false;
         }
         #ifdef DEBUG
         else if(S2MeasureNow == true)
@@ -1304,7 +1326,7 @@ int main(void)
           sd_ble_gap_adv_stop(m_conn_handle);
         }
         
-         if(pendingUpload == true)
+         if(pendingUpload == true && bleConnected == false)
         {
           if(advertisingStarted==false)
           {
@@ -1356,5 +1378,6 @@ int main(void)
           }
         }
         idle_state_handle();
+    #endif
     }
 }

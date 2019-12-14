@@ -80,6 +80,7 @@ static char const * fds_evt_str[] =
 //  .deltaMeasAlarmOff  = 0,
 //};
 
+//Custom struct to hold the configuration of the BSI
 BSI_Config bsi_config = {
 
     .BSI_Name = {'N','O','N','A','M','E','\0'},
@@ -168,6 +169,7 @@ ret_code_t write_fds(uint16_t sensorFile, uint16_t sensorKey)
   fds_record_desc_t descript  = {0};
   fds_find_token_t  token     = {0};
   
+  //Creates a struct the holds the config data, file name, file key. this is passed to the fds write.
   static fds_record_t const FDS_BSI_record =
   {
       .file_id           = fds_BSI_File,
@@ -205,13 +207,13 @@ ret_code_t write_fds(uint16_t sensorFile, uint16_t sensorKey)
         sd_app_evt_wait();//Sleep till next event. This line requires a soft device to be present.
       }
     }
-    retCode = fds_gc();
+    retCode = fds_gc(); // Call garbage collection
   }
 
   /* Wait for fds to initialize. */
   //(void) sd_app_evt_wait();//Sleep till next event. This line requires a soft device to be present.
 
-  fds_record_close(&descript);//Have to close it when were done to that garbage collection can happen
+  fds_record_close(&descript);//Have to close it when were done so that garbage collection can happen
   return retCode;
 }
 
@@ -238,6 +240,7 @@ ret_code_t init_fds()
 }
 
 static bool volatile fds_record_deleted;
+//Deletes all the files contained in the FDS
 ret_code_t delete_config_fds(void)
 {
     ret_code_t retCode;
@@ -257,6 +260,8 @@ ret_code_t delete_config_fds(void)
     
     return retCode;
 }
+
+//Writes the Config struct into the FDS memory
 bool update_BSI_Config(void)
 {
     // Updates the FDS with the new config after it's been updated through the characteristic
@@ -312,6 +317,7 @@ void fds_evt_handler(fds_evt_t const * p_evt)
     }
 }
 
+//Function for unpacking the sensor config, this allows the app to just send a char, instead of a variable for each sensor.
 ret_code_t init_sensors(uint16_t sensorMap)
 {
     //Intending to just use a binary value to indicate which sensors are off or on. We need to unpack the the byte

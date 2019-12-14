@@ -31,8 +31,6 @@
 
 #include "bsi_uart.h"
 
-
-
 #define NUS_SERVICE_UUID_TYPE           BLE_UUID_TYPE_VENDOR_BEGIN                  /**< UUID type for the Nordic UART Service (vendor specific). */
 
 #define UART_TX_BUF_SIZE                256                                         /**< UART TX buffer size. */
@@ -81,25 +79,27 @@ static void nus_data_handler(ble_nus_evt_t * p_evt)
             while (app_uart_put('\n') == NRF_ERROR_BUSY);
         }
     }
+
+    //Catch the events from the Loli. these events let us know if it is ok to send data or not.
     switch(p_evt->type)
     {
-      case BLE_NUS_EVT_TX_RDY:
+      case BLE_NUS_EVT_TX_RDY: //the previous data is finished being sent and it's ok to send more.
         tx_rdy = true;
         #ifdef DEMO_WRITE
         printf("txrdy: %d", txrdycount++);
         #endif
         break;
-      case BLE_NUS_EVT_COMM_STARTED:
-      #ifdef DEMO_WRITE
-      printf("commstarted: %d", commstartedcount++);
-      #endif
-      comm_started = true;
-        break;/**< Notification has been enabled. */
+      case BLE_NUS_EVT_COMM_STARTED: //if we get this flag it means that notifications have been enabled on the Loli side. We can begin sending data.
+	      #ifdef DEMO_WRITE
+	      printf("commstarted: %d", commstartedcount++);
+	      #endif
+	      comm_started = true;
+	      break;/**< Notification has been enabled. */
       case BLE_NUS_EVT_COMM_STOPPED:
-      comm_started = false;
-      #ifdef DEMO_WRITE
-      printf("commstopped");
-      #endif
+	      comm_started = false;
+	      #ifdef DEMO_WRITE
+	      printf("commstopped");
+	      #endif
         break;
     }
 }
@@ -119,8 +119,7 @@ static void nrf_qwr_error_handler(uint32_t nrf_error)
     APP_ERROR_HANDLER(nrf_error);
 }
 
-/**@brief Function for initializing services that will be used by the application.
- */
+//This function initialises the bluetooth service used by the Nordic Uart Service. this is how we are going to pass the data. 
 void nServices_init(void)
 {
     uint32_t           err_code;
@@ -143,13 +142,8 @@ void nServices_init(void)
 }
 
 
-/**@brief   Function for handling app_uart events.
- *
- * @details This function will receive a single character from the app_uart module and append it to
- *          a string. The string will be be sent over BLE when the last character received was a
- *          'new line' '\n' (hex 0x0A) or if the string has reached the maximum data length.
- */
-/**@snippet [Handling the data received over UART] */
+//This funtion passes the data in 243 byte chunks to the NUS. it has to wait for an event(tx_rdy) before it can send the next piece. 
+//Not waiting for the event causes significant delays in data transmissions
 uint8_t chunk_array[BLE_NUS_MAX_DATA_LEN];
 void uart_data_send(uint8_t * p_data, uint16_t dLen, uint16_t m_conn_handle)
 {
@@ -179,6 +173,7 @@ void uart_data_send(uint8_t * p_data, uint16_t dLen, uint16_t m_conn_handle)
           memcpy(chunk_array,&p_data[datasent],dateLen);
           do
           {
+              //
               err_code = ble_nus_data_send(&m_nus, chunk_array, &dateLen, m_conn_handle);
               if ((err_code != NRF_ERROR_INVALID_STATE) &&
                   (err_code != NRF_ERROR_RESOURCES) &&
@@ -196,7 +191,7 @@ void uart_data_send(uint8_t * p_data, uint16_t dLen, uint16_t m_conn_handle)
 }   
 
 
-
+// this code is not used, it is for the physical uart and handles data from a terminal input. should probably be cut out..
 void uart_event_handle(app_uart_evt_t * p_event)
 {
     static uint8_t data_array[BLE_NUS_MAX_DATA_LEN];

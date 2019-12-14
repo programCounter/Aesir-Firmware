@@ -21,6 +21,7 @@
 
 #define BUFFER_SIZE 3
 //Pin_map(port,pin)
+//pin map for the data lines to the 2 analog sensors, the pulse, and the voltage regulator.
 #define VREG_PWR NRF_GPIO_PIN_MAP(1,15) 
 #define ANLG_SENSOR1_PWR NRF_GPIO_PIN_MAP(0,12) 
 #define ANLG_SENSOR2_PWR NRF_GPIO_PIN_MAP(0,11) 
@@ -48,6 +49,7 @@ void saadc_callback(nrf_drv_saadc_evt_t const * p_event)
     }
 }
 
+//Checks the time between pulses and determins if the BSI should enter an alarm state
 void pulse_alarm_check()
 {
   if(pulseAlarmOn)
@@ -84,12 +86,13 @@ void pulse_alarm_check()
   }
 }
 
+//event handler for the pulse input. 
 void pulse_evt_handler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
 {
     bsi_config.pulseNum++;
-    pulse_alarm_check();
-    bsi_config.pulseTime = ticksPulse;
-    bsi_config.configChanged = true;
+    pulse_alarm_check(); // check if the alarm needs to be set.
+    bsi_config.pulseTime = ticksPulse; // write the current time of the pulse
+    bsi_config.configChanged = true; // the pulse count has been incremenet, change the flag so the info get saved.
 }
 
 void gpio_init(void)
@@ -110,16 +113,18 @@ void gpio_init(void)
     //err_code = nrf_drv_gpiote_out_init(PIN_OUT, &out_config);
     //APP_ERROR_CHECK(err_code);
 
+  //Set the mode for the pulse input, event fire on low to high transition.
   nrf_drv_gpiote_in_config_t pulse_config = GPIOTE_CONFIG_IN_SENSE_LOTOHI(true);
-  pulse_config.pull = NRF_GPIO_PIN_NOPULL;
+  pulse_config.pull = NRF_GPIO_PIN_NOPULL;//no pullup resistor needed, have one on the board
 
+  //Register our event handler for the pulse input.
   err_code = nrf_drv_gpiote_in_init(PULSE_SENSOR_INP, &pulse_config, pulse_evt_handler); 
   APP_ERROR_CHECK(err_code);
   nrf_drv_gpiote_in_event_enable(PULSE_SENSOR_INP, true);
 }
 
 
-
+//Init the ADC channels we are going to need for the 2 analog sensors and the battery level resistor
 void saadc_init(void)
 {
     nrfx_err_t err_code;
@@ -154,7 +159,7 @@ nrf_saadc_value_t measureSensor(uint8_t channel)
       nrf_gpio_pin_write(VREG_PWR,1); //Power Regulator On
       nrf_delay_ms(1);
       nrf_gpio_pin_write(ANLG_SENSOR1_PWR,1); //Sensor power on
-      nrf_delay_ms(bsi_config.sensor2_config.pwrOnDelay); //Just pull the mS ammount from the config struct.
+      nrf_delay_ms(bsi_config.sensor2_config.pwrOnDelay); //Just pull the mS ammount from the config struct. // The warm up time needed before the sensor is in a steady state
       nrfx_saadc_sample_convert(channel,&p_ADC_Result);// This returns a single value from the specified ADC channel. THIS FUNCTION IS BLOCKING!
       nrf_gpio_pin_write(ANLG_SENSOR1_PWR,0); //Sensor power off
       nrf_gpio_pin_write(VREG_PWR,0); //Power Regulator Off
@@ -163,7 +168,7 @@ nrf_saadc_value_t measureSensor(uint8_t channel)
       nrf_gpio_pin_write(VREG_PWR,1); //Power Regulator On
       nrf_delay_ms(1);
       nrf_gpio_pin_write(ANLG_SENSOR2_PWR,1); //Sensor power on
-      nrf_delay_ms(bsi_config.sensor3_config.pwrOnDelay);//Just pull the mS ammount from the config struct.
+      nrf_delay_ms(bsi_config.sensor3_config.pwrOnDelay);//Just pull the mS ammount from the config struct. // The warm up time needed before the sensor is in a steady state
       nrfx_saadc_sample_convert(channel,&p_ADC_Result);// This returns a single value from the specified ADC channel. THIS FUNCTION IS BLOCKING!
       nrf_gpio_pin_write(ANLG_SENSOR2_PWR,0); //Sensor power off
       nrf_gpio_pin_write(VREG_PWR,0); //Power Regulator Off

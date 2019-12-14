@@ -168,9 +168,10 @@ NRF_BLE_QWR_DEF(m_qwr);                                                         
 BLE_ADVERTISING_DEF(m_advertising);                                             /**< Advertising module instance. */
 
 static uint16_t m_conn_handle = BLE_CONN_HANDLE_INVALID;                        /**< Handle of the current connection. */
-
+//counters for tracking when its time to take a measurement.
 static uint32_t ticksS2;
 static uint32_t ticksS3;
+//Flags needed to control the flow of the program
 static bool S2MeasureNow;
 static bool S3MeasureNow;
 static bool UploadNow;
@@ -226,23 +227,23 @@ static volatile uint8_t m_advert_data[1650]; // 256 bytes on air at one time, ma
 static uint32_t NumFlashAddrs = 16777215; // the device is configured in 24bit addressing mode so 2^24 adresses are possible
 
 #ifdef DEBUG
-#define MINUTE_TIMER_TICK APP_TIMER_TICKS(1000) // 1 second, debuggin time mudda fuxa
-uint16_t advertRetry = 0;
-#define advRetryMax  5
-//Generate a random number between a max and min so that no two devices have the same timeout.
-#define randTimeMax  10000
-#define randTimeMin  5000
-#define randTime  (rand() % (randTimeMax + 1 - randTimeMin) + randTimeMin)
-#define ADVERT_RETRY_TIMER_TICK APP_TIMER_TICKS(randTime)
+    #define MINUTE_TIMER_TICK APP_TIMER_TICKS(1000) // 1 second, debuggin time mudda fuxa
+    uint16_t advertRetry = 0;
+    #define advRetryMax  5 //max number of times the BSI will advertise befor giving up
+    //Generate a random number between a max and min so that no two devices have the same timeout.
+    #define randTimeMax  10000
+    #define randTimeMin  5000
+    #define randTime  (rand() % (randTimeMax + 1 - randTimeMin) + randTimeMin)//generates a random time the device will sleep in between advert retries
+    #define ADVERT_RETRY_TIMER_TICK APP_TIMER_TICKS(randTime)
 #else
-#define MINUTE_TIMER_TICK APP_TIMER_TICKS(60000) //1 min, lowest resolution of time we will think about.
-uint16_t advertRetry = 0;
-#define advRetryMax  10
-//Generate a random number between a max and min so that no two devices have the same timeout.
-#define randTimeMax  10000
-#define randTimeMin  5000
-#define randTime  (rand() % (randTimeMax + 1 - randTimeMin) + randTimeMin)
-#define ADVERT_RETRY_TIMER_TICK APP_TIMER_TICKS(randTime)
+    #define MINUTE_TIMER_TICK APP_TIMER_TICKS(60000) //1 min, lowest resolution of time we will think about.
+    uint16_t advertRetry = 0;
+    #define advRetryMax  10//max number of times the BSI will advertise befor giving up
+    //Generate a random number between a max and min so that no two devices have the same timeout.
+    #define randTimeMax  10000
+    #define randTimeMin  5000
+    #define randTime  (rand() % (randTimeMax + 1 - randTimeMin) + randTimeMin)//generates a random time the device will sleep in between advert retries
+    #define ADVERT_RETRY_TIMER_TICK APP_TIMER_TICKS(randTime)
 #endif
 
 
@@ -317,14 +318,15 @@ static void gap_params_init(void)
        err_code = sd_ble_gap_appearance_set(BLE_APPEARANCE_);
        APP_ERROR_CHECK(err_code); */
 
+    //clears out the gap config so we know its blank
     memset(&gap_conn_params, 0, sizeof(gap_conn_params));
-
+    //stores basic connection info and then registers it.
     gap_conn_params.min_conn_interval = MIN_CONN_INTERVAL;
     gap_conn_params.max_conn_interval = MAX_CONN_INTERVAL;
     gap_conn_params.slave_latency     = SLAVE_LATENCY;
     gap_conn_params.conn_sup_timeout  = CONN_SUP_TIMEOUT;
 
-    err_code = sd_ble_gap_ppcp_set(&gap_conn_params);
+    err_code = sd_ble_gap_ppcp_set(&gap_conn_params);//registration.
     APP_ERROR_CHECK(err_code);
 }
 
@@ -433,7 +435,7 @@ static void services_init(void)
     //Code below from custom service tutorial
     // Initialize CUS Service init structure to zero.
     memset(&cus_init, 0, sizeof(cus_init));
-      
+    //Initializes our custom service, this is going to contain all the characteristics for setting the BSI configuration.
     err_code = ble_cus_init(&m_cus, &cus_init);
     APP_ERROR_CHECK(err_code);	
 
@@ -534,7 +536,7 @@ static void minute_timer_timeout_handler(void * p_context)
     ticksPulse++;
     if(ticksPulse >= pulseInterval) //pulse interval is defines in sdk config
     {
-      pulseWriteNow = true;
+      pulseWriteNow = true; //Set the flag and the main loop will do the rest.
       ticksPulse = 0;
     }
     if(pulseAlarmOn)
@@ -557,7 +559,7 @@ static void minute_timer_timeout_handler(void * p_context)
     if(ticksS2 >= bsi_config.sensor2_config.measInterval)
     #endif
     {
-      S2MeasureNow = true;
+      S2MeasureNow = true;//Set the flag and the main loop will do the rest.
       ticksS2 = 0;
     }
   }
@@ -575,7 +577,7 @@ static void minute_timer_timeout_handler(void * p_context)
     if(ticksS3 >= bsi_config.sensor2_config.measInterval)
     #endif
     {
-      S3MeasureNow = true;
+      S3MeasureNow = true;//Set the flag and the main loop will do the rest.
       ticksS3 = 0;
     }
   }
@@ -594,12 +596,14 @@ static void timers_init(void)
     APP_ERROR_CHECK(err_code);
 
     // Create timers.
+    //Create the timer that fires every minute. all our sensors measure based on this timer.
     err_code = app_timer_create(&m_minute_timer_id,
                                 APP_TIMER_MODE_REPEATED,
                                 minute_timer_timeout_handler);
                               
     APP_ERROR_CHECK(err_code);
 
+    //Create a single shot timer, this is started when the BSI re-trys advertising after its has timed out.
     err_code = app_timer_create(&m_advert_timer_id,
                                 APP_TIMER_MODE_SINGLE_SHOT,
                                 Advet_timeout_handler);
@@ -614,7 +618,7 @@ static void timers_init(void)
 static void application_timers_start(void)
 {
 
-    ret_code_t err_code;//Start the 1 minute timer, this is the timer used to trigger the updload
+    ret_code_t err_code;//Start the 1 minute timer, this is the timer used to trigger the updload and measurements
     err_code = app_timer_start(m_minute_timer_id, MINUTE_TIMER_TICK, NULL);
     APP_ERROR_CHECK(err_code);
 
@@ -693,10 +697,12 @@ static void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context)
             {
                 return; //Returns if the evet has no evt or context. Null
             }
+            //this event fires when something writes to a characteristic. we go to this function and update the congfig where applicable
            on_write(p_cus, p_ble_evt);
            break;
         
         case BLE_GATTS_EVT_SYS_ATTR_MISSING:
+            // this means that one of device attributes has not been set yet, we add a blank attribute till a proper attr is ready.
             err_code = sd_ble_gatts_sys_attr_set(m_conn_handle, NULL, 0, 0);
             APP_ERROR_CHECK(err_code);
             break;
@@ -704,22 +710,23 @@ static void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context)
         case BLE_GAP_EVT_DISCONNECTED:
             NRF_LOG_INFO("Disconnected.");
             // LED indication will be changed when advertising starts.
-
+            //Handles the disconect of the BT connection, resets needed flags and clears the LED
             on_disconnect(p_cus, p_ble_evt); //from BLE_CUS.c
             comm_started = false;
             bleConnected = false;
             advertisingStarted = false;
             err_code = bsp_indication_set(BSP_INDICATE_IDLE);
             APP_ERROR_CHECK(err_code);
-            #ifdef APP_DEMO
-            err_code = bsp_indication_set(BSP_INDICATE_ADVERTISING);
-            APP_ERROR_CHECK(err_code);
-            advertising_start(false);
+            #ifdef APP_DEMO // capstone demo code to keep the BSI in 1M phy for the app
+                err_code = bsp_indication_set(BSP_INDICATE_ADVERTISING);
+                APP_ERROR_CHECK(err_code);
+                advertising_start(false);
             #endif
             break;
 
         case BLE_GAP_EVT_CONNECTED:
             NRF_LOG_INFO("Connected.");
+            //Turns the connected LED on and retrieves the connection handle.
             err_code = bsp_indication_set(BSP_INDICATE_CONNECTED);
             APP_ERROR_CHECK(err_code);
             m_conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
@@ -727,6 +734,7 @@ static void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context)
             APP_ERROR_CHECK(err_code);
 
             on_connect(p_cus, p_ble_evt);//from BLE_CUS.c
+
             bleConnected = true;
             advertisingStarted = false;
             advertRetry = 0;
@@ -939,6 +947,7 @@ static void bsp_event_handler(bsp_event_t event)
 
 
 /**@brief Function for initializing the Advertising functionality.*/
+//Most of the parameters are defines at the top of main.c
 static void advertising_init(bool codedPHY)
 {
     ret_code_t             err_code;
@@ -957,7 +966,7 @@ static void advertising_init(bool codedPHY)
     init.config.ble_adv_fast_enabled      = true;
     init.config.ble_adv_fast_interval     = APP_ADV_INTERVAL;
     init.config.ble_adv_fast_timeout      = APP_ADV_DURATION;
-    if(codedPHY==true)
+    if(codedPHY==true)//need to be able to to turn coded phy on for data transmiossion and off so we can connect to the APP.
     {
       init.config.ble_adv_primary_phy       = BLE_GAP_PHY_CODED;
       init.config.ble_adv_secondary_phy     = BLE_GAP_PHY_CODED;
@@ -1043,7 +1052,7 @@ static void advertising_start(bool erase_bonds)
     {
         ret_code_t err_code = ble_advertising_start(&m_advertising, BLE_ADV_MODE_FAST);
      }
-     advertisingStarted = true;
+     advertisingStarted = true;// need this flag so that we dont start advertising if we are already advertising, gets real mad.
 }
 
 ///**@brief Struct that contains pointers to the encoded advertising data. */
@@ -1175,21 +1184,21 @@ int main(void)
     } //
     services_init(); //Initialises the basic services and calls ble_cus_init which inits the custom service and charateristics for configuring the BSI
     nServices_init(); //Initialises the NUS(for UART) and the qued write module
-    #ifndef DEMO_SENSORS
-    advertising_init(false);
-    advertising_start(erase_bonds);
+    #ifndef DEMO_SENSORS 
+        advertising_init(false);
+        advertising_start(erase_bonds);
     #endif
     //somejunkvar = true;
     //ble_bas_battery_level_update(&m_bas, 5, BLE_CONN_HANDLE_ALL);
     // Enter main loop.
     for (;;)
     {
-    #ifdef APP_DEMO
+    #ifdef APP_DEMO//code for capstone demo so we can lock a device into 1M phy and continous advertising for the phone app
 
         if(bsi_config.configChanged == true)
         {
           delete_config_fds();//Somtimes the FDS gets mad, cleaning it out seems to help...
-          retCode = write_fds(fds_BSI_File,fds_BSI_Key);
+          retCode = write_fds(fds_BSI_File,fds_BSI_Key);//write the changed config to the FDS
           bsi_config.configChanged = false; // Written the config, set this back to false...
         }
         idle_state_handle();
@@ -1232,8 +1241,8 @@ int main(void)
             measureSensor(1);
             lwrite_qspi = true;
           #else
-          measureSensor(1);
-          lwrite_qspi = true;
+              measureSensor(1);
+              lwrite_qspi = true;
           #endif
           // Time to take a measurement on Analog S3
           S3MeasureNow = false;
@@ -1241,38 +1250,38 @@ int main(void)
         if(lwrite_qspi == true) // BUTTON 0 is PRESSED
         {
           
-          #ifdef DEBUG_QSPI
-          for(int i = 0; i < (1024*14); i++) // 1024 pages fit in 4kB (if 4 bytes per page)
-          {                                  // *14 intentionally not filling last (15th) sector to prevent erasing in rewrite prep           // measureSensor(0);  //debug  
-              CurrentPage.sensorValue = rand();
-              write_qspi_page();   //debug
-              CurrentPage.countMin ++;
-          }
-          uint16_t StressCountMin = 0; 
-          bsi_config.qspi_currentSector = 1;
-          for(uint16_t i = 1; i < 15; i++)
-          {
-              read_qspi_sector(i);
-              for(uint16_t j = 0; j < 1024; j++)
+          #ifdef DEBUG_QSPI // code for stress testing the QSPI
+              for(int i = 0; i < (1024*14); i++) // 1024 pages fit in 4kB (if 4 bytes per page)
+              {                                  // *14 intentionally not filling last (15th) sector to prevent erasing in rewrite prep           // measureSensor(0);  //debug  
+                  CurrentPage.sensorValue = rand();
+                  write_qspi_page();   //debug
+                  CurrentPage.countMin ++;
+              }
+              uint16_t StressCountMin = 0; 
+              bsi_config.qspi_currentSector = 1;
+              for(uint16_t i = 1; i < 15; i++)
               {
-                  StressCountMin++;
-                  if(ReadSector.Page[j].countMin != (j+((i-1)*1024))){
-                      StressTest_FAILED = true;
-                      break;
+                  read_qspi_sector(i);
+                  for(uint16_t j = 0; j < 1024; j++)
+                  {
+                      StressCountMin++;
+                      if(ReadSector.Page[j].countMin != (j+((i-1)*1024))){
+                          StressTest_FAILED = true;
+                          break;
+                      }
                   }
               }
-          }
-          //end of test cleanup
-          bsi_config.lastKnownAddr = 4096;
-          bsi_config.qspi_currentSector = 1;
+              //end of test cleanup
+              bsi_config.lastKnownAddr = 4096;
+              bsi_config.qspi_currentSector = 1;
 
           #else
-          write_qspi_page();
+            write_qspi_page();
           #endif
         }//END OF if(lwrite_qspi == true)
 
 
-        if(lread_qspi == true) // BUTTON 3 is PRESSED
+        if(lread_qspi == true) 
         {
           #ifdef DEBUG_QSPI
             read_qspi_sector(bsi_config.qspi_currentSector-1);
@@ -1291,9 +1300,9 @@ int main(void)
         
         //read_qspi_header();
 
-        //if(bsi_config.lastKnownAddr >= (bsi_config.uploadSize+(4096*bsi_config.qspi_currentSector)))
-
-        if(bsi_config.lastKnownAddr >= (200+(4096*bsi_config.qspi_currentSector)) || alarmState > 0)
+        //if our current collected data exceeds the limit set in the config. it's time to upload data.
+        if(bsi_config.lastKnownAddr >= (bsi_config.uploadSize+(4096*bsi_config.qspi_currentSector)))
+        //if(bsi_config.lastKnownAddr >= (200+(4096*bsi_config.qspi_currentSector)) || alarmState > 0)
         {
           pendingUpload = true;
           if(alarmState == 0)
@@ -1302,7 +1311,7 @@ int main(void)
           }
           advertRetry = 0;// if we get another batch of data we want to re-try sending, even if retry has maxed.
           //advertisingStarted=false;
-          sd_ble_gap_adv_stop(m_conn_handle);
+          sd_ble_gap_adv_stop(m_conn_handle);//make sure advertising is stopped.
         }
         
         if(pendingUpload == true)// && bleConnected == false)

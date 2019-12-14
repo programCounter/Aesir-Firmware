@@ -136,7 +136,7 @@ static uint32_t custom_value_char_add(ble_cus_t * p_cus, const ble_cus_init_t * 
 //      p_defVal[0] = 105;
 //    }
     
-    
+    //change the size of the characterestics based on which one we are currently adding.
     if(ble_uuid.uuid == CUSTOM_CHAR_UUID_BSI_NAME)
     {
      memcpy(&p_Val,p_defVal,16);
